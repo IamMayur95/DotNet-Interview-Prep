@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Questions - API Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #0f3460;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            color: #00d9ff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #b0b0b0;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 16px;
+            border: 2px solid #00d9ff;
+            border-radius: 25px;
+            background: #16213e;
+            color: #e0e0e0;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        #searchInput:focus {
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+        
+        #searchInput::placeholder {
+            color: #7a7a7a;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00d9ff;
+            font-size: 20px;
+        }
+        
+        .question-card {
+            background: #16213e;
+            border-left: 4px solid #00d9ff;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.2);
+        }
+        
+        details {
+            cursor: pointer;
+        }
+        
+        summary {
+            padding: 20px;
+            background: #1a2a4e;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #00d9ff;
+            user-select: none;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        summary:hover {
+            background: #213654;
+        }
+        
+        summary::marker {
+            color: #00ff88;
+        }
+        
+        .answer-content {
+            padding: 25px;
+            background: #0a1929;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h3::before {
+            content: "▶";
+            margin-right: 10px;
+            font-size: 0.8em;
+        }
+        
+        .section p, .section ul {
+            color: #d0d0d0;
+            margin-left: 25px;
+        }
+        
+        .section ul {
+            list-style-type: disc;
+            margin-left: 45px;
+        }
+        
+        .section li {
+            margin-bottom: 8px;
+        }
+        
+        pre {
+            background: #000000;
+            border: 1px solid #00d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0 15px 25px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #00ff88;
+        }
+        
+        .key-takeaway {
+            background: linear-gradient(135deg, #1a4d2e 0%, #0f2818 100%);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 15px 0 15px 25px;
+            border-radius: 5px;
+            font-style: italic;
+        }
+        
+        .category-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            margin-left: 25px;
+        }
+        
+        .tag {
+            background: #00d9ff;
+            color: #0a1929;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .no-results {
+            text-align: center;
+            color: #ff6b6b;
+            padding: 40px;
+            font-size: 1.2em;
+            display: none;
+        }
+        
+        .highlight {
+            background-color: #ffd700;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            summary {
+                font-size: 1em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 .NET Core Interview Q&A</h1>
+        <p class="subtitle">API Development & Optimization | Senior Developer Edition</p>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search questions (e.g., versioning, POST, PATCH, optimize)..." autocomplete="off">
+            <span class="search-icon">🔍</span>
+        </div>
+        
+        <div id="questionsContainer">
+            <!-- Question 37 -->
+            <div class="question-card">
+                <details>
+                    <summary>37. How to optimize API?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>Theory</h3>
+                            <p>API optimization focuses on reducing latency, improving throughput, and minimizing resource consumption. Key strategies include caching, compression, asynchronous operations, pagination, database query optimization, and proper HTTP status code usage. The goal is to serve more requests faster with less overhead while maintaining reliability.</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>How it works in .NET Core</h3>
+                            <p>Modern .NET Core APIs leverage several built-in mechanisms:</p>
+                            <ul>
+                                <li><strong>Response Caching Middleware:</strong> <code>app.UseResponseCaching()</code> with <code>[ResponseCache]</code> attribute</li>
+                                <li><strong>Output Caching (.NET 7+):</strong> More granular control with <code>app.UseOutputCache()</code></li>
+                                <li><strong>Compression:</strong> <code>AddResponseCompression()</code> for Gzip/Brotli</li>
+                                <li><strong>Async/Await:</strong> Non-blocking I/O operations throughout the pipeline</li>
+                                <li><strong>EF Core:</strong> <code>.AsNoTracking()</code>, <code>.Select()</code> projections, compiled queries</li>
+                                <li><strong>HTTP/2 & HTTP/3:</strong> Multiplexing and reduced overhead (Kestrel native support)</li>
+                                <li><strong>Minimal APIs:</strong> Lower memory footprint than controller-based APIs</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>Practical Example</h3>
+                            <p>In one of my projects, we had a product catalog API that was returning full entities with navigation properties, causing 2-3 second response times. Here's how I optimized it:</p>
+                            
+<pre><code>// Before - Slow (loads all related data)
+[HttpGet]
+public async Task&lt;IActionResult&gt; GetProducts()
+{
+    var products = await _context.Products
+        .Include(p => p.Category)
+        .Include(p => p.Reviews)
+        .ToListAsync();
+    return Ok(products);
+}
+
+// After - Optimized
+[HttpGet]
+[ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "page", "size" })]
+public async Task&lt;IActionResult&gt; GetProducts(
+    [FromQuery] int page = 1, 
+    [FromQuery] int size = 20)
+{
+    var products = await _context.Products
+        .AsNoTracking() // No change tracking overhead
+        .Select(p => new ProductDto // Project only needed fields
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price,
+            CategoryName = p.Category.Name
+        })
+        .Skip((page - 1) * size)
+        .Take(size)
+        .ToListAsync();
+        
+    return Ok(products);
+}
+
+// Program.cs - Enable compression
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add&lt;BrotliCompressionProvider&gt;();
+    options.Providers.Add&lt;GzipCompressionProvider&gt;();
+});
+
+app.UseResponseCompression();
+app.UseResponseCaching();
+</code></pre>
+                            <p><strong>Result:</strong> Response time dropped from 2.5s to 180ms, and payload size reduced by 65%. We also implemented Redis distributed caching for frequently accessed endpoints.</p>
+                        </div>
+                        
+                        <div class="key-takeaway">
+                            <strong>Key Takeaway:</strong> Show you understand the full optimization stack—query optimization, caching strategies, compression, and async patterns. Mention real metrics (latency improvements, throughput gains) to demonstrate production experience.
+                        </div>
+                        
+                        <div class="category-tags">
+                            <span class="tag">API</span>
+                            <span class="tag">.NET Core Concepts</span>
+                            <span class="tag">EF Core</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 38 -->
+            <div class="question-card">
+                <details>
+                    <summary>38. Explain Versioning in API</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>Theory</h3>
+                            <p>API versioning allows you to evolve your API without breaking existing clients. It enables you to introduce new features, change response structures, or deprecate endpoints while maintaining backward compatibility. Common strategies include URL versioning, header versioning, query string versioning, and media type versioning.</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>How it works in .NET Core</h3>
+                            <p>The <code>Asp.Versioning.Http</code> NuGet package (formerly Microsoft.AspNetCore.Mvc.Versioning) provides comprehensive versioning support:</p>
+                            <ul>
+                                <li><strong>URL Path:</strong> <code>/api/v1/products</code> vs <code>/api/v2/products</code></li>
+                                <li><strong>Query String:</strong> <code>/api/products?api-version=1.0</code></li>
+                                <li><strong>Header:</strong> Custom header like <code>X-API-Version: 1.0</code></li>
+                                <li><strong>Media Type:</strong> <code>Accept: application/vnd.myapi.v1+json</code></li>
+                                <li><strong>ApiVersion Attribute:</strong> Decorates controllers/actions with <code>[ApiVersion("1.0")]</code></li>
+                                <li><strong>Deprecation Support:</strong> Mark versions as deprecated with sunset dates</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>Practical Example</h3>
+                            <p>In one of my projects migrating from a monolith to microservices, we needed to version our APIs because mobile clients couldn't update immediately. Here's the setup I implemented:</p>
+                            
+<pre><code>// Program.cs - Configure versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true; // Adds api-supported-versions header
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-API-Version"),
+        new QueryStringApiVersionReader("api-version")
+    );
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // For Swagger docs
+    options.SubstituteApiVersionInUrl = true;
+});
+
+// V1 Controller - Original implementation
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0")]
+public class OrdersController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public async Task&lt;ActionResult&lt;OrderV1Dto&gt;&gt; GetOrder(int id)
+    {
+        // Old structure: flat order with items as array
+        return new OrderV1Dto
+        {
+            OrderId = id,
+            CustomerName = "John Doe",
+            Items = new[] { "Item1", "Item2" }
+        };
+    }
+}
+
+// V2 Controller - Enhanced with better structure
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("2.0")]
+public class OrdersController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public async Task&lt;ActionResult&lt;OrderV2Dto&gt;&gt; GetOrder(int id)
+    {
+        // New structure: nested items with details + hypermedia links
+        return new OrderV2Dto
+        {
+            OrderId = id,
+            Customer = new CustomerDto { Name = "John Doe", Email = "john@example.com" },
+            Items = new List&lt;OrderItemDto&gt;
+            {
+                new() { ProductId = 1, Name = "Item1", Quantity = 2, Price = 29.99m }
+            },
+            Links = new { Self = $"/api/v2/orders/{id}", Cancel = $"/api/v2/orders/{id}/cancel" }
+        };
+    }
+}
+
+// Mark V1 as deprecated
+[ApiVersion("1.0", Deprecated = true)]
+</code></pre>
+                            <p><strong>Result:</strong> Legacy clients continued working on v1 while new features rolled out on v2. We added <code>Sunset</code> headers to v1 responses warning of eventual deprecation.</p>
+                        </div>
+                        
+                        <div class="key-takeaway">
+                            <strong>Key Takeaway:</strong> Demonstrate you know multiple versioning strategies and can choose the right one (URL for public APIs, header for internal). Mention handling deprecation gracefully with clear communication to consumers.
+                        </div>
+                        
+                        <div class="category-tags">
+                            <span class="tag">API</span>
+                            <span class="tag">.NET Core Concepts</span>
+                            <span class="tag">Microservices</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 39 -->
+            <div class="question-card">
+                <details>
+                    <summary>39. Difference between POST and PUT</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>Theory</h3>
+                            <p><strong>POST</strong> is used to create new resources and is <em>non-idempotent</em> (multiple identical requests create multiple resources). <strong>PUT</strong> is used to update or replace an existing resource and is <em>idempotent</em> (multiple identical requests produce the same result). POST typically returns 201 Created with location header, while PUT returns 200 OK or 204 No Content.</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>How it works in .NET Core</h3>
+                            <p>In ASP.NET Core Web API:</p>
+                            <ul>
+                                <li><strong>POST:</strong> Decorated with <code>[HttpPost]</code>, usually no ID in route. Returns <code>CreatedAtAction()</code> or <code>CreatedAtRoute()</code></li>
+                                <li><strong>PUT:</strong> Decorated with <code>[HttpPut("{id}")]</code>, requires resource ID. Returns <code>NoContent()</code> or <code>Ok()</code></li>
+                                <li><strong>Model Binding:</strong> Both use <code>[FromBody]</code> for request payload</li>
+                                <li><strong>Validation:</strong> Both leverage <code>ModelState.IsValid</code> and Data Annotations</li>
+                                <li><strong>Idempotency Keys:</strong> Can implement custom headers for POST idempotency using middleware</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>Practical Example</h3>
+                            <p>In one of my projects building an e-commerce API, we had clear separation between creating products (POST) and updating inventory (PUT):</p>
+                            
+<pre><code>// POST - Create a new product (non-idempotent)
+[HttpPost]
+[ProducesResponseType(StatusCodes.Status201Created)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+public async Task&lt;IActionResult&gt; CreateProduct([FromBody] CreateProductDto dto)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+    
+    var product = new Product
+    {
+        Name = dto.Name,
+        Price = dto.Price,
+        CreatedAt = DateTime.UtcNow
+    };
+    
+    _context.Products.Add(product);
+    await _context.SaveChangesAsync();
+    
+    // Multiple calls = multiple products created
+    return CreatedAtAction(
+        nameof(GetProduct), 
+        new { id = product.Id }, 
+        product
+    );
+}
+
+// PUT - Update existing product (idempotent)
+[HttpPut("{id}")]
+[ProducesResponseType(StatusCodes.Status204NoContent)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+public async Task&lt;IActionResult&gt; UpdateProduct(int id, [FromBody] UpdateProductDto dto)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+    
+    var product = await _context.Products.FindAsync(id);
+    if (product == null)
+        return NotFound();
+    
+    // Complete replacement of resource
+    product.Name = dto.Name;
+    product.Price = dto.Price;
+    product.UpdatedAt = DateTime.UtcNow;
+    
+    await _context.SaveChangesAsync();
+    
+    // Multiple identical calls = same result
+    return NoContent();
+}
+
+// Alternative: PUT for upsert (create or replace)
+[HttpPut("{id}")]
+public async Task&lt;IActionResult&gt; UpsertProduct(int id, [FromBody] ProductDto dto)
+{
+    var product = await _context.Products.FindAsync(id);
+    var isNewResource = product == null;
+    
+    if (isNewResource)
+    {
+        product = new Product { Id = id };
+        _context.Products.Add(product);
+    }
+    
+    product.Name = dto.Name;
+    product.Price = dto.Price;
+    
+    await _context.SaveChangesAsync();
+    
+    return isNewResource 
+        ? CreatedAtAction(nameof(GetProduct), new { id }, product)
+        : NoContent();
+}
+</code></pre>
+                            <p><strong>Real Issue I Faced:</strong> We had payment processing where clients would retry on network timeouts. POST requests would create duplicate orders. I solved this by implementing an idempotency key middleware that checked a Redis cache before processing POST requests.</p>
+                        </div>
+                        
+                        <div class="key-takeaway">
+                            <strong>Key Takeaway:</strong> Emphasize idempotency as the key difference—PUT can be safely retried, POST cannot. Mention real-world scenarios like payment processing or network retries where this matters critically.
+                        </div>
+                        
+                        <div class="category-tags">
+                            <span class="tag">API</span>
+                            <span class="tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 40 -->
+            <div class="question-card">
+                <details>
+                    <summary>40. Example HTTP PATCH request</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>Theory</h3>
+                            <p>HTTP PATCH is used for partial updates to a resource—modifying specific fields without replacing the entire entity. Unlike PUT (which replaces the whole resource), PATCH only sends changed fields. Common formats include JSON Patch (RFC 6902) and JSON Merge Patch (RFC 7396). PATCH is idempotent in most implementations.</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>How it works in .NET Core</h3>
+                            <p>.NET Core supports PATCH through:</p>
+                            <ul>
+                                <li><strong>[HttpPatch] attribute:</strong> Routes HTTP PATCH requests to specific actions</li>
+                                <li><strong>Microsoft.AspNetCore.JsonPatch:</strong> NuGet package implementing RFC 6902</li>
+                                <li><strong>JsonPatchDocument&lt;T&gt;:</strong> Type-safe patch document with operations (add, remove, replace, copy, move, test)</li>
+                                <li><strong>ApplyTo() method:</strong> Applies patch operations to target object with validation</li>
+                                <li><strong>ModelState integration:</strong> Validates patch operations before applying</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>Practical Example</h3>
+                            <p>In one of my projects with a user profile API, we had mobile clients that only wanted to update specific fields (like email or phone) without sending the entire profile. Here's the implementation:</p>
+                            
+<pre><code>// Install NuGet: Microsoft.AspNetCore.JsonPatch
+// Install NuGet: Microsoft.AspNetCore.Mvc.NewtonsoftJson
+
+// Program.cs - Enable Newtonsoft for PATCH support
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
+
+// Controller
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
+{
+    private readonly AppDbContext _context;
+    
+    public UsersController(AppDbContext context) => _context = context;
+    
+    [HttpPatch("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task&lt;IActionResult&gt; PatchUser(
+        int id, 
+        [FromBody] JsonPatchDocument&lt;UserUpdateDto&gt; patchDoc)
+    {
+        if (patchDoc == null)
+            return BadRequest("Patch document is null");
+        
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+            return NotFound();
+        
+        // Map entity to DTO
+        var userDto = new UserUpdateDto
+        {
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            FirstName = user.FirstName,
+            LastName = user.LastName
+        };
+        
+        // Apply patch with validation
+        patchDoc.ApplyTo(userDto, ModelState);
+        
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        // Validate the patched DTO
+        if (!TryValidateModel(userDto))
+            return BadRequest(ModelState);
+        
+        // Map DTO back to entity
+        user.Email = userDto.Email;
+        user.PhoneNumber = userDto.PhoneNumber;
+        user.FirstName = userDto.FirstName;
+        user.LastName = userDto.LastName;
+        user.UpdatedAt = DateTime.UtcNow;
+        
+        await _context.SaveChangesAsync();
+        
+        return NoContent();
+    }
+}
+
+public class UserUpdateDto
+{
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
+    
+    [Phone]
+    public string PhoneNumber { get; set; }
+    
+    [MaxLength(50)]
+    public string FirstName { get; set; }
+    
+    [MaxLength(50)]
+    public string LastName { get; set; }
+}
+</code></pre>
+
+<p><strong>Example Client Request (JSON Patch format):</strong></p>
+<pre><code>PATCH /api/users/123 HTTP/1.1
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "replace",
+    "path": "/email",
+    "value": "newemail@example.com"
+  },
+  {
+    "op": "replace",
+    "path": "/phoneNumber",
+    "value": "+1-555-1234"
+  }
+]
+</code></pre>
+
+<p><strong>Alternative: Simple PATCH (without JsonPatchDocument):</strong></p>
+<pre><code>// Simpler approach for basic partial updates
+[HttpPatch("{id}")]
+public async Task&lt;IActionResult&gt; SimplePartialUpdate(
+    int id, 
+    [FromBody] Dictionary&lt;string, object&gt; updates)
+{
+    var user = await _context.Users.FindAsync(id);
+    if (user == null) return NotFound();
+    
+    foreach (var kvp in updates)
+    {
+        var prop = typeof(User).GetProperty(kvp.Key);
+        if (prop != null && prop.CanWrite)
+        {
+            var value = Convert.ChangeType(kvp.Value, prop.PropertyType);
+            prop.SetValue(user, value);
+        }
+    }
+    
+    await _context.SaveChangesAsync();
+    return NoContent();
+}
+
+// Client sends: { "email": "new@example.com", "phoneNumber": "555-1234" }
+</code></pre>
+                            <p><strong>Why I Used This:</strong> Mobile bandwidth was expensive for users in emerging markets, so sending only changed fields reduced payload size by 80% compared to PUT. We also used ETags with <code>If-Match</code> headers to prevent concurrent update conflicts.</p>
+                        </div>
+                        
+                        <div class="key-takeaway">
+                            <strong>Key Takeaway:</strong> Show you understand JSON Patch RFC standard and when PATCH is superior to PUT (bandwidth constraints, partial updates, mobile clients). Mention validation at both patch document and model levels.
+                        </div>
+                        
+                        <div class="category-tags">
+                            <span class="tag">API</span>
+                            <span class="tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+        <div class="no-results" id="noResults">
+            🔍 No questions found matching your search. Try different keywords!
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const questionCards = document.querySelectorAll('.question-card');
+        const noResults = document.getElementById('noResults');
+        
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+            
+            questionCards.forEach(card => {
+                const summary = card.querySelector('summary').textContent.toLowerCase();
+                const content = card.querySelector('.answer-content').textContent.toLowerCase();
+                
+                if (searchTerm === '' || summary.includes(searchTerm) || content.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                    
+                    // Highlight matching text in summary
+                    const summaryElement = card.querySelector('summary');
+                    const originalText = summaryElement.textContent;
+                    if (searchTerm !== '') {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        summaryElement.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    } else {
+                        summaryElement.textContent = originalText;
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+        
+        // Auto-expand all on Ctrl+E
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                const allDetails = document.querySelectorAll('details');
+                const allOpen = Array.from(allDetails).every(d => d.open);
+                allDetails.forEach(d => d.open = !allOpen);
+            }
+        });
+        
+        console.log('%c🚀 Tip: Press Ctrl+E to expand/collapse all questions', 'color: #00d9ff; font-size: 14px; font-weight: bold;');
+    </script>
+</body>
+</html>

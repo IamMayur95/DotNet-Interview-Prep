@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Q&A (27-30)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background-color: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #3c3c3c;
+            border: 2px solid #007acc;
+            border-radius: 6px;
+            color: #d4d4d4;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #searchBar:focus {
+            border-color: #4ec9b0;
+        }
+
+        #searchBar::placeholder {
+            color: #858585;
+        }
+
+        .qa-item {
+            background-color: #252526;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4ec9b0;
+            background-color: #2d2d30;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        summary:hover {
+            background-color: #3e3e42;
+        }
+
+        summary::marker {
+            color: #007acc;
+        }
+
+        .answer-content {
+            padding: 25px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #569cd6;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #3e3e42;
+            padding-bottom: 5px;
+        }
+
+        .section-content {
+            color: #d4d4d4;
+            padding-left: 15px;
+        }
+
+        .section-content ul {
+            margin-left: 20px;
+        }
+
+        .section-content li {
+            margin-bottom: 8px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .category-tag {
+            background-color: #007acc;
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        pre {
+            background-color: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: #ce9178;
+        }
+
+        .keyword { color: #569cd6; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .method { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+
+        .key-takeaway {
+            background-color: #2d4a2c;
+            border-left: 4px solid #4ec9b0;
+            padding: 15px;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            summary {
+                font-size: 1rem;
+                padding: 15px;
+            }
+
+            .answer-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 .NET Core Interview Questions & Answers (27-30)</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="🔍 Search questions by keyword (e.g., swagger, routing, logging, controllers...)">
+        </div>
+
+        <div id="noResults" class="no-results">
+            No questions found matching your search.
+        </div>
+
+        <div id="qaContainer">
+            <!-- Question 27 -->
+            <div class="qa-item" data-keywords="swagger api documentation openapi swashbuckle ui endpoint json xml comments">
+                <details>
+                    <summary>Q27. How to add Swagger for documentation of API?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                Swagger (now OpenAPI) generates interactive API documentation automatically by inspecting your controllers, models, and endpoints. It provides a web UI where developers can test endpoints, view request/response schemas, and understand authentication requirements. In .NET Core, <strong>Swashbuckle.AspNetCore</strong> is the standard library that implements OpenAPI specification, generating JSON documentation and hosting the Swagger UI.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>Swashbuckle.AspNetCore</strong> NuGet package (contains SwaggerGen + SwaggerUI)</li>
+                                    <li><strong>AddSwaggerGen()</strong> registers the Swagger generator middleware</li>
+                                    <li><strong>UseSwagger()</strong> serves the OpenAPI JSON at <code>/swagger/v1/swagger.json</code></li>
+                                    <li><strong>UseSwaggerUI()</strong> serves the interactive UI at <code>/swagger</code></li>
+                                    <li><strong>XML comments</strong> from code are included for richer documentation</li>
+                                    <li><strong>Annotations</strong> like [ProducesResponseType], [SwaggerOperation] enhance metadata</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                When migrating our legacy SOAP services to REST APIs, I added Swagger to help the front-end team understand the new endpoints without lengthy documentation meetings:
+<pre><code><span class="comment">// 1. Install NuGet package</span>
+<span class="comment">// dotnet add package Swashbuckle.AspNetCore</span>
+
+<span class="comment">// 2. Program.cs - Configure Swagger</span>
+<span class="keyword">var</span> builder = <span class="class-name">WebApplication</span>.<span class="method">CreateBuilder</span>(args);
+
+<span class="comment">// Add services</span>
+builder.Services.<span class="method">AddControllers</span>();
+builder.Services.<span class="method">AddEndpointsApiExplorer</span>();
+
+<span class="comment">// Configure Swagger with XML comments</span>
+builder.Services.<span class="method">AddSwaggerGen</span>(options =>
+{
+    options.<span class="method">SwaggerDoc</span>(<span class="string">"v1"</span>, <span class="keyword">new</span> <span class="class-name">OpenApiInfo</span>
+    {
+        Title = <span class="string">"MIC API"</span>,
+        Version = <span class="string">"v1"</span>,
+        Description = <span class="string">"API for binder management and project approval"</span>,
+        Contact = <span class="keyword">new</span> <span class="class-name">OpenApiContact</span>
+        {
+            Name = <span class="string">"Support Team"</span>,
+            Email = <span class="string">"support@example.com"</span>
+        }
+    });
+
+    <span class="comment">// Enable XML comments for documentation</span>
+    <span class="keyword">var</span> xmlFile = <span class="string">$"<span class="property">{Assembly.GetExecutingAssembly().GetName().Name}</span>.xml"</span>;
+    <span class="keyword">var</span> xmlPath = <span class="class-name">Path</span>.<span class="method">Combine</span>(<span class="class-name">AppContext</span>.BaseDirectory, xmlFile);
+    options.<span class="method">IncludeXmlComments</span>(xmlPath);
+
+    <span class="comment">// Add JWT authentication to Swagger</span>
+    options.<span class="method">AddSecurityDefinition</span>(<span class="string">"Bearer"</span>, <span class="keyword">new</span> <span class="class-name">OpenApiSecurityScheme</span>
+    {
+        Description = <span class="string">"JWT Authorization header using Bearer scheme"</span>,
+        Name = <span class="string">"Authorization"</span>,
+        In = <span class="class-name">ParameterLocation</span>.Header,
+        Type = <span class="class-name">SecuritySchemeType</span>.ApiKey,
+        Scheme = <span class="string">"Bearer"</span>
+    });
+
+    options.<span class="method">AddSecurityRequirement</span>(<span class="keyword">new</span> <span class="class-name">OpenApiSecurityRequirement</span>
+    {
+        {
+            <span class="keyword">new</span> <span class="class-name">OpenApiSecurityScheme</span>
+            {
+                Reference = <span class="keyword">new</span> <span class="class-name">OpenApiReference</span>
+                {
+                    Type = <span class="class-name">ReferenceType</span>.SecurityScheme,
+                    Id = <span class="string">"Bearer"</span>
+                }
+            },
+            <span class="keyword">new</span> <span class="keyword">string</span>[] { }
+        }
+    });
+});
+
+<span class="keyword">var</span> app = builder.<span class="method">Build</span>();
+
+<span class="comment">// Enable Swagger in Development and Staging</span>
+<span class="keyword">if</span> (app.Environment.<span class="method">IsDevelopment</span>() || app.Environment.<span class="method">IsStaging</span>())
+{
+    app.<span class="method">UseSwagger</span>();
+    app.<span class="method">UseSwaggerUI</span>(c =>
+    {
+        c.<span class="method">SwaggerEndpoint</span>(<span class="string">"/swagger/v1/swagger.json"</span>, <span class="string">"MIC API v1"</span>);
+        c.RoutePrefix = <span class="string">"swagger"</span>; <span class="comment">// Access at /swagger</span>
+    });
+}
+
+app.<span class="method">UseAuthorization</span>();
+app.<span class="method">MapControllers</span>();
+app.<span class="method">Run</span>();
+
+<span class="comment">// 3. Enable XML documentation in .csproj</span>
+<span class="comment">// &lt;PropertyGroup&gt;</span>
+<span class="comment">//   &lt;GenerateDocumentationFile&gt;true&lt;/GenerateDocumentationFile&gt;</span>
+<span class="comment">//   &lt;NoWarn&gt;$(NoWarn);1591&lt;/NoWarn&gt;</span>
+<span class="comment">// &lt;/PropertyGroup&gt;</span>
+
+<span class="comment">// 4. Document your API endpoints</span>
+[<span class="class-name">ApiController</span>]
+[<span class="class-name">Route</span>(<span class="string">"api/[controller]"</span>)]
+<span class="keyword">public class</span> <span class="class-name">BindersController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="comment">/// &lt;summary&gt;</span>
+    <span class="comment">/// Gets a binder by its ID</span>
+    <span class="comment">/// &lt;/summary&gt;</span>
+    <span class="comment">/// &lt;param name="id"&gt;The binder ID&lt;/param&gt;</span>
+    <span class="comment">/// &lt;returns&gt;Binder details&lt;/returns&gt;</span>
+    <span class="comment">/// &lt;response code="200"&gt;Returns the binder&lt;/response&gt;</span>
+    <span class="comment">/// &lt;response code="404"&gt;Binder not found&lt;/response&gt;</span>
+    [<span class="class-name">HttpGet</span>(<span class="string">"{id}"</span>)]
+    [<span class="class-name">ProducesResponseType</span>(<span class="class-name">StatusCodes</span>.Status200OK)]
+    [<span class="class-name">ProducesResponseType</span>(<span class="class-name">StatusCodes</span>.Status404NotFound)]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">ActionResult</span>&lt;<span class="class-name">BinderDto</span>&gt;&gt; <span class="method">GetBinder</span>(<span class="keyword">int</span> id)
+    {
+        <span class="comment">// Implementation...</span>
+    }
+}
+</code></pre>
+                                After this setup, our front-end team could access <code>/swagger</code> and test every endpoint directly from the browser. It cut our API onboarding time by 70%.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    Use <strong>Swashbuckle.AspNetCore</strong> package. Configure with <code>AddSwaggerGen()</code>, enable with <code>UseSwagger()</code> and <code>UseSwaggerUI()</code>. Use XML comments and [ProducesResponseType] attributes for rich documentation. Disable in production for security unless behind authentication.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">API</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 28 -->
+            <div class="qa-item" data-keywords="routing attribute conventional routing routes mapcontrollerroute httpget httppost route">
+                <details>
+                    <summary>Q28. Routing - Understand attribute vs conventional routing</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                <strong>Conventional routing</strong> defines URL patterns globally in one place (Program.cs) using <code>MapControllerRoute()</code>, following patterns like <code>{controller}/{action}/{id}</code>. <strong>Attribute routing</strong> defines routes directly on controllers/actions using attributes like <code>[Route]</code>, <code>[HttpGet]</code>, giving fine-grained control per endpoint. APIs typically use attribute routing (RESTful), while MVC views often use conventional routing (consistency across many pages).
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>Conventional:</strong> <code>MapControllerRoute()</code> in Program.cs defines global patterns</li>
+                                    <li><strong>Attribute:</strong> <code>[Route]</code>, <code>[HttpGet]</code>, <code>[HttpPost]</code> on controllers/actions</li>
+                                    <li><strong>Precedence:</strong> Attribute routing overrides conventional routing</li>
+                                    <li><strong>Token replacement:</strong> <code>[controller]</code>, <code>[action]</code> tokens in attribute routes</li>
+                                    <li><strong>Route constraints:</strong> <code>{id:int}</code>, <code>{slug:minlength(3)}</code> for validation</li>
+                                    <li><strong>Order matters:</strong> Use <code>[Route(Order = 1)]</code> when routes might conflict</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                In our migration from WebForms to .NET Core, I used conventional routing for admin MVC pages (consistent structure) and attribute routing for RESTful APIs:
+<pre><code><span class="comment">// ===== CONVENTIONAL ROUTING (Program.cs) =====</span>
+<span class="keyword">var</span> builder = <span class="class-name">WebApplication</span>.<span class="method">CreateBuilder</span>(args);
+builder.Services.<span class="method">AddControllersWithViews</span>();
+
+<span class="keyword">var</span> app = builder.<span class="method">Build</span>();
+
+<span class="comment">// Define conventional routes</span>
+app.<span class="method">MapControllerRoute</span>(
+    name: <span class="string">"default"</span>,
+    pattern: <span class="string">"{controller=Home}/{action=Index}/{id?}"</span>
+);
+
+<span class="comment">// Creates URLs like:</span>
+<span class="comment">// /Home/Index</span>
+<span class="comment">// /Binder/Details/123</span>
+<span class="comment">// /Project/Approval</span>
+
+<span class="comment">// ===== ATTRIBUTE ROUTING (API Controller) =====</span>
+[<span class="class-name">ApiController</span>]
+[<span class="class-name">Route</span>(<span class="string">"api/[controller]"</span>)] <span class="comment">// Token replaced with "binders"</span>
+<span class="keyword">public class</span> <span class="class-name">BindersController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="comment">// GET: api/binders</span>
+    [<span class="class-name">HttpGet</span>]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">GetAll</span>() { <span class="comment">/* ... */</span> }
+
+    <span class="comment">// GET: api/binders/123</span>
+    [<span class="class-name">HttpGet</span>(<span class="string">"{id:int}"</span>)] <span class="comment">// Route constraint ensures int</span>
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">GetById</span>(<span class="keyword">int</span> id) { <span class="comment">/* ... */</span> }
+
+    <span class="comment">// POST: api/binders</span>
+    [<span class="class-name">HttpPost</span>]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Create</span>([<span class="class-name">FromBody</span>] <span class="class-name">BinderDto</span> dto) { <span class="comment">/* ... */</span> }
+
+    <span class="comment">// GET: api/binders/search?query=test</span>
+    [<span class="class-name">HttpGet</span>(<span class="string">"search"</span>)] <span class="comment">// Custom segment</span>
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Search</span>([<span class="class-name">FromQuery</span>] <span class="keyword">string</span> query) { <span class="comment">/* ... */</span> }
+
+    <span class="comment">// GET: api/binders/123/documents</span>
+    [<span class="class-name">HttpGet</span>(<span class="string">"{id:int}/documents"</span>)]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">GetDocuments</span>(<span class="keyword">int</span> id) { <span class="comment">/* ... */</span> }
+}
+
+<span class="comment">// ===== MIX OF BOTH (MVC Controller) =====</span>
+<span class="comment">// Uses conventional routing by default, but can override with attributes</span>
+<span class="keyword">public class</span> <span class="class-name">BinderController</span> : <span class="class-name">Controller</span>
+{
+    <span class="comment">// Uses conventional: /Binder/Index</span>
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Index</span>() { <span class="comment">/* ... */</span> }
+
+    <span class="comment">// Override with attribute: /binder-detail/123</span>
+    [<span class="class-name">Route</span>(<span class="string">"binder-detail/{id:int}"</span>)]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Details</span>(<span class="keyword">int</span> id) { <span class="comment">/* ... */</span> }
+}
+
+<span class="comment">// ===== REAL SCENARIO I HIT =====</span>
+<span class="comment">// We had a route collision:</span>
+<span class="comment">// /api/binders/active (should get active binders)</span>
+<span class="comment">// /api/binders/{id} (id="active" was interpreted as string!)</span>
+
+<span class="comment">// Solution: Use route order and constraints</span>
+[<span class="class-name">HttpGet</span>(<span class="string">"active"</span>, Order = 1)] <span class="comment">// Matches first</span>
+<span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">GetActive</span>() { <span class="comment">/* ... */</span> }
+
+[<span class="class-name">HttpGet</span>(<span class="string">"{id:int}"</span>, Order = 2)] <span class="comment">// Only matches if id is int</span>
+<span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">GetById</span>(<span class="keyword">int</span> id) { <span class="comment">/* ... */</span> }
+</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    <strong>Conventional routing:</strong> Good for MVC apps with consistent patterns (admin dashboards). <strong>Attribute routing:</strong> Preferred for REST APIs, gives precise control per endpoint. Use route constraints (<code>{id:int}</code>) to avoid ambiguity. APIs should always use attribute routing with [ApiController].
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">API</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 29 -->
+            <div class="qa-item" data-keywords="logging ilogger loggerfactory log levels debug info warning error appsettings serilog nlog">
+                <details>
+                    <summary>Q29. Logging - Use built-in logging</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                .NET Core includes a built-in logging framework that supports multiple providers (Console, Debug, EventSource, etc.) and integrates with third-party loggers like Serilog or NLog. The <code>ILogger&lt;T&gt;</code> interface provides methods for different log levels (Trace, Debug, Info, Warning, Error, Critical). Logging configuration is managed through <code>appsettings.json</code>, allowing different log levels per environment without code changes.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>ILogger&lt;T&gt;</strong> injected via DI, T is the category (usually class name)</li>
+                                    <li><strong>ILoggerFactory</strong> creates logger instances (rarely used directly)</li>
+                                    <li><strong>Log levels:</strong> Trace (0) → Debug (1) → Information (2) → Warning (3) → Error (4) → Critical (5)</li>
+                                    <li><strong>Providers:</strong> Console, Debug, EventSource, EventLog (Windows), AzureAppServices</li>
+                                    <li><strong>Configuration:</strong> appsettings.json "Logging" section defines levels per namespace</li>
+                                    <li><strong>Structured logging:</strong> Use message templates with parameters for better querying</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                In our microservices project, logging was critical for debugging production issues. Here's how I set it up:
+<pre><code><span class="comment">// ===== appsettings.json - Configuration =====</span>
+{
+  <span class="string">"Logging"</span>: {
+    <span class="string">"LogLevel"</span>: {
+      <span class="string">"Default"</span>: <span class="string">"Information"</span>,
+      <span class="string">"Microsoft.AspNetCore"</span>: <span class="string">"Warning"</span>, <span class="comment">// Reduce noise from framework</span>
+      <span class="string">"Microsoft.EntityFrameworkCore"</span>: <span class="string">"Information"</span>, <span class="comment">// See SQL queries</span>
+      <span class="string">"MyApp.Services"</span>: <span class="string">"Debug"</span> <span class="comment">// Detailed logs for my services</span>
+    }
+  }
+}
+
+<span class="comment">// ===== appsettings.Development.json =====</span>
+{
+  <span class="string">"Logging"</span>: {
+    <span class="string">"LogLevel"</span>: {
+      <span class="string">"Default"</span>: <span class="string">"Debug"</span> <span class="comment">// More verbose in dev</span>
+    }
+  }
+}
+
+<span class="comment">// ===== Program.cs - Add logging providers =====</span>
+<span class="keyword">var</span> builder = <span class="class-name">WebApplication</span>.<span class="method">CreateBuilder</span>(args);
+
+<span class="comment">// Built-in logging is added by default, but you can customize:</span>
+builder.Logging.<span class="method">ClearProviders</span>(); <span class="comment">// Remove defaults</span>
+builder.Logging.<span class="method">AddConsole</span>(); <span class="comment">// Console output</span>
+builder.Logging.<span class="method">AddDebug</span>(); <span class="comment">// Debug window in VS</span>
+builder.Logging.<span class="method">AddEventSourceLogger</span>(); <span class="comment">// For ETW tracing</span>
+
+<span class="comment">// Optional: Add Serilog for production</span>
+<span class="comment">// builder.Host.UseSerilog((context, config) => </span>
+<span class="comment">//     config.ReadFrom.Configuration(context.Configuration));</span>
+
+<span class="comment">// ===== Using ILogger in a Controller =====</span>
+[<span class="class-name">ApiController</span>]
+[<span class="class-name">Route</span>(<span class="string">"api/[controller]"</span>)]
+<span class="keyword">public class</span> <span class="class-name">BindersController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span>&lt;<span class="class-name">BindersController</span>&gt; _logger;
+    <span class="keyword">private readonly</span> <span class="class-name">IBinderService</span> _binderService;
+
+    <span class="keyword">public</span> <span class="method">BindersController</span>(
+        <span class="class-name">ILogger</span>&lt;<span class="class-name">BindersController</span>&gt; logger, 
+        <span class="class-name">IBinderService</span> binderService)
+    {
+        _logger = logger;
+        _binderService = binderService;
+    }
+
+    [<span class="class-name">HttpGet</span>(<span class="string">"{id}"</span>)]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">GetBinder</span>(<span class="keyword">int</span> id)
+    {
+        <span class="comment">// Structured logging - parameters are captured separately</span>
+        _logger.<span class="method">LogInformation</span>(<span class="string">"Fetching binder with ID: {BinderId}"</span>, id);
+
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">var</span> binder = <span class="keyword">await</span> _binderService.<span class="method">GetByIdAsync</span>(id);
+
+            <span class="keyword">if</span> (binder == <span class="keyword">null</span>)
+            {
+                _logger.<span class="method">LogWarning</span>(<span class="string">"Binder {BinderId} not found"</span>, id);
+                <span class="keyword">return</span> <span class="method">NotFound</span>();
+            }
+
+            _logger.<span class="method">LogDebug</span>(<span class="string">"Successfully retrieved binder {BinderId} with {DocumentCount} documents"</span>, 
+                id, binder.Documents.Count);
+
+            <span class="keyword">return</span> <span class="method">Ok</span>(binder);
+        }
+        <span class="keyword">catch</span> (<span class="class-name">DbException</span> dbEx)
+        {
+            <span class="comment">// Error with exception details</span>
+            _logger.<span class="method">LogError</span>(dbEx, 
+                <span class="string">"Database error retrieving binder {BinderId}"</span>, id);
+            <span class="keyword">return</span> <span class="method">StatusCode</span>(500, <span class="string">"Database error occurred"</span>);
+        }
+        <span class="keyword">catch</span> (<span class="class-name">Exception</span> ex)
+        {
+            <span class="comment">// Critical error - requires immediate attention</span>
+            _logger.<span class="method">LogCritical</span>(ex, 
+                <span class="string">"Critical error in GetBinder for ID {BinderId}"</span>, id);
+            <span class="keyword">return</span> <span class="method">StatusCode</span>(500);
+        }
+    }
+}
+
+<span class="comment">// ===== Using ILogger in a Service =====</span>
+<span class="keyword">public class</span> <span class="class-name">BinderService</span> : <span class="class-name">IBinderService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span>&lt;<span class="class-name">BinderService</span>&gt; _logger;
+
+    <span class="keyword">public</span> <span class="method">BinderService</span>(<span class="class-name">ILogger</span>&lt;<span class="class-name">BinderService</span>&gt; logger)
+    {
+        _logger = logger;
+    }
+
+    <span class="keyword">public async</span> <span class="class-name">Task</span> <span class="method">ProcessBinderAsync</span>(<span class="keyword">int</span> id)
+    {
+        <span class="comment">// Using LoggerMessage for high-performance logging</span>
+        <span class="keyword">using</span> (_logger.<span class="method">BeginScope</span>(<span class="string">"Processing binder {BinderId}"</span>, id))
+        {
+            _logger.<span class="method">LogInformation</span>(<span class="string">"Starting binder processing"</span>);
+            
+            <span class="comment">// Scoped logs will include BinderId in all messages</span>
+            <span class="keyword">await</span> <span class="method">ProcessSteps</span>();
+            
+            _logger.<span class="method">LogInformation</span>(<span class="string">"Completed binder processing"</span>);
+        }
+    }
+}
+
+<span class="comment">// REAL PRODUCTION TIP:</span>
+<span class="comment">// We integrated with Azure Application Insights:</span>
+builder.Services.<span class="method">AddApplicationInsightsTelemetry</span>();
+<span class="comment">// All ILogger calls automatically went to App Insights!</span>
+</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    Inject <code>ILogger&lt;T&gt;</code> via DI, use structured logging with message templates. Configure log levels in appsettings.json per namespace. Use appropriate levels (Debug for dev, Information for normal flow, Error for exceptions). Integrate with Application Insights or Serilog for production.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">API</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 30 -->
+            <div class="qa-item" data-keywords="controllers api controller mvc controllerbase httpget httppost action methods">
+                <details>
+                    <summary>Q30. Controllers - Build simple controllers</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                Controllers handle HTTP requests and return responses. In .NET Core, <strong>API controllers</strong> inherit from <code>ControllerBase</code> and return data (JSON/XML), while <strong>MVC controllers</strong> inherit from <code>Controller</code> and return views. Controllers contain action methods decorated with HTTP verb attributes ([HttpGet], [HttpPost], etc.). The <code>[ApiController]</code> attribute enables automatic model validation, binding from body by default, and problem details for errors.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>ControllerBase</strong> - Base for API controllers (no view support)</li>
+                                    <li><strong>Controller</strong> - Base for MVC controllers (includes view support)</li>
+                                    <li><strong>[ApiController]</strong> - Enables automatic 400 responses, attribute routing required</li>
+                                    <li><strong>[Route]</strong> - Defines route template for controller/actions</li>
+                                    <li><strong>Action methods</strong> - Return IActionResult, ActionResult&lt;T&gt;, or specific types</li>
+                                    <li><strong>Model binding</strong> - [FromBody], [FromQuery], [FromRoute], [FromForm]</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                When building our first .NET Core API for the binder management system, I started with these simple controllers:
+<pre><code><span class="comment">// ===== SIMPLE API CONTROLLER =====</span>
+[<span class="class-name">ApiController</span>] <span class="comment">// Enables automatic features</span>
+[<span class="class-name">Route</span>(<span class="string">"api/[controller]"</span>)] <span class="comment">// Maps to api/binders</span>
+<span class="keyword">public class</span> <span class="class-name">BindersController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IBinderService</span> _binderService;
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span>&lt;<span class="class-name">BindersController</span>&gt; _logger;
+
+    <span class="comment">// Dependency injection in constructor</span>
+    <span class="keyword">public</span> <span class="method">BindersController</span>(
+        <span class="class-name">IBinderService</span> binderService, 
+        <span class="class-name">ILogger</span>&lt;<span class="class-name">BindersController</span>&gt; logger)
+    {
+        _binderService = binderService;
+        _logger = logger;
+    }
+
+    <span class="comment">// GET: api/binders</span>
+    [<span class="class-name">HttpGet</span>]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">ActionResult</span>&lt;<span class="class-name">IEnumerable</span>&lt;<span class="class-name">BinderDto</span>&gt;&gt;&gt; <span class="method">GetAll</span>()
+    {
+        <span class="keyword">var</span> binders = <span class="keyword">await</span> _binderService.<span class="method">GetAllAsync</span>();
+        <span class="keyword">return</span> <span class="method">Ok</span>(binders); <span class="comment">// Returns 200 with data</span>
+    }
+
+    <span class="comment">// GET: api/binders/123</span>
+    [<span class="class-name">HttpGet</span>(<span class="string">"{id:int}"</span>)] <span class="comment">// Route parameter constraint</span>
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">ActionResult</span>&lt;<span class="class-name">BinderDto</span>&gt;&gt; <span class="method">GetById</span>(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">var</span> binder = <span class="keyword">await</span> _binderService.<span class="method">GetByIdAsync</span>(id);
+        
+        <span class="keyword">if</span> (binder == <span class="keyword">null</span>)
+            <span class="keyword">return</span> <span class="method">NotFound</span>(); <span class="comment">// Returns 404</span>
+
+        <span class="keyword">return</span> <span class="method">Ok</span>(binder); <span class="comment">// Returns 200 with binder data</span>
+    }
+
+    <span class="comment">// POST: api/binders</span>
+    [<span class="class-name">HttpPost</span>]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">ActionResult</span>&lt;<span class="class-name">BinderDto</span>&gt;&gt; <span class="method">Create</span>([<span class="class-name">FromBody</span>] <span class="class-name">CreateBinderDto</span> dto)
+    {
+        <span class="comment">// [ApiController] automatically validates ModelState</span>
+        <span class="comment">// No need for manual ModelState.IsValid check!</span>
+
+        <span class="keyword">var</span> binder = <span class="keyword">await</span> _binderService.<span class="method">CreateAsync</span>(dto);
+        
+        <span class="comment">// Returns 201 with Location header</span>
+        <span class="keyword">return</span> <span class="method">CreatedAtAction</span>(
+            nameof(GetById), 
+            <span class="keyword">new</span> { id = binder.Id }, 
+            binder
+        );
+    }
+
+    <span class="comment">// PUT: api/binders/123</span>
+    [<span class="class-name">HttpPut</span>(<span class="string">"{id:int}"</span>)]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">Update</span>(<span class="keyword">int</span> id, [<span class="class-name">FromBody</span>] <span class="class-name">UpdateBinderDto</span> dto)
+    {
+        <span class="keyword">if</span> (id != dto.Id)
+            <span class="keyword">return</span> <span class="method">BadRequest</span>(<span class="string">"ID mismatch"</span>); <span class="comment">// Returns 400</span>
+
+        <span class="keyword">var</span> updated = <span class="keyword">await</span> _binderService.<span class="method">UpdateAsync</span>(dto);
+        
+        <span class="keyword">if</span> (!updated)
+            <span class="keyword">return</span> <span class="method">NotFound</span>();
+
+        <span class="keyword">return</span> <span class="method">NoContent</span>(); <span class="comment">// Returns 204</span>
+    }
+
+    <span class="comment">// DELETE: api/binders/123</span>
+    [<span class="class-name">HttpDelete</span>(<span class="string">"{id:int}"</span>)]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">Delete</span>(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">var</span> deleted = <span class="keyword">await</span> _binderService.<span class="method">DeleteAsync</span>(id);
+        
+        <span class="keyword">if</span> (!deleted)
+            <span class="keyword">return</span> <span class="method">NotFound</span>();
+
+        <span class="keyword">return</span> <span class="method">NoContent</span>(); <span class="comment">// Returns 204</span>
+    }
+
+    <span class="comment">// GET: api/binders/search?query=test&amp;pageSize=20</span>
+    [<span class="class-name">HttpGet</span>(<span class="string">"search"</span>)]
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">ActionResult</span>&lt;<span class="class-name">PagedResult</span>&lt;<span class="class-name">BinderDto</span>&gt;&gt;&gt; <span class="method">Search</span>(
+        [<span class="class-name">FromQuery</span>] <span class="keyword">string</span> query, 
+        [<span class="class-name">FromQuery</span>] <span class="keyword">int</span> pageSize = 10)
+    {
+        <span class="keyword">var</span> results = <span class="keyword">await</span> _binderService.<span class="method">SearchAsync</span>(query, pageSize);
+        <span class="keyword">return</span> <span class="method">Ok</span>(results);
+    }
+}
+
+<span class="comment">// ===== DTO CLASSES =====</span>
+<span class="keyword">public class</span> <span class="class-name">BinderDto</span>
+{
+    <span class="keyword">public int</span> Id { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public string</span> Name { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public string</span> Description { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public</span> <span class="class-name">DateTime</span> CreatedDate { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+}
+
+<span class="keyword">public class</span> <span class="class-name">CreateBinderDto</span>
+{
+    [<span class="class-name">Required</span>]
+    [<span class="class-name">StringLength</span>(100)]
+    <span class="keyword">public string</span> Name { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+
+    [<span class="class-name">MaxLength</span>(500)]
+    <span class="keyword">public string</span> Description { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+}
+
+<span class="comment">// ===== SIMPLE MVC CONTROLLER (for Views) =====</span>
+<span class="keyword">public class</span> <span class="class-name">HomeController</span> : <span class="class-name">Controller</span> <span class="comment">// Inherits Controller, not ControllerBase</span>
+{
+    <span class="comment">// GET: /Home/Index</span>
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Index</span>()
+    {
+        <span class="keyword">return</span> <span class="method">View</span>(); <span class="comment">// Returns a Razor view</span>
+    }
+
+    <span class="comment">// POST: /Home/Submit</span>
+    [<span class="class-name">HttpPost</span>]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Submit</span>([<span class="class-name">FromForm</span>] <span class="class-name">BinderViewModel</span> model)
+    {
+        <span class="keyword">if</span> (!ModelState.IsValid)
+            <span class="keyword">return</span> <span class="method">View</span>(model);
+
+        <span class="comment">// Process form...</span>
+        
+        <span class="keyword">return</span> <span class="method">RedirectToAction</span>(nameof(Index));
+    }
+}
+
+<span class="comment">// ===== REGISTER IN PROGRAM.CS =====</span>
+builder.Services.<span class="method">AddControllers</span>(); <span class="comment">// For API controllers</span>
+<span class="comment">// OR</span>
+builder.Services.<span class="method">AddControllersWithViews</span>(); <span class="comment">// For MVC controllers with views</span>
+
+app.<span class="method">MapControllers</span>(); <span class="comment">// Map controller routes</span>
+</code></pre>
+                                This controller pattern became our standard across all microservices. Clean, testable, and followed REST conventions.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    API controllers inherit from <code>ControllerBase</code> and use <code>[ApiController]</code> attribute. Use HTTP verb attributes ([HttpGet], [HttpPost]) with route templates. Return <code>ActionResult&lt;T&gt;</code> for type safety. Use appropriate status codes (200, 201, 204, 400, 404). Inject dependencies via constructor.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">API</span>
+                            <span class="category-tag">C-Sharp concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const searchBar = document.getElementById('searchBar');
+        const qaItems = document.querySelectorAll('.qa-item');
+        const noResults = document.getElementById('noResults');
+
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let visibleCount = 0;
+
+            qaItems.forEach(item => {
+                const keywords = item.dataset.keywords.toLowerCase();
+                const summaryText = item.querySelector('summary').textContent.toLowerCase();
+                const contentText = item.querySelector('.answer-content').textContent.toLowerCase();
+                
+                const isMatch = keywords.includes(searchTerm) || 
+                               summaryText.includes(searchTerm) || 
+                               contentText.includes(searchTerm);
+
+                if (isMatch) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+
+        // Optional: Scroll to opened item
+        const allDetails = document.querySelectorAll('details');
+        allDetails.forEach(detail => {
+            detail.addEventListener('toggle', (e) => {
+                if (e.target.open) {
+                    e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

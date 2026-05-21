@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Q&A</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background-color: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #3c3c3c;
+            border: 2px solid #007acc;
+            border-radius: 6px;
+            color: #d4d4d4;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #searchBar:focus {
+            border-color: #4ec9b0;
+        }
+
+        #searchBar::placeholder {
+            color: #858585;
+        }
+
+        .qa-item {
+            background-color: #252526;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4ec9b0;
+            background-color: #2d2d30;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        summary:hover {
+            background-color: #3e3e42;
+        }
+
+        summary::marker {
+            color: #007acc;
+        }
+
+        .answer-content {
+            padding: 25px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #569cd6;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #3e3e42;
+            padding-bottom: 5px;
+        }
+
+        .section-content {
+            color: #d4d4d4;
+            padding-left: 15px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .category-tag {
+            background-color: #007acc;
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        pre {
+            background-color: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: #ce9178;
+        }
+
+        .keyword { color: #569cd6; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .method { color: #dcdcaa; }
+        .property { color: #9cdcfe; }
+
+        .key-takeaway {
+            background-color: #2d4a2c;
+            border-left: 4px solid #4ec9b0;
+            padding: 15px;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            summary {
+                font-size: 1rem;
+                padding: 15px;
+            }
+
+            .answer-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 .NET Core Interview Questions & Answers</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="🔍 Search questions by keyword (e.g., async, exception, middleware...)">
+        </div>
+
+        <div id="noResults" class="no-results">
+            No questions found matching your search.
+        </div>
+
+        <div id="qaContainer">
+            <!-- Question 23 -->
+            <div class="qa-item" data-keywords="async await asynchronous synchronous programming threading task performance">
+                <details>
+                    <summary>Q23. Async and await? How does it differ from synchronous programming?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                <code>async</code> and <code>await</code> enable asynchronous programming, allowing threads to remain non-blocked while waiting for I/O operations (database calls, HTTP requests, file operations). Unlike synchronous programming where execution waits for each operation to complete, async operations free up the calling thread to handle other work. The <code>async</code> keyword marks a method that can run asynchronously, while <code>await</code> suspends execution until the awaited task completes, without blocking the thread.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>Task&lt;T&gt;</strong> and <strong>Task</strong> represent async operations</li>
+                                    <li><strong>async/await</strong> is compiler syntactic sugar that generates state machines</li>
+                                    <li>ASP.NET Core is built async-first (e.g., <code>HttpClient.GetAsync</code>, <code>DbContext.SaveChangesAsync</code>)</li>
+                                    <li><strong>ConfigureAwait(false)</strong> used in library code to avoid context capture</li>
+                                    <li>Thread pool manages worker threads efficiently during async operations</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                In one of my migration projects, we had a synchronous API endpoint that was bottlenecking under load. The endpoint queried SQL Server and called an external REST API:
+<pre><code><span class="comment">// Old synchronous approach (blocking)</span>
+<span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">GetOrderDetails</span>(<span class="keyword">int</span> orderId)
+{
+    <span class="keyword">var</span> order = _dbContext.Orders.<span class="method">Find</span>(orderId); <span class="comment">// Blocks thread</span>
+    <span class="keyword">var</span> response = _httpClient.<span class="method">GetStringAsync</span>(shipmentUrl).<span class="property">Result</span>; <span class="comment">// Deadlock risk!</span>
+    <span class="keyword">return</span> <span class="method">Ok</span>(order);
+}
+
+<span class="comment">// Modern async approach (non-blocking)</span>
+<span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">GetOrderDetailsAsync</span>(<span class="keyword">int</span> orderId)
+{
+    <span class="keyword">var</span> order = <span class="keyword">await</span> _dbContext.Orders.<span class="method">FindAsync</span>(orderId); <span class="comment">// Thread released</span>
+    <span class="keyword">var</span> response = <span class="keyword">await</span> _httpClient.<span class="method">GetStringAsync</span>(shipmentUrl);
+    <span class="keyword">return</span> <span class="method">Ok</span>(order);
+}
+</code></pre>
+                                After the change, our server could handle 3x more concurrent requests because threads weren't stuck waiting.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    Async/await improves scalability by freeing threads during I/O operations. Use it for database, file, and network calls—never for CPU-bound work (use Task.Run for that). Always propagate async all the way up; mixing .Result or .Wait() causes deadlocks.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">C-Sharp concepts</span>
+                            <span class="category-tag">API</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 24 -->
+            <div class="qa-item" data-keywords="async sync performance speed faster synchronous asynchronous comparison overhead">
+                <details>
+                    <summary>Q24. There is one method which is sync and same method is async then which one will work faster?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                A synchronous method executes slightly faster for a <strong>single operation</strong> because async introduces overhead (state machine generation, Task allocation, context switching). However, under <strong>load with multiple concurrent requests</strong>, async vastly outperforms sync because it doesn't block threads. The key metric isn't individual speed—it's throughput and scalability.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>Sync overhead:</strong> Thread blocked = wasted memory (1MB stack per thread)</li>
+                                    <li><strong>Async overhead:</strong> ~100 bytes for Task object + state machine</li>
+                                    <li><strong>BenchmarkDotNet</strong> can measure the nanosecond difference</li>
+                                    <li><strong>Kestrel</strong> web server in .NET Core benefits massively from async (handles 10k+ concurrent connections)</li>
+                                    <li><strong>ValueTask&lt;T&gt;</strong> can reduce allocation overhead for hot paths</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                I benchmarked this exact scenario when migrating a legacy WebForms app to .NET Core. Here's what I found:
+<pre><code><span class="comment">// Single call: sync wins by ~50 nanoseconds</span>
+<span class="keyword">public</span> <span class="keyword">int</span> <span class="method">GetCountSync</span>() 
+{
+    <span class="keyword">return</span> _dbContext.Orders.<span class="method">Count</span>(); <span class="comment">// ~2ms</span>
+}
+
+<span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="keyword">int</span>&gt; <span class="method">GetCountAsync</span>() 
+{
+    <span class="keyword">return await</span> _dbContext.Orders.<span class="method">CountAsync</span>(); <span class="comment">// ~2.00005ms (state machine overhead)</span>
+}
+
+<span class="comment">// Under load (100 concurrent users):</span>
+<span class="comment">// Sync: Server maxes out at 200 requests/sec, high thread pool starvation</span>
+<span class="comment">// Async: Server handles 2000+ requests/sec, threads remain available</span>
+</code></pre>
+                                <strong>Real measurement from my load test:</strong>
+                                <ul>
+                                    <li>Sync: Average response 500ms, 95th percentile 3 seconds (thread starvation)</li>
+                                    <li>Async: Average response 50ms, 95th percentile 200ms</li>
+                                </ul>
+                                The async method was "slower" in isolation but 10x faster under load.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    For a single operation, sync is microscopically faster. In production web apps with concurrent users, async is orders of magnitude better because it prevents thread pool exhaustion. Always choose async for I/O in server applications—the tiny overhead is worth the massive scalability gain.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">C-Sharp concepts</span>
+                            <span class="category-tag">API</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 25 -->
+            <div class="qa-item" data-keywords="exception handling global error middleware exceptionhandler usedeveloperexceptionpage">
+                <details>
+                    <summary>Q25. Exception Handling - Configure global exception handling?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                Global exception handling in .NET Core centralizes error management by intercepting unhandled exceptions across the entire application. Instead of wrapping every controller action in try-catch blocks, middleware catches exceptions, logs them, and returns consistent error responses. This ensures a uniform client experience and prevents sensitive stack traces from leaking to production users.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>app.UseExceptionHandler("/error")</strong> - Built-in middleware for production</li>
+                                    <li><strong>app.UseDeveloperExceptionPage()</strong> - Development-only detailed errors</li>
+                                    <li><strong>Custom Middleware</strong> - Implement IMiddleware or use app.Use() for full control</li>
+                                    <li><strong>ProblemDetails</strong> - RFC 7807 standard for error responses</li>
+                                    <li><strong>IExceptionHandler</strong> (.NET 8+) - New interface for exception handling</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                In my microservices project, we standardized error responses across 15 APIs. Here's the approach I used:
+<pre><code><span class="comment">// Program.cs - Configure global exception handling</span>
+<span class="keyword">var</span> builder = <span class="class-name">WebApplication</span>.<span class="method">CreateBuilder</span>(args);
+<span class="keyword">var</span> app = builder.<span class="method">Build</span>();
+
+<span class="keyword">if</span> (app.Environment.<span class="method">IsDevelopment</span>())
+{
+    app.<span class="method">UseDeveloperExceptionPage</span>(); <span class="comment">// Detailed errors in dev</span>
+}
+<span class="keyword">else</span>
+{
+    app.<span class="method">UseExceptionHandler</span>(<span class="string">"/error"</span>); <span class="comment">// Production</span>
+    app.<span class="method">UseHsts</span>();
+}
+
+<span class="comment">// Custom middleware for detailed logging</span>
+app.<span class="method">Use</span>(<span class="keyword">async</span> (context, next) =>
+{
+    <span class="keyword">try</span>
+    {
+        <span class="keyword">await</span> <span class="method">next</span>(context);
+    }
+    <span class="keyword">catch</span> (<span class="class-name">Exception</span> ex)
+    {
+        <span class="keyword">var</span> logger = context.RequestServices.<span class="method">GetRequiredService</span>&lt;<span class="class-name">ILogger</span>&lt;<span class="class-name">Program</span>&gt;&gt;();
+        logger.<span class="method">LogError</span>(ex, <span class="string">"Unhandled exception for {Path}"</span>, context.Request.Path);
+        
+        context.Response.StatusCode = <span class="class-name">StatusCodes</span>.Status500InternalServerError;
+        context.Response.ContentType = <span class="string">"application/json"</span>;
+        
+        <span class="keyword">var</span> problemDetails = <span class="keyword">new</span> <span class="class-name">ProblemDetails</span>
+        {
+            Status = 500,
+            Title = <span class="string">"An error occurred"</span>,
+            Detail = app.Environment.<span class="method">IsDevelopment</span>() ? ex.Message : <span class="string">"Please contact support"</span>,
+            Instance = context.Request.Path
+        };
+        
+        <span class="keyword">await</span> context.Response.<span class="method">WriteAsJsonAsync</span>(problemDetails);
+    }
+});
+
+<span class="comment">// Error controller for UseExceptionHandler</span>
+[<span class="class-name">ApiExplorerSettings</span>(IgnoreApi = <span class="keyword">true</span>)]
+<span class="keyword">public class</span> <span class="class-name">ErrorController</span> : <span class="class-name">ControllerBase</span>
+{
+    [<span class="class-name">Route</span>(<span class="string">"/error"</span>)]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">HandleError</span>()
+    {
+        <span class="keyword">var</span> exceptionFeature = HttpContext.Features.<span class="method">Get</span>&lt;<span class="class-name">IExceptionHandlerFeature</span>&gt;();
+        <span class="keyword">var</span> error = exceptionFeature?.Error;
+        
+        <span class="comment">// Log error here</span>
+        
+        <span class="keyword">return</span> <span class="method">Problem</span>(
+            title: <span class="string">"An error occurred"</span>,
+            statusCode: 500
+        );
+    }
+}
+</code></pre>
+                                This approach caught everything—DB timeouts, null references, network failures—and logged them to Seq while returning clean JSON to clients.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    Use <code>UseExceptionHandler</code> for production and <code>UseDeveloperExceptionPage</code> for development. Custom middleware gives you control over logging and response format. Always return ProblemDetails for consistency and never expose stack traces in production.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">API</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 26 -->
+            <div class="qa-item" data-keywords="filter exception handling action filter exceptionfilter attribute middleware difference">
+                <details>
+                    <summary>Q26. Difference between filter and exception handling?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <div class="section-title">📚 Theory</div>
+                            <div class="section-content">
+                                <strong>Filters</strong> (specifically Exception Filters) operate within the MVC/API pipeline and handle exceptions at the controller/action level. They execute <em>before</em> global exception handling and can access MVC context (ModelState, ActionContext). <strong>Global exception handling (middleware)</strong> operates at the HTTP pipeline level and catches <em>all</em> exceptions, including those outside MVC (middleware failures, startup errors). Filters are more granular; global handling is the safety net.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">⚙️ How it works in .NET Core</div>
+                            <div class="section-content">
+                                <ul>
+                                    <li><strong>Exception Filters:</strong> Implement <code>IExceptionFilter</code> or <code>IAsyncExceptionFilter</code>, triggered only in MVC pipeline</li>
+                                    <li><strong>Order of execution:</strong> Exception Filter → Exception Middleware</li>
+                                    <li><strong>Filters can mark exceptions as handled</strong> (context.ExceptionHandled = true), preventing middleware from catching it</li>
+                                    <li><strong>Filters have access to:</strong> ActionContext, ModelState, RouteData</li>
+                                    <li><strong>Middleware has access to:</strong> HttpContext only, but catches <em>everything</em></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💼 Practical Example</div>
+                            <div class="section-content">
+                                In one project, I needed different error handling for API vs. Razor Pages. Here's how I used both:
+<pre><code><span class="comment">// Exception Filter - API-specific validation errors</span>
+<span class="keyword">public class</span> <span class="class-name">ApiExceptionFilter</span> : <span class="class-name">IExceptionFilter</span>
+{
+    <span class="keyword">public void</span> <span class="method">OnException</span>(<span class="class-name">ExceptionContext</span> context)
+    {
+        <span class="keyword">if</span> (context.Exception <span class="keyword">is</span> <span class="class-name">ValidationException</span> validationEx)
+        {
+            context.Result = <span class="keyword">new</span> <span class="class-name">BadRequestObjectResult</span>(<span class="keyword">new</span> 
+            {
+                errors = validationEx.Errors,
+                timestamp = <span class="class-name">DateTime</span>.UtcNow
+            });
+            context.ExceptionHandled = <span class="keyword">true</span>; <span class="comment">// Prevents middleware from handling</span>
+        }
+        <span class="comment">// Let other exceptions bubble to global handler</span>
+    }
+}
+
+<span class="comment">// Register filter in Program.cs</span>
+builder.Services.<span class="method">AddControllers</span>(options =>
+{
+    options.Filters.<span class="method">Add</span>&lt;<span class="class-name">ApiExceptionFilter</span>&gt;();
+});
+
+<span class="comment">// Global middleware - catches everything else</span>
+app.<span class="method">Use</span>(<span class="keyword">async</span> (context, next) =>
+{
+    <span class="keyword">try</span>
+    {
+        <span class="keyword">await</span> <span class="method">next</span>(context);
+    }
+    <span class="keyword">catch</span> (<span class="class-name">DbUpdateException</span> dbEx)
+    {
+        <span class="comment">// Database-specific handling</span>
+        <span class="keyword">await</span> <span class="method">HandleDatabaseError</span>(context, dbEx);
+    }
+    <span class="keyword">catch</span> (<span class="class-name">Exception</span> ex)
+    {
+        <span class="comment">// Everything else</span>
+        <span class="keyword">await</span> <span class="method">HandleGenericError</span>(context, ex);
+    }
+});
+
+<span class="comment">// Use case comparison:</span>
+<span class="comment">// Filter: Model validation failed → Return 400 with field errors</span>
+<span class="comment">// Middleware: Database connection lost → Return 503 with retry-after header</span>
+</code></pre>
+                                <strong>Real scenario I hit:</strong> A middleware failure in authentication was <em>not</em> caught by our Exception Filter (because it happened before MVC pipeline). Only the global middleware caught it. That taught me the layering matters.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🎯 Key Takeaway</div>
+                            <div class="section-content">
+                                <div class="key-takeaway">
+                                    <strong>Exception Filters:</strong> Use for MVC-specific logic (validation, action-level errors, model binding failures). <strong>Global Middleware:</strong> Use as the last safety net for everything (middleware failures, authentication errors, unhandled exceptions). Filters run first and can prevent middleware from seeing the exception.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">API</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const searchBar = document.getElementById('searchBar');
+        const qaItems = document.querySelectorAll('.qa-item');
+        const noResults = document.getElementById('noResults');
+
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let visibleCount = 0;
+
+            qaItems.forEach(item => {
+                const keywords = item.dataset.keywords.toLowerCase();
+                const summaryText = item.querySelector('summary').textContent.toLowerCase();
+                const contentText = item.querySelector('.answer-content').textContent.toLowerCase();
+                
+                const isMatch = keywords.includes(searchTerm) || 
+                               summaryText.includes(searchTerm) || 
+                               contentText.includes(searchTerm);
+
+                if (isMatch) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+
+        // Optional: Collapse all except clicked
+        const allDetails = document.querySelectorAll('details');
+        allDetails.forEach(detail => {
+            detail.addEventListener('toggle', (e) => {
+                if (e.target.open) {
+                    // Optional: Scroll to the opened item
+                    e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Q&A - CI/CD & Deployment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #569cd6;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #3c3c3c;
+            border-radius: 6px;
+            background: #2d2d30;
+            color: #d4d4d4;
+            transition: border-color 0.3s;
+        }
+
+        #searchBar:focus {
+            outline: none;
+            border-color: #569cd6;
+        }
+
+        .qa-item {
+            background: #252526;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .qa-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4ec9b0;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s;
+            color: #569cd6;
+        }
+
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .answer {
+            padding: 0 20px 20px 20px;
+            border-top: 2px solid #3c3c3c;
+        }
+
+        .section {
+            margin: 20px 0;
+        }
+
+        .section h3 {
+            color: #dcdcaa;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .section p, .section ul {
+            color: #d4d4d4;
+            margin-bottom: 10px;
+        }
+
+        .section ul {
+            margin-left: 20px;
+        }
+
+        .section li {
+            margin-bottom: 5px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .category-tag {
+            background: #264f78;
+            color: #9cdcfe;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #ce9178;
+        }
+
+        pre code {
+            color: #d4d4d4;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #569cd6; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        .property { color: #9cdcfe; }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            summary {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 .NET Core Interview Q&A - CI/CD & Deployment</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="🔍 Search questions by keyword (e.g., docker, kubernetes, migrations, linux)..." />
+        </div>
+
+        <div id="qaContainer">
+            <!-- Q1: Database CI/CD in Entity Framework -->
+            <div class="qa-item" data-keywords="database cicd entity framework ef core migrations automation deployment pipeline azure devops github actions">
+                <details>
+                    <summary>Database CI/CD in Entity Framework</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                Database CI/CD with Entity Framework involves automating database schema changes through the deployment pipeline. 
+                                Instead of manually running migrations in production, you script and version them, integrate them into your build/release 
+                                process, and apply them automatically (or with approval gates). This ensures schema changes are tracked in source control, 
+                                tested in lower environments, and deployed consistently. Key concerns include idempotency (safe to rerun), rollback strategies, 
+                                and zero-downtime deployments.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                EF Core migrations are the foundation of database CI/CD:
+                            </p>
+                            <ul>
+                                <li><strong>Migration Scripts:</strong> Use <code>dotnet ef migrations add</code> to generate migration files tracked in Git</li>
+                                <li><strong>SQL Script Generation:</strong> Use <code>dotnet ef migrations script</code> to create idempotent SQL scripts for deployment</li>
+                                <li><strong>Runtime Migrations:</strong> Call <code>context.Database.Migrate()</code> on app startup (simple but risky in production)</li>
+                                <li><strong>CI/CD Integration:</strong> Run migrations as part of Azure DevOps, GitHub Actions, or Jenkins pipelines</li>
+                                <li><strong>Tools:</strong>
+                                    <ul>
+                                        <li><code>EF Core Bundles</code> (.NET 6+): Self-contained executables for migrations</li>
+                                        <li><code>DbUp</code> or <code>Flyway</code>: Alternative migration tools with better control</li>
+                                        <li><code>Azure SQL Database Projects</code>: State-based deployments with DACPAC files</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p>
+                                Best practice: Generate SQL scripts in CI, review them, then apply via CD pipeline with proper credentials and approval gates.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a microservices project I worked on, we had 12 services each with their own database. Manual migrations were a nightmare. 
+                                Here's how I automated it with GitHub Actions and EF Core:
+                            </p>
+                            <pre><code><span class="comment"># .github/workflows/deploy.yml</span>
+<span class="keyword">name:</span> Deploy API with Database Migration
+
+<span class="keyword">on:</span>
+  <span class="property">push:</span>
+    <span class="property">branches:</span> [main]
+
+<span class="keyword">jobs:</span>
+  <span class="property">deploy:</span>
+    <span class="property">runs-on:</span> ubuntu-latest
+    <span class="property">steps:</span>
+      - <span class="property">uses:</span> actions/checkout@v3
+      
+      <span class="comment"># Build and generate migration SQL script</span>
+      - <span class="property">name:</span> Generate Migration Script
+        <span class="property">run:</span> |
+          dotnet tool install --global dotnet-ef
+          dotnet ef migrations script --idempotent --output ./migration.sql \
+            --project ./MyApi/MyApi.csproj
+      
+      <span class="comment"># Review artifact (optional approval step)</span>
+      - <span class="property">name:</span> Upload Migration Script
+        <span class="property">uses:</span> actions/upload-artifact@v3
+        <span class="property">with:</span>
+          <span class="property">name:</span> migration-script
+          <span class="property">path:</span> ./migration.sql
+      
+      <span class="comment"># Apply migration to Azure SQL</span>
+      - <span class="property">name:</span> Run Migration
+        <span class="property">run:</span> |
+          sqlcmd -S ${{ secrets.SQL_SERVER }} \
+            -U ${{ secrets.SQL_USER }} \
+            -P ${{ secrets.SQL_PASSWORD }} \
+            -d MyDatabase -i ./migration.sql
+</code></pre>
+                            <p>
+                                For .NET 6+, I also used <strong>EF Core Bundles</strong> for better portability:
+                            </p>
+                            <pre><code><span class="comment">// Generate a self-contained migration bundle</span>
+dotnet ef migrations bundle --output ./efbundle --self-contained
+
+<span class="comment">// In CI/CD pipeline, just run the bundle</span>
+./efbundle --connection "Server=...;Database=MyDb;..."
+</code></pre>
+                            <p>
+                                This eliminated manual errors, gave us audit trails, and enabled rollback by running specific migration scripts in reverse.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Never run migrations manually in production. Use <code>dotnet ef migrations script</code> to generate idempotent SQL, 
+                                integrate it into your CI/CD pipeline, and apply with approval gates. EF Core Bundles (.NET 6+) simplify this further. 
+                                Show you understand trade-offs between runtime migrations (fast but risky) vs. scripted migrations (safer, auditable).
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">EF Core</span>
+                            <span class="category-tag">CI/CD and Docker</span>
+                            <span class="category-tag">SQL</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Q2: Deploy .NET Core App on Linux -->
+            <div class="qa-item" data-keywords="linux deployment dotnet systemd nginx apache reverse proxy ubuntu centos debian kestrel hosting">
+                <details>
+                    <summary>How We Can Deploy .NET Core App on Linux</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                .NET Core is cross-platform, so deploying to Linux is straightforward. You publish the app as a self-contained or 
+                                framework-dependent deployment, configure a process manager (like systemd) to keep it running, and place a reverse proxy 
+                                (Nginx or Apache) in front of Kestrel for production. Linux hosting is popular because it's cost-effective, lightweight, 
+                                and integrates well with Docker and cloud-native architectures.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                Deployment steps for Linux:
+                            </p>
+                            <ul>
+                                <li><strong>Publish the App:</strong>
+                                    <ul>
+                                        <li><code>dotnet publish -c Release -o ./publish</code></li>
+                                        <li>Choose deployment mode: Framework-dependent (requires .NET runtime on server) or Self-contained (bundles runtime)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Copy to Server:</strong> Use <code>scp</code>, <code>rsync</code>, or CI/CD pipelines</li>
+                                <li><strong>Install .NET Runtime:</strong> If framework-dependent, install .NET SDK/runtime via apt, yum, or snap</li>
+                                <li><strong>Configure systemd:</strong> Create a service file to manage the app lifecycle</li>
+                                <li><strong>Set Up Reverse Proxy:</strong> Configure Nginx or Apache to forward requests to Kestrel (default port 5000/5001)</li>
+                                <li><strong>Security:</strong> Use non-root user, configure firewall (ufw/iptables), and set up HTTPS with Let's Encrypt</li>
+                            </ul>
+                            <p>
+                                Kestrel is production-ready but Nginx/Apache add SSL termination, static file caching, and load balancing.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                I deployed a high-traffic ASP.NET Core API to Ubuntu servers behind Nginx. Here's the exact process I used:
+                            </p>
+                            <pre><code><span class="comment"># 1. Publish the app locally</span>
+dotnet publish -c Release -r linux-x64 --self-contained false -o ./publish
+
+<span class="comment"># 2. Copy to server (via SCP or CI/CD)</span>
+scp -r ./publish/* user@server:/var/www/myapi
+
+<span class="comment"># 3. Create systemd service: /etc/systemd/system/myapi.service</span>
+[Unit]
+Description=My ASP.NET Core API
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/myapi
+ExecStart=/usr/bin/dotnet /var/www/myapi/MyApi.dll
+Restart=always
+RestartSec=10
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
+
+<span class="comment"># 4. Enable and start the service</span>
+sudo systemctl enable myapi.service
+sudo systemctl start myapi.service
+sudo systemctl status myapi.service
+
+<span class="comment"># 5. Configure Nginx: /etc/nginx/sites-available/myapi</span>
+server {
+    listen 80;
+    server_name api.example.com;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+<span class="comment"># 6. Enable site and reload Nginx</span>
+sudo ln -s /etc/nginx/sites-available/myapi /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+<span class="comment"># 7. Set up HTTPS with Let's Encrypt</span>
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d api.example.com
+</code></pre>
+                            <p>
+                                This setup gave us auto-restart on crashes, proper logging via journalctl, and HTTPS at zero cost. For monitoring, I added 
+                                Prometheus exporters and integrated with Azure Monitor.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Deploying to Linux is production-standard for .NET Core. Know the full stack: systemd for process management, Nginx for 
+                                reverse proxy, and Let's Encrypt for SSL. Self-contained deployments simplify versioning; framework-dependent saves space. 
+                                Show you've done this end-to-end, not just read docs.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Cloud</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">CI/CD and Docker</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Q3: Deploy ASP.NET App in Docker -->
+            <div class="qa-item" data-keywords="docker container dockerfile asp.net deployment image build multi-stage compose registry acr">
+                <details>
+                    <summary>How to Deploy ASP.NET App in Docker</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                Docker containerizes your ASP.NET app with all its dependencies into a portable image that runs consistently across environments. 
+                                You create a <code>Dockerfile</code> that defines the build and runtime steps, build the image, and deploy it to Docker Hub, 
+                                Azure Container Registry, or AWS ECR. Containers solve "works on my machine" problems and are foundational for Kubernetes, 
+                                microservices, and CI/CD pipelines.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                Docker deployment steps:
+                            </p>
+                            <ul>
+                                <li><strong>Dockerfile:</strong> Use official Microsoft images (<code>mcr.microsoft.com/dotnet/aspnet</code> for runtime, <code>dotnet/sdk</code> for builds)</li>
+                                <li><strong>Multi-Stage Builds:</strong> Build in SDK image, copy artifacts to runtime image (reduces size ~10x)</li>
+                                <li><strong>Build Image:</strong> <code>docker build -t myapi:latest .</code></li>
+                                <li><strong>Run Locally:</strong> <code>docker run -p 8080:80 myapi:latest</code></li>
+                                <li><strong>Push to Registry:</strong> <code>docker push myregistry.azurecr.io/myapi:latest</code></li>
+                                <li><strong>Deploy:</strong> Use Docker Compose, Azure Container Instances, App Service, or Kubernetes</li>
+                                <li><strong>Best Practices:</strong>
+                                    <ul>
+                                        <li>Use <code>.dockerignore</code> to exclude bin/obj folders</li>
+                                        <li>Run as non-root user for security</li>
+                                        <li>Use health checks and environment variables for config</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a microservices migration, I containerized 20+ ASP.NET Core APIs. Here's the production-grade Dockerfile I used:
+                            </p>
+                            <pre><code><span class="comment"># Multi-stage Dockerfile</span>
+<span class="comment"># Stage 1: Build</span>
+<span class="keyword">FROM</span> mcr.microsoft.com/dotnet/sdk:<span class="number">8.0</span> <span class="keyword">AS</span> build
+<span class="keyword">WORKDIR</span> /src
+
+<span class="comment"># Copy csproj and restore (cached layer)</span>
+<span class="keyword">COPY</span> [<span class="string">"MyApi/MyApi.csproj"</span>, <span class="string">"MyApi/"</span>]
+<span class="keyword">RUN</span> dotnet restore <span class="string">"MyApi/MyApi.csproj"</span>
+
+<span class="comment"># Copy source and build</span>
+<span class="keyword">COPY</span> . .
+<span class="keyword">WORKDIR</span> <span class="string">"/src/MyApi"</span>
+<span class="keyword">RUN</span> dotnet build <span class="string">"MyApi.csproj"</span> -c Release -o /app/build
+
+<span class="comment"># Stage 2: Publish</span>
+<span class="keyword">FROM</span> build <span class="keyword">AS</span> publish
+<span class="keyword">RUN</span> dotnet publish <span class="string">"MyApi.csproj"</span> -c Release -o /app/publish /p:UseAppHost=<span class="keyword">false</span>
+
+<span class="comment"># Stage 3: Runtime</span>
+<span class="keyword">FROM</span> mcr.microsoft.com/dotnet/aspnet:<span class="number">8.0</span> <span class="keyword">AS</span> final
+<span class="keyword">WORKDIR</span> /app
+<span class="keyword">EXPOSE</span> <span class="number">80</span>
+<span class="keyword">EXPOSE</span> <span class="number">443</span>
+
+<span class="comment"># Security: Run as non-root</span>
+<span class="keyword">RUN</span> adduser --disabled-password --gecos <span class="string">''</span> appuser && chown -R appuser /app
+<span class="keyword">USER</span> appuser
+
+<span class="keyword">COPY</span> --from=publish /app/publish .
+
+<span class="comment"># Health check</span>
+<span class="keyword">HEALTHCHECK</span> --interval=<span class="number">30</span>s --timeout=<span class="number">3</span>s --retries=<span class="number">3</span> \
+  <span class="keyword">CMD</span> curl --fail http://localhost/health || exit <span class="number">1</span>
+
+<span class="keyword">ENTRYPOINT</span> [<span class="string">"dotnet"</span>, <span class="string">"MyApi.dll"</span>]
+</code></pre>
+                            <p>
+                                <strong>Docker Compose for local dev:</strong>
+                            </p>
+                            <pre><code><span class="comment"># docker-compose.yml</span>
+<span class="property">version:</span> <span class="string">'3.8'</span>
+<span class="property">services:</span>
+  <span class="property">api:</span>
+    <span class="property">build:</span> .
+    <span class="property">ports:</span>
+      - <span class="string">"8080:80"</span>
+    <span class="property">environment:</span>
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=MyDb;...
+    <span class="property">depends_on:</span>
+      - db
+  
+  <span class="property">db:</span>
+    <span class="property">image:</span> mcr.microsoft.com/mssql/server:<span class="number">2022</span>-latest
+    <span class="property">environment:</span>
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+    <span class="property">ports:</span>
+      - <span class="string">"1433:1433"</span>
+</code></pre>
+                            <p>
+                                <strong>CI/CD with GitHub Actions:</strong>
+                            </p>
+                            <pre><code><span class="comment"># Push to Azure Container Registry and deploy</span>
+- <span class="property">name:</span> Build and Push Docker Image
+  <span class="property">run:</span> |
+    docker build -t myregistry.azurecr.io/myapi:${{ github.sha }} .
+    docker push myregistry.azurecr.io/myapi:${{ github.sha }}
+    
+- <span class="property">name:</span> Deploy to Azure Container Apps
+  <span class="property">run:</span> |
+    az containerapp update \
+      --name myapi --resource-group myRG \
+      --image myregistry.azurecr.io/myapi:${{ github.sha }}
+</code></pre>
+                            <p>
+                                This cut deployment time from 20 minutes to under 2 minutes and eliminated environment drift entirely.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Multi-stage Dockerfiles are non-negotiable—they keep images lean (runtime only) and builds fast (cached layers). Always use 
+                                official Microsoft base images and run as non-root. Show you understand the full workflow: Dockerfile → Build → Push → Deploy 
+                                to AKS/Azure Container Apps/AWS ECS.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">CI/CD and Docker</span>
+                            <span class="category-tag">Cloud</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Q4: Docker and Kubernetes -->
+            <div class="qa-item" data-keywords="docker kubernetes k8s container orchestration pods services deployments helm aks eks gke">
+                <details>
+                    <summary>Explain Docker and Kubernetes</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                <strong>Docker</strong> is a containerization platform that packages apps with their dependencies into isolated containers. 
+                                It solves the "works on my machine" problem by ensuring consistency across dev, test, and production. <strong>Kubernetes (K8s)</strong> 
+                                is a container orchestration platform that manages Docker containers at scale—handling deployment, scaling, load balancing, 
+                                self-healing, and rolling updates. While Docker runs containers, Kubernetes runs clusters of containers across multiple machines.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                <strong>Docker:</strong>
+                            </p>
+                            <ul>
+                                <li>Containerizes .NET apps using <code>Dockerfile</code></li>
+                                <li>Provides lightweight, portable runtime environments</li>
+                                <li>Works with Docker Desktop (local), Docker Compose (multi-container), and registries (ACR, Docker Hub)</li>
+                            </ul>
+                            <p>
+                                <strong>Kubernetes:</strong>
+                            </p>
+                            <ul>
+                                <li><strong>Pods:</strong> Smallest unit, runs one or more containers</li>
+                                <li><strong>Deployments:</strong> Manage replica sets, rolling updates, and rollbacks</li>
+                                <li><strong>Services:</strong> Expose pods via stable IPs and DNS (ClusterIP, LoadBalancer, NodePort)</li>
+                                <li><strong>Ingress:</strong> HTTP/HTTPS routing and SSL termination</li>
+                                <li><strong>ConfigMaps/Secrets:</strong> Inject configuration and credentials</li>
+                                <li><strong>Helm:</strong> Package manager for K8s (like NuGet for deployments)</li>
+                                <li><strong>Managed Services:</strong> Azure Kubernetes Service (AKS), AWS EKS, Google GKE</li>
+                            </ul>
+                            <p>
+                                For .NET developers, Kubernetes means deploying containerized APIs/services to a cluster that auto-scales, self-heals, 
+                                and handles traffic distribution.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a fintech project, we migrated 30 microservices from VMs to AKS (Azure Kubernetes Service). Here's how I deployed 
+                                a .NET Core API:
+                            </p>
+                            <pre><code><span class="comment"># Step 1: Build and push Docker image (see previous answer)</span>
+docker build -t myregistry.azurecr.io/payment-api:v1.0 .
+docker push myregistry.azurecr.io/payment-api:v1.0
+
+<span class="comment"># Step 2: Kubernetes Deployment YAML (deployment.yaml)</span>
+<span class="property">apiVersion:</span> apps/v1
+<span class="property">kind:</span> Deployment
+<span class="property">metadata:</span>
+  <span class="property">name:</span> payment-api
+<span class="property">spec:</span>
+  <span class="property">replicas:</span> <span class="number">3</span>  <span class="comment"># Run 3 instances for high availability</span>
+  <span class="property">selector:</span>
+    <span class="property">matchLabels:</span>
+      <span class="property">app:</span> payment-api
+  <span class="property">template:</span>
+    <span class="property">metadata:</span>
+      <span class="property">labels:</span>
+        <span class="property">app:</span> payment-api
+    <span class="property">spec:</span>
+      <span class="property">containers:</span>
+      - <span class="property">name:</span> payment-api
+        <span class="property">image:</span> myregistry.azurecr.io/payment-api:v1.0
+        <span class="property">ports:</span>
+        - <span class="property">containerPort:</span> <span class="number">80</span>
+        <span class="property">env:</span>
+        - <span class="property">name:</span> ASPNETCORE_ENVIRONMENT
+          <span class="property">value:</span> <span class="string">"Production"</span>
+        - <span class="property">name:</span> ConnectionStrings__DefaultConnection
+          <span class="property">valueFrom:</span>
+            <span class="property">secretKeyRef:</span>
+              <span class="property">name:</span> db-secret
+              <span class="property">key:</span> connectionString
+        <span class="property">resources:</span>
+          <span class="property">requests:</span>
+            <span class="property">memory:</span> <span class="string">"256Mi"</span>
+            <span class="property">cpu:</span> <span class="string">"250m"</span>
+          <span class="property">limits:</span>
+            <span class="property">memory:</span> <span class="string">"512Mi"</span>
+            <span class="property">cpu:</span> <span class="string">"500m"</span>
+        <span class="property">livenessProbe:</span>
+          <span class="property">httpGet:</span>
+            <span class="property">path:</span> /health
+            <span class="property">port:</span> <span class="number">80</span>
+          <span class="property">initialDelaySeconds:</span> <span class="number">30</span>
+          <span class="property">periodSeconds:</span> <span class="number">10</span>
+
+<span class="comment"># Step 3: Service YAML (service.yaml)</span>
+<span class="property">apiVersion:</span> v1
+<span class="property">kind:</span> Service
+<span class="property">metadata:</span>
+  <span class="property">name:</span> payment-api-service
+<span class="property">spec:</span>
+  <span class="property">type:</span> LoadBalancer
+  <span class="property">selector:</span>
+    <span class="property">app:</span> payment-api
+  <span class="property">ports:</span>
+  - <span class="property">protocol:</span> TCP
+    <span class="property">port:</span> <span class="number">80</span>
+    <span class="property">targetPort:</span> <span class="number">80</span>
+
+<span class="comment"># Step 4: Apply to AKS cluster</span>
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+<span class="comment"># Step 5: Check status</span>
+kubectl get pods
+kubectl get services
+kubectl logs -l app=payment-api
+
+<span class="comment"># Step 6: Scale dynamically</span>
+kubectl scale deployment payment-api --replicas=<span class="number">10</span>
+
+<span class="comment"># Step 7: Rolling update (zero downtime)</span>
+kubectl set image deployment/payment-api payment-api=myregistry.azurecr.io/payment-api:v1.1
+kubectl rollout status deployment/payment-api
+</code></pre>
+                            <p>
+                                <strong>Using Helm for reusable deployments:</strong>
+                            </p>
+                            <pre><code><span class="comment"># Create Helm chart</span>
+helm create payment-api-chart
+
+<span class="comment"># Deploy with custom values</span>
+helm install payment-api ./payment-api-chart \
+  --set image.tag=v1.0 \
+  --set replicaCount=<span class="number">5</span>
+
+<span class="comment"># Upgrade</span>
+helm upgrade payment-api ./payment-api-chart --set image.tag=v1.1
+</code></pre>
+                            <p>
+                                Kubernetes handled auto-scaling during peak loads (Black Friday), auto-restarted crashed pods, and enabled zero-downtime 
+                                deployments. We went from 20-minute manual deployments to 2-minute automated rollouts.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Docker = container runtime; Kubernetes = container orchestration at scale. For .NET Core, you containerize with Docker 
+                                and deploy/manage with Kubernetes. Know core K8s concepts: Pods, Deployments, Services, Ingress, ConfigMaps/Secrets. 
+                                Show you've worked with AKS, EKS, or on-prem K8s—not just theory.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">CI/CD and Docker</span>
+                            <span class="category-tag">Cloud</span>
+                            <span class="category-tag">Microservices</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <div class="no-results" id="noResults">
+            No matching questions found. Try different keywords.
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchBar = document.getElementById('searchBar');
+        const qaItems = document.querySelectorAll('.qa-item');
+        const noResults = document.getElementById('noResults');
+
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            qaItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords').toLowerCase();
+                const summaryText = item.querySelector('summary').textContent.toLowerCase();
+                const matchesSearch = keywords.includes(searchTerm) || summaryText.includes(searchTerm);
+
+                if (matchesSearch) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = visibleCount === 0 && searchTerm !== '' ? 'block' : 'none';
+        });
+
+        // Optional: Auto-expand on direct search match
+        searchBar.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const firstVisible = Array.from(qaItems).find(item => item.style.display !== 'none');
+                if (firstVisible) {
+                    const details = firstVisible.querySelector('details');
+                    details.open = true;
+                    firstVisible.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

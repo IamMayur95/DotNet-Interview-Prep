@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud - .NET Interview Q&A</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #252526;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007acc;
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 10px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #007acc;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background: #252526;
+            border: 2px solid #3e3e42;
+            border-radius: 5px;
+            color: #d4d4d4;
+            transition: border-color 0.3s;
+        }
+
+        #searchBox:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .question-item {
+            background: #252526;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #3e3e42;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .question-item:hover {
+            transform: translateX(5px);
+            border-color: #007acc;
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #4ec9b0;
+            background: #2d2d30;
+            user-select: none;
+            list-style: none;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::before {
+            content: '▶';
+            position: absolute;
+            left: 15px;
+            transition: transform 0.3s;
+            color: #007acc;
+        }
+
+        details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .answer-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section h3 {
+            color: #569cd6;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #3e3e42;
+            padding-bottom: 5px;
+        }
+
+        .section p, .section ul {
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .section ul {
+            margin-left: 20px;
+        }
+
+        .section li {
+            margin-bottom: 8px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #ce9178;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .class-name {
+            color: #4ec9b0;
+        }
+
+        .method {
+            color: #dcdcaa;
+        }
+
+        .key-takeaway {
+            background: #264f78;
+            border-left: 4px solid #007acc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background: #3e3e42;
+            color: #4ec9b0;
+            padding: 5px 12px;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #858585;
+            border-top: 1px solid #3e3e42;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            .answer-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>☁️ Cloud - Azure Interview Questions</h1>
+            <div class="category-badge">6 Questions</div>
+            <p style="margin-top: 15px; color: #858585;">Senior .NET Core Developer Interview Preparation</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchBox" placeholder="🔍 Search questions by keyword (e.g., Azure Functions, Key Vault, ADF...)">
+        </div>
+
+        <div id="questionsContainer">
+            <!-- Question 1 -->
+            <div class="question-item" data-keywords="azure functions types trigger binding durable consumption premium app service plan serverless">
+                <details>
+                    <summary>Q1: What are the types of Azure Functions?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Azure Functions are serverless compute services that run event-driven code without managing infrastructure. 
+                                There are different types based on <strong>hosting plans</strong> (Consumption, Premium, App Service) and 
+                                <strong>trigger types</strong> (HTTP, Timer, Queue, Blob, Event Grid, Service Bus, Cosmos DB, etc.). 
+                                Additionally, <strong>Durable Functions</strong> enable stateful workflows in a serverless environment.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Hosting Plans:</strong></p>
+                            <ul>
+                                <li><strong>Consumption Plan:</strong> Pay-per-execution, auto-scales, 5-minute timeout default</li>
+                                <li><strong>Premium Plan:</strong> Pre-warmed instances, VNET integration, unlimited execution time</li>
+                                <li><strong>App Service Plan:</strong> Dedicated VMs, always-on, predictable pricing</li>
+                            </ul>
+                            <p><strong>Function Types by Trigger:</strong></p>
+                            <ul>
+                                <li><strong>HTTP Triggered:</strong> <code>HttpTrigger</code> attribute, REST API endpoints</li>
+                                <li><strong>Timer Triggered:</strong> <code>TimerTrigger</code> with CRON expressions</li>
+                                <li><strong>Queue/Service Bus:</strong> <code>QueueTrigger</code>, <code>ServiceBusTrigger</code></li>
+                                <li><strong>Blob/Event Grid:</strong> <code>BlobTrigger</code>, <code>EventGridTrigger</code></li>
+                                <li><strong>Durable Functions:</strong> Orchestrator, Activity, Entity functions using <code>Microsoft.Azure.WebJobs.Extensions.DurableTask</code></li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we migrated a batch processing system to Azure Functions. We used a <strong>Timer Triggered function</strong> 
+                                on a Premium plan to process nightly reports, an <strong>HTTP Triggered function</strong> for real-time API requests, and 
+                                <strong>Durable Functions</strong> for a multi-step approval workflow that required state management across days.
+                            </p>
+                            <pre><code><span class="comment">// HTTP Triggered Function</span>
+[<span class="class-name">FunctionName</span>(<span class="string">"GetUserData"</span>)]
+<span class="keyword">public static async</span> <span class="class-name">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">Run</span>(
+    [<span class="class-name">HttpTrigger</span>(<span class="class-name">AuthorizationLevel</span>.Function, <span class="string">"get"</span>, <span class="string">"post"</span>)] <span class="class-name">HttpRequest</span> req,
+    <span class="class-name">ILogger</span> log)
+{
+    log.<span class="method">LogInformation</span>(<span class="string">"HTTP trigger function processed a request."</span>);
+    <span class="keyword">return new</span> <span class="class-name">OkObjectResult</span>(<span class="string">"User data fetched"</span>);
+}
+
+<span class="comment">// Timer Triggered Function (runs daily at 2 AM)</span>
+[<span class="class-name">FunctionName</span>(<span class="string">"DailyReportProcessor"</span>)]
+<span class="keyword">public static void</span> <span class="method">Run</span>(
+    [<span class="class-name">TimerTrigger</span>(<span class="string">"0 0 2 * * *"</span>)] <span class="class-name">TimerInfo</span> myTimer,
+    <span class="class-name">ILogger</span> log)
+{
+    log.<span class="method">LogInformation</span>($<span class="string">"Timer trigger function executed at: {DateTime.Now}"</span>);
+    <span class="comment">// Process daily reports</span>
+}</code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Azure Functions come in three hosting plans (Consumption, Premium, App Service) and support multiple trigger types 
+                                (HTTP, Timer, Queue, Blob, etc.). For stateful workflows, use Durable Functions. Choose the plan based on performance, 
+                                cost, and scaling requirements.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Cloud</span>
+                            <span class="tag">Azure Functions</span>
+                            <span class="tag">Serverless</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-item" data-keywords="azure key vault secret expiration connection string application behavior rotation">
+                <details>
+                    <summary>Q2: If an Azure Key Vault secret is used in a connection string and that secret reaches its expiration date, what happens to the application using it?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                When an Azure Key Vault secret expires, it becomes <strong>disabled</strong> and cannot be retrieved by applications. 
+                                Any application attempting to access the expired secret will receive an error (typically HTTP 403 Forbidden), causing 
+                                connection failures. The application won't automatically refresh the secret unless you implement <strong>secret rotation</strong> 
+                                or <strong>periodic reload mechanisms</strong>. This can lead to downtime if not handled proactively.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Key Vault Integration:</strong></p>
+                            <ul>
+                                <li>Use <code>Azure.Extensions.AspNetCore.Configuration.Secrets</code> NuGet package</li>
+                                <li>Configure in <code>Program.cs</code> using <code>AddAzureKeyVault()</code></li>
+                                <li>Secrets are loaded at startup by default (no automatic refresh)</li>
+                            </ul>
+                            <p><strong>Handling Expiration:</strong></p>
+                            <ul>
+                                <li><strong>ConfigureReload:</strong> Enable periodic reload with <code>ConfigureKeyVault(options => options.ReloadInterval = TimeSpan.FromMinutes(30))</code></li>
+                                <li><strong>Secret Rotation:</strong> Use Azure Key Vault's built-in rotation with Event Grid notifications</li>
+                                <li><strong>Monitoring:</strong> Set up Azure Monitor alerts before expiration dates</li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we had a production outage because a SQL connection string secret expired overnight. 
+                                After that incident, I implemented <strong>automatic secret refresh every 30 minutes</strong> and configured 
+                                <strong>Azure Monitor alerts</strong> 30 days before expiration. We also used Managed Identity to avoid storing credentials.
+                            </p>
+                            <pre><code><span class="comment">// Program.cs - Configure Key Vault with auto-refresh</span>
+<span class="keyword">var</span> builder = <span class="class-name">WebApplication</span>.<span class="method">CreateBuilder</span>(args);
+
+<span class="keyword">var</span> keyVaultUrl = <span class="keyword">new</span> <span class="class-name">Uri</span>(builder.Configuration[<span class="string">"KeyVaultUrl"</span>]);
+<span class="keyword">var</span> credential = <span class="keyword">new</span> <span class="class-name">DefaultAzureCredential</span>();
+
+builder.Configuration.<span class="method">AddAzureKeyVault</span>(keyVaultUrl, credential, <span class="keyword">new</span> <span class="class-name">AzureKeyVaultConfigurationOptions</span>
+{
+    <span class="comment">// Reload secrets every 30 minutes</span>
+    ReloadInterval = <span class="class-name">TimeSpan</span>.<span class="method">FromMinutes</span>(<span class="keyword">30</span>)
+});
+
+<span class="keyword">var</span> app = builder.<span class="method">Build</span>();
+
+<span class="comment">// Access secret</span>
+<span class="keyword">var</span> connectionString = app.Configuration[<span class="string">"ConnectionStrings:SqlDatabase"</span>];
+<span class="comment">// If expired, this will be null or throw exception</span></code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Expired Key Vault secrets cause application failures (403 errors). Implement automatic secret rotation, 
+                                configure periodic reload in .NET Core using <code>ReloadInterval</code>, and set up expiration alerts to prevent downtime. 
+                                Always test secret rotation in non-production environments first.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Cloud</span>
+                            <span class="tag">Azure Key Vault</span>
+                            <span class="tag">Security</span>
+                            <span class="tag">Secret Management</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-item" data-keywords="azure bastion ip whitelist vnet virtual network vm connection security nsg network">
+                <details>
+                    <summary>Q3: Explain the process of whitelisting an IP using Bastion and how connection from VM was established? Explain the VNET creation.</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                <strong>Azure Bastion</strong> provides secure RDP/SSH access to VMs without exposing them to the public internet. 
+                                It acts as a jump server within a VNET. IP whitelisting is done via <strong>Network Security Groups (NSGs)</strong> 
+                                on the Bastion subnet or VM subnet. A <strong>VNET (Virtual Network)</strong> is an isolated network in Azure where 
+                                you define subnets, IP ranges, and security rules. Bastion requires a dedicated <code>AzureBastionSubnet</code> with 
+                                a minimum /27 CIDR block.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>VNET Creation Steps:</strong></p>
+                            <ul>
+                                <li>Create a VNET with address space (e.g., 10.0.0.0/16)</li>
+                                <li>Add subnets: <code>AzureBastionSubnet</code> (e.g., 10.0.1.0/27) and VM subnet (e.g., 10.0.2.0/24)</li>
+                                <li>Deploy Azure Bastion in the <code>AzureBastionSubnet</code></li>
+                            </ul>
+                            <p><strong>IP Whitelisting via NSG:</strong></p>
+                            <ul>
+                                <li>Create NSG rule: Allow inbound traffic from specific IPs on port 443 (Bastion uses HTTPS)</li>
+                                <li>Attach NSG to <code>AzureBastionSubnet</code> or VM subnet</li>
+                                <li>Add outbound rules to allow Bastion to communicate with VMs (port 3389 for RDP, 22 for SSH)</li>
+                            </ul>
+                            <p><strong>Connection Process:</strong></p>
+                            <ul>
+                                <li>User connects to Azure Portal → Navigate to VM → Click "Connect" → Select "Bastion"</li>
+                                <li>Bastion validates NSG rules, establishes SSL connection over port 443</li>
+                                <li>No public IP needed on VM; connection is proxied through Bastion</li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we deployed a .NET Core API on Azure VMs and needed secure access for DevOps teams. 
+                                We created a VNET with two subnets: one for Bastion (10.10.1.0/27) and one for VMs (10.10.2.0/24). 
+                                We whitelisted our office IP range (203.0.113.0/24) in the NSG attached to the Bastion subnet. 
+                                This allowed only our team to connect via Bastion to the VMs for troubleshooting without exposing RDP ports publicly.
+                            </p>
+                            <pre><code><span class="comment">// Azure CLI commands to set up VNET and Bastion</span>
+
+<span class="comment"># 1. Create Resource Group</span>
+az group create --name MyResourceGroup --location eastus
+
+<span class="comment"># 2. Create VNET with address space</span>
+az network vnet create \
+  --name MyVNet \
+  --resource-group MyResourceGroup \
+  --address-prefix 10.10.0.0/16 \
+  --subnet-name VMSubnet \
+  --subnet-prefix 10.10.2.0/24
+
+<span class="comment"># 3. Create AzureBastionSubnet</span>
+az network vnet subnet create \
+  --name AzureBastionSubnet \
+  --resource-group MyResourceGroup \
+  --vnet-name MyVNet \
+  --address-prefix 10.10.1.0/27
+
+<span class="comment"># 4. Create Public IP for Bastion</span>
+az network public-ip create \
+  --resource-group MyResourceGroup \
+  --name BastionPublicIP \
+  --sku Standard
+
+<span class="comment"># 5. Create Bastion</span>
+az network bastion create \
+  --name MyBastion \
+  --resource-group MyResourceGroup \
+  --vnet-name MyVNet \
+  --public-ip-address BastionPublicIP
+
+<span class="comment"># 6. Create NSG and whitelist IP</span>
+az network nsg create --resource-group MyResourceGroup --name BastionNSG
+az network nsg rule create \
+  --resource-group MyResourceGroup \
+  --nsg-name BastionNSG \
+  --name AllowOfficeIP \
+  --priority 100 \
+  --source-address-prefixes 203.0.113.0/24 \
+  --destination-port-ranges 443 \
+  --access Allow \
+  --protocol Tcp</code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Azure Bastion provides secure VM access without public IPs. Create a VNET with <code>AzureBastionSubnet</code> (/27 minimum), 
+                                deploy Bastion, and whitelist IPs using NSG rules on port 443. Connection is proxied through Bastion over SSL, 
+                                eliminating the need for public RDP/SSH ports.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Cloud</span>
+                            <span class="tag">Azure Bastion</span>
+                            <span class="tag">VNET</span>
+                            <span class="tag">Security</span>
+                            <span class="tag">NSG</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-item" data-keywords="azure data factory adf pipeline trigger rest api schedule event tumbling window manual execution">
+                <details>
+                    <summary>Q4: How will you trigger ADF pipeline?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Azure Data Factory (ADF) pipelines can be triggered in multiple ways: <strong>Manual execution</strong>, 
+                                <strong>Schedule triggers</strong> (CRON-based), <strong>Tumbling Window triggers</strong> (fixed intervals with dependency), 
+                                <strong>Event-based triggers</strong> (Blob storage events), and <strong>REST API/SDK</strong> for programmatic execution. 
+                                Each method suits different scenarios—scheduled batch jobs, real-time data ingestion, or orchestration from external systems.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Trigger Types:</strong></p>
+                            <ul>
+                                <li><strong>Manual:</strong> Click "Trigger Now" in Azure Portal or use Azure CLI</li>
+                                <li><strong>Schedule Trigger:</strong> Define CRON expression in ADF (e.g., daily at 2 AM)</li>
+                                <li><strong>Tumbling Window:</strong> Fixed-size, non-overlapping time windows with retry logic</li>
+                                <li><strong>Event Trigger:</strong> Responds to Blob storage events (file created/deleted)</li>
+                                <li><strong>REST API:</strong> Call ADF REST API from .NET Core using <code>Azure.ResourceManager.DataFactory</code> SDK</li>
+                            </ul>
+                            <p><strong>.NET Core Integration:</strong></p>
+                            <ul>
+                                <li>Use <code>DataFactoryManagementClient</code> from <code>Microsoft.Azure.Management.DataFactory</code></li>
+                                <li>Authenticate using <code>DefaultAzureCredential</code> or Service Principal</li>
+                                <li>Call <code>Pipelines.CreateRunAsync()</code> to trigger programmatically</li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we had a .NET Core API that processed user uploads and needed to trigger an ADF pipeline 
+                                to transform and load data into a data warehouse. We used <strong>event-based triggers</strong> for immediate processing 
+                                when files were uploaded to Blob storage, and <strong>scheduled triggers</strong> for nightly aggregations. 
+                                For ad-hoc runs, we triggered pipelines via REST API from our .NET Core admin portal.
+                            </p>
+                            <pre><code><span class="comment">// Trigger ADF Pipeline from .NET Core using REST API</span>
+<span class="keyword">using</span> Azure.Identity;
+<span class="keyword">using</span> Azure.ResourceManager;
+<span class="keyword">using</span> Azure.ResourceManager.DataFactory;
+
+<span class="keyword">public class</span> <span class="class-name">AdfTriggerService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">DataFactoryPipelineResource</span> _pipeline;
+
+    <span class="keyword">public</span> <span class="method">AdfTriggerService</span>(<span class="keyword">string</span> subscriptionId, <span class="keyword">string</span> resourceGroup, 
+                              <span class="keyword">string</span> factoryName, <span class="keyword">string</span> pipelineName)
+    {
+        <span class="keyword">var</span> credential = <span class="keyword">new</span> <span class="class-name">DefaultAzureCredential</span>();
+        <span class="keyword">var</span> armClient = <span class="keyword">new</span> <span class="class-name">ArmClient</span>(credential);
+        
+        <span class="keyword">var</span> resourceId = <span class="class-name">DataFactoryPipelineResource</span>.<span class="method">CreateResourceIdentifier</span>(
+            subscriptionId, resourceGroup, factoryName, pipelineName);
+        
+        _pipeline = armClient.<span class="method">GetDataFactoryPipelineResource</span>(resourceId);
+    }
+
+    <span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="keyword">string</span>&gt; <span class="method">TriggerPipelineAsync</span>()
+    {
+        <span class="keyword">var</span> runResponse = <span class="keyword">await</span> _pipeline.<span class="method">CreateRunAsync</span>();
+        <span class="keyword">return</span> runResponse.Value.RunId;
+    }
+}
+
+<span class="comment">// Usage in API Controller</span>
+[<span class="class-name">HttpPost</span>(<span class="string">"trigger-etl"</span>)]
+<span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">TriggerEtl</span>()
+{
+    <span class="keyword">var</span> service = <span class="keyword">new</span> <span class="class-name">AdfTriggerService</span>(
+        <span class="string">"sub-123"</span>, <span class="string">"myResourceGroup"</span>, <span class="string">"myDataFactory"</span>, <span class="string">"EtlPipeline"</span>);
+    
+    <span class="keyword">var</span> runId = <span class="keyword">await</span> service.<span class="method">TriggerPipelineAsync</span>();
+    <span class="keyword">return</span> <span class="method">Ok</span>(<span class="keyword">new</span> { RunId = runId });
+}</code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>ADF pipelines can be triggered manually, via schedules (CRON), tumbling windows (fixed intervals), 
+                                event-based triggers (Blob events), or programmatically using REST API/.NET SDK. Use <code>DataFactoryManagementClient</code> 
+                                in .NET Core to trigger pipelines dynamically from your applications.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Cloud</span>
+                            <span class="tag">Azure Data Factory</span>
+                            <span class="tag">ETL</span>
+                            <span class="tag">Data Engineering</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-item" data-keywords="azure service bus topics queues messaging pub sub publisher subscriber fanout broadcast">
+                <details>
+                    <summary>Q5: Differentiate between Azure Topics and Queues</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Both <strong>Azure Queues</strong> and <strong>Topics</strong> are messaging services, but they differ in architecture. 
+                                <strong>Queues</strong> follow a <strong>point-to-point</strong> pattern (one sender, one receiver), where each message 
+                                is processed by a single consumer. <strong>Topics</strong> follow a <strong>publish-subscribe</strong> pattern, where 
+                                messages are sent to multiple subscribers through <strong>subscriptions</strong> with optional filters. 
+                                Topics enable fanout scenarios and decoupled multi-consumer architectures.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Azure Queue (Storage Queue or Service Bus Queue):</strong></p>
+                            <ul>
+                                <li><strong>Use Case:</strong> Load leveling, task distribution, single consumer</li>
+                                <li><strong>Pattern:</strong> FIFO (First-In-First-Out), one message → one consumer</li>
+                                <li><strong>.NET Package:</strong> <code>Azure.Messaging.ServiceBus</code> or <code>Azure.Storage.Queues</code></li>
+                                <li><strong>Message Guarantee:</strong> At-least-once delivery with peek-lock</li>
+                            </ul>
+                            <p><strong>Azure Topics (Service Bus Topics):</strong></p>
+                            <ul>
+                                <li><strong>Use Case:</strong> Pub-sub, event broadcasting, multiple consumers</li>
+                                <li><strong>Pattern:</strong> One message → multiple subscriptions (each subscription gets a copy)</li>
+                                <li><strong>.NET Package:</strong> <code>Azure.Messaging.ServiceBus</code></li>
+                                <li><strong>Filtering:</strong> SQL filters, correlation filters on subscriptions</li>
+                            </ul>
+                            <table style="border-collapse: collapse; width: 100%; margin-top: 15px; color: #cccccc;">
+                                <tr style="background: #2d2d30;">
+                                    <th style="border: 1px solid #3e3e42; padding: 10px;">Feature</th>
+                                    <th style="border: 1px solid #3e3e42; padding: 10px;">Queue</th>
+                                    <th style="border: 1px solid #3e3e42; padding: 10px;">Topic</th>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Pattern</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Point-to-Point</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Publish-Subscribe</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Consumers</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Single</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Multiple (via subscriptions)</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Filtering</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">No</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Yes (SQL, Correlation)</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Use Case</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Task distribution</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Event broadcasting</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we used <strong>Service Bus Queues</strong> for processing orders (one order → one processor), 
+                                ensuring each order was handled exactly once. For the same system, we used <strong>Topics</strong> to broadcast 
+                                "OrderPlaced" events to multiple services—inventory service, notification service, and analytics service—each with 
+                                its own subscription. This allowed decoupled, parallel processing of the same event.
+                            </p>
+                            <pre><code><span class="comment">// Sending to Queue (Point-to-Point)</span>
+<span class="keyword">var</span> client = <span class="keyword">new</span> <span class="class-name">ServiceBusClient</span>(connectionString);
+<span class="keyword">var</span> sender = client.<span class="method">CreateSender</span>(<span class="string">"orderqueue"</span>);
+<span class="keyword">await</span> sender.<span class="method">SendMessageAsync</span>(<span class="keyword">new</span> <span class="class-name">ServiceBusMessage</span>(<span class="string">"Order123"</span>));
+
+<span class="comment">// Publishing to Topic (Pub-Sub)</span>
+<span class="keyword">var</span> topicSender = client.<span class="method">CreateSender</span>(<span class="string">"ordertopic"</span>);
+<span class="keyword">await</span> topicSender.<span class="method">SendMessageAsync</span>(<span class="keyword">new</span> <span class="class-name">ServiceBusMessage</span>(<span class="string">"Order123"</span>));
+
+<span class="comment">// Multiple subscriptions receive the message:</span>
+<span class="comment">// - "inventory-subscription" → updates stock</span>
+<span class="comment">// - "notification-subscription" → sends email</span>
+<span class="comment">// - "analytics-subscription" → logs metrics</span></code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Use Queues for point-to-point communication (one sender → one receiver) and Topics for publish-subscribe 
+                                (one sender → multiple receivers). Topics support subscriptions with filters, enabling fanout patterns. 
+                                Both use <code>Azure.Messaging.ServiceBus</code> in .NET Core.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Cloud</span>
+                            <span class="tag">Azure Service Bus</span>
+                            <span class="tag">Messaging</span>
+                            <span class="tag">Microservices</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-item" data-keywords="azure logic apps function apps serverless workflow integration automation low code">
+                <details>
+                    <summary>Q6: Differentiate between Azure Logic Apps and Function Apps</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                <strong>Azure Logic Apps</strong> is a <strong>low-code/no-code</strong> workflow automation service with 400+ built-in connectors 
+                                for integrations (Salesforce, SAP, Office 365, etc.). It's designed for <strong>orchestration and integration</strong> scenarios. 
+                                <strong>Azure Functions</strong> is a <strong>code-first</strong> serverless compute service for executing custom business logic 
+                                in response to events. Logic Apps are billed per action execution, while Functions are billed by execution time and memory.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Azure Logic Apps:</strong></p>
+                            <ul>
+                                <li><strong>Development:</strong> Visual designer (Azure Portal, VS Code), JSON workflow definition</li>
+                                <li><strong>Use Case:</strong> Integration with SaaS apps, B2B workflows, scheduled automation</li>
+                                <li><strong>Connectors:</strong> 400+ built-in (SQL, Blob, Office 365, Dynamics, ServiceNow)</li>
+                                <li><strong>Pricing:</strong> Per action execution (e.g., $0.000025 per action)</li>
+                                <li><strong>Limitations:</strong> Less control over code, vendor lock-in</li>
+                            </ul>
+                            <p><strong>Azure Functions:</strong></p>
+                            <ul>
+                                <li><strong>Development:</strong> Code in C#, Python, Node.js, Java using VS/VS Code</li>
+                                <li><strong>Use Case:</strong> Custom business logic, data processing, API backends</li>
+                                <li><strong>Triggers:</strong> HTTP, Timer, Queue, Blob, Event Grid, Cosmos DB, etc.</li>
+                                <li><strong>Pricing:</strong> Consumption (per execution + memory), Premium, App Service</li>
+                                <li><strong>Advantages:</strong> Full control, testable, version control (Git)</li>
+                            </ul>
+                            <table style="border-collapse: collapse; width: 100%; margin-top: 15px; color: #cccccc;">
+                                <tr style="background: #2d2d30;">
+                                    <th style="border: 1px solid #3e3e42; padding: 10px;">Feature</th>
+                                    <th style="border: 1px solid #3e3e42; padding: 10px;">Logic Apps</th>
+                                    <th style="border: 1px solid #3e3e42; padding: 10px;">Function Apps</th>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Development</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Low-code (visual designer)</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Code-first (C#, Python, etc.)</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Best For</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Integration, workflows</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Custom logic, event processing</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Connectors</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">400+ built-in</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Via custom code/SDKs</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Testing</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Limited</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Full unit testing support</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Pricing</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Per action</td>
+                                    <td style="border: 1px solid #3e3e42; padding: 10px;">Per execution + memory</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we used <strong>Logic Apps</strong> to automate approval workflows—when a document was uploaded to SharePoint, 
+                                it triggered a Logic App that sent approval emails via Outlook, updated Dynamics 365, and logged events in SQL. 
+                                For the same project, we used <strong>Azure Functions</strong> to process uploaded PDFs (text extraction, validation) 
+                                because it required custom C# code with third-party libraries (iTextSharp). Logic Apps for integration, Functions for custom logic.
+                            </p>
+                            <pre><code><span class="comment">// Azure Function for Custom PDF Processing</span>
+[<span class="class-name">FunctionName</span>(<span class="string">"ProcessPdf"</span>)]
+<span class="keyword">public static async</span> <span class="class-name">Task</span> <span class="method">Run</span>(
+    [<span class="class-name">BlobTrigger</span>(<span class="string">"uploads/{name}.pdf"</span>)] <span class="class-name">Stream</span> pdfStream,
+    <span class="keyword">string</span> name,
+    <span class="class-name">ILogger</span> log)
+{
+    log.<span class="method">LogInformation</span>($<span class="string">"Processing PDF: {name}"</span>);
+    
+    <span class="comment">// Custom business logic</span>
+    <span class="keyword">var</span> text = <span class="method">ExtractTextFromPdf</span>(pdfStream);
+    <span class="keyword">var</span> isValid = <span class="method">ValidateContent</span>(text);
+    
+    <span class="keyword">if</span> (isValid)
+    {
+        <span class="comment">// Store in database, trigger Logic App for approval</span>
+        <span class="keyword">await</span> <span class="method">TriggerLogicApp</span>(name, text);
+    }
+}
+
+<span class="comment">// Logic Apps Workflow (Visual Designer - JSON definition):</span>
+<span class="comment">// 1. When PDF is validated (HTTP trigger from Function)</span>
+<span class="comment">// 2. Send email via Office 365 Connector</span>
+<span class="comment">// 3. Update Dynamics 365 record</span>
+<span class="comment">// 4. Log to SQL Database</span></code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Use Logic Apps for low-code integration workflows with built-in connectors (Office 365, SAP, Salesforce). 
+                                Use Function Apps for custom business logic requiring full code control. They complement each other—Logic Apps for 
+                                orchestration, Functions for compute. Both are serverless and event-driven.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Cloud</span>
+                            <span class="tag">Azure Logic Apps</span>
+                            <span class="tag">Azure Functions</span>
+                            <span class="tag">Serverless</span>
+                            <span class="tag">Integration</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <div class="no-results" id="noResults">
+            <h2>🔍 No matching questions found</h2>
+            <p>Try different keywords or clear the search</p>
+        </div>
+
+        <footer>
+            <p>💡 <strong>Tip:</strong> Review each answer, practice the code examples, and relate them to your own project experiences.</p>
+            <p style="margin-top: 10px;">Generated for senior .NET Core developer interview preparation</p>
+        </footer>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchBox = document.getElementById('searchBox');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const noResults = document.getElementById('noResults');
+        const questionItems = document.querySelectorAll('.question-item');
+
+        searchBox.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            questionItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords').toLowerCase();
+                const questionText = item.querySelector('summary').textContent.toLowerCase();
+                
+                if (keywords.includes(searchTerm) || questionText.includes(searchTerm) || searchTerm === '') {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResults.style.display = 'block';
+                questionsContainer.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                questionsContainer.style.display = 'block';
+            }
+        });
+
+        // Smooth scroll on page load
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>

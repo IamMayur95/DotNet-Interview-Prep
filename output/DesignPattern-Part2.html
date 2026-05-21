@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Q&A - Design Patterns</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #569cd6;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #3c3c3c;
+            border-radius: 6px;
+            background: #2d2d30;
+            color: #d4d4d4;
+            transition: border-color 0.3s;
+        }
+
+        #searchBar:focus {
+            outline: none;
+            border-color: #569cd6;
+        }
+
+        .qa-item {
+            background: #252526;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .qa-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4ec9b0;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s;
+            color: #569cd6;
+        }
+
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .answer {
+            padding: 0 20px 20px 20px;
+            border-top: 2px solid #3c3c3c;
+        }
+
+        .section {
+            margin: 20px 0;
+        }
+
+        .section h3 {
+            color: #dcdcaa;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .section p, .section ul {
+            color: #d4d4d4;
+            margin-bottom: 10px;
+        }
+
+        .section ul {
+            margin-left: 20px;
+        }
+
+        .section li {
+            margin-bottom: 5px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .category-tag {
+            background: #264f78;
+            color: #9cdcfe;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #ce9178;
+        }
+
+        pre code {
+            color: #d4d4d4;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #569cd6; }
+        .class-name { color: #4ec9b0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            summary {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 .NET Core Interview Q&A - Design Patterns</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="🔍 Search questions by keyword (e.g., factory, CQRS, dependency injection)..." />
+        </div>
+
+        <div id="qaContainer">
+            <!-- Q1: Factory Pattern -->
+            <div class="qa-item" data-keywords="factory pattern creational design object creation encapsulation instantiation">
+                <details>
+                    <summary>Factory Pattern - Encapsulate Object Creation</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                The Factory Pattern is a creational design pattern that provides an interface for creating objects without specifying their exact class. 
+                                Instead of using <code>new</code> directly, you delegate object creation to a factory method or class. This decouples client code from 
+                                concrete implementations, making it easier to swap or extend object types. It's particularly useful when the creation logic is complex, 
+                                involves configuration, or when you need to return different subtypes based on input parameters.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                In modern .NET, factories are commonly implemented in a few ways:
+                            </p>
+                            <ul>
+                                <li><strong>Factory Method Pattern:</strong> A method that returns an interface or base class type</li>
+                                <li><strong>Abstract Factory:</strong> Using interfaces like <code>IServiceProvider</code> or custom factory interfaces registered in DI</li>
+                                <li><strong>Delegate Factories:</strong> Using <code>Func&lt;T&gt;</code> injected via DI to defer object creation</li>
+                                <li><strong>Named Factories:</strong> Leveraging <code>IHttpClientFactory</code>, <code>ILoggerFactory</code>, or custom implementations registered with <code>AddTransient/AddScoped</code></li>
+                            </ul>
+                            <p>
+                                .NET's built-in DI container supports factory delegates out of the box. You can register a <code>Func&lt;string, IService&gt;</code> 
+                                that resolves different implementations based on runtime parameters.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we had multiple payment processors (Stripe, PayPal, Square) and needed to select the right one based on 
+                                user preference. Instead of littering <code>if/switch</code> statements everywhere, I built a factory:
+                            </p>
+                            <pre><code><span class="comment">// Interface</span>
+<span class="keyword">public interface</span> <span class="class-name">IPaymentProcessor</span>
+{
+    <span class="keyword">Task</span>&lt;<span class="keyword">bool</span>&gt; <span class="method">ProcessPaymentAsync</span>(<span class="keyword">decimal</span> amount);
+}
+
+<span class="comment">// Implementations</span>
+<span class="keyword">public class</span> <span class="class-name">StripeProcessor</span> : <span class="class-name">IPaymentProcessor</span>
+{
+    <span class="keyword">public async</span> <span class="keyword">Task</span>&lt;<span class="keyword">bool</span>&gt; <span class="method">ProcessPaymentAsync</span>(<span class="keyword">decimal</span> amount)
+        => <span class="keyword">await</span> <span class="comment">/* Stripe API call */</span>;
+}
+
+<span class="comment">// Factory</span>
+<span class="keyword">public class</span> <span class="class-name">PaymentProcessorFactory</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IServiceProvider</span> _serviceProvider;
+
+    <span class="keyword">public</span> <span class="method">PaymentProcessorFactory</span>(<span class="class-name">IServiceProvider</span> serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    <span class="keyword">public</span> <span class="class-name">IPaymentProcessor</span> <span class="method">Create</span>(<span class="keyword">string</span> processorType)
+    {
+        <span class="keyword">return</span> processorType <span class="keyword">switch</span>
+        {
+            <span class="string">"Stripe"</span> => _serviceProvider.GetRequiredService&lt;<span class="class-name">StripeProcessor</span>&gt;(),
+            <span class="string">"PayPal"</span> => _serviceProvider.GetRequiredService&lt;<span class="class-name">PayPalProcessor</span>&gt;(),
+            _ => <span class="keyword">throw new</span> <span class="class-name">ArgumentException</span>(<span class="string">"Invalid processor"</span>)
+        };
+    }
+}
+
+<span class="comment">// DI Registration in Program.cs</span>
+builder.Services.AddTransient&lt;<span class="class-name">StripeProcessor</span>&gt;();
+builder.Services.AddTransient&lt;<span class="class-name">PayPalProcessor</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="class-name">PaymentProcessorFactory</span>&gt;();
+</code></pre>
+                            <p>
+                                This made unit testing trivial and allowed us to add new processors without touching existing code—just register them in DI 
+                                and update the factory switch.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                The Factory Pattern keeps your code loosely coupled and testable. In .NET Core, leverage the DI container to inject factories 
+                                rather than hardcoding <code>new</code> everywhere. It's essential for scalable, maintainable systems where object creation 
+                                logic needs flexibility.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">C-Sharp Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Q2: CQRS -->
+            <div class="qa-item" data-keywords="cqrs command query separation read write event sourcing mediatr microservices architecture">
+                <details>
+                    <summary>CQRS - Command-Query Separation</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                CQRS (Command Query Responsibility Segregation) is an architectural pattern that separates read operations (queries) from write 
+                                operations (commands). Commands change state but don't return data; queries return data but don't change state. This separation 
+                                allows you to optimize each side independently—scale reads differently from writes, use different data models, or even separate 
+                                databases. It's particularly powerful in event-driven or domain-driven design (DDD) systems where complex business logic benefits 
+                                from clear responsibility boundaries.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                In .NET, CQRS is typically implemented using:
+                            </p>
+                            <ul>
+                                <li><strong>MediatR:</strong> A popular NuGet package (<code>MediatR</code>) that provides in-process messaging for commands and queries</li>
+                                <li><strong>Command/Query Handlers:</strong> Separate classes implementing <code>IRequestHandler&lt;TRequest, TResponse&gt;</code></li>
+                                <li><strong>Separate Data Models:</strong> DTOs for reads (queries) vs domain entities for writes (commands)</li>
+                                <li><strong>Separate Databases (optional):</strong> Read replicas, Redis caches, or separate SQL/NoSQL stores for queries</li>
+                                <li><strong>Event Sourcing:</strong> Often paired with CQRS, using frameworks like <code>EventStore</code> or <code>Azure Event Hubs</code></li>
+                            </ul>
+                            <p>
+                                MediatR handles routing commands/queries to their handlers, making controllers thin and focused on HTTP concerns only.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a high-traffic e-commerce API I worked on, we had a bottleneck where product searches were slowing down order placements. 
+                                I introduced CQRS using MediatR:
+                            </p>
+                            <pre><code><span class="comment">// Command - Places an order (write)</span>
+<span class="keyword">public record</span> <span class="class-name">PlaceOrderCommand</span>(<span class="keyword">int</span> UserId, List&lt;<span class="keyword">int</span>&gt; ProductIds) 
+    : <span class="class-name">IRequest</span>&lt;<span class="keyword">int</span>&gt;;
+
+<span class="keyword">public class</span> <span class="class-name">PlaceOrderHandler</span> : <span class="class-name">IRequestHandler</span>&lt;<span class="class-name">PlaceOrderCommand</span>, <span class="keyword">int</span>&gt;
+{
+    <span class="keyword">private readonly</span> <span class="class-name">ApplicationDbContext</span> _context;
+
+    <span class="keyword">public async</span> <span class="keyword">Task</span>&lt;<span class="keyword">int</span>&gt; <span class="method">Handle</span>(<span class="class-name">PlaceOrderCommand</span> request, <span class="class-name">CancellationToken</span> ct)
+    {
+        <span class="keyword">var</span> order = <span class="keyword">new</span> <span class="class-name">Order</span> { UserId = request.UserId, OrderDate = DateTime.UtcNow };
+        _context.Orders.Add(order);
+        <span class="keyword">await</span> _context.SaveChangesAsync(ct);
+        <span class="keyword">return</span> order.Id;
+    }
+}
+
+<span class="comment">// Query - Gets order details (read)</span>
+<span class="keyword">public record</span> <span class="class-name">GetOrderQuery</span>(<span class="keyword">int</span> OrderId) : <span class="class-name">IRequest</span>&lt;<span class="class-name">OrderDto</span>&gt;;
+
+<span class="keyword">public class</span> <span class="class-name">GetOrderHandler</span> : <span class="class-name">IRequestHandler</span>&lt;<span class="class-name">GetOrderQuery</span>, <span class="class-name">OrderDto</span>&gt;
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IReadOnlyDbContext</span> _readDb; <span class="comment">// Could be a Redis cache or read replica</span>
+
+    <span class="keyword">public async</span> <span class="keyword">Task</span>&lt;<span class="class-name">OrderDto</span>&gt; <span class="method">Handle</span>(<span class="class-name">GetOrderQuery</span> request, <span class="class-name">CancellationToken</span> ct)
+    {
+        <span class="keyword">return await</span> _readDb.Orders
+            .Where(o => o.Id == request.OrderId)
+            .Select(o => <span class="keyword">new</span> <span class="class-name">OrderDto</span>(o.Id, o.Total))
+            .FirstOrDefaultAsync(ct);
+    }
+}
+
+<span class="comment">// Controller</span>
+[<span class="class-name">ApiController</span>]
+[<span class="class-name">Route</span>(<span class="string">"api/orders"</span>)]
+<span class="keyword">public class</span> <span class="class-name">OrdersController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IMediator</span> _mediator;
+
+    [<span class="class-name">HttpPost</span>]
+    <span class="keyword">public async</span> <span class="keyword">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">PlaceOrder</span>(<span class="class-name">PlaceOrderCommand</span> command)
+        => <span class="method">Ok</span>(<span class="keyword">await</span> _mediator.Send(command));
+
+    [<span class="class-name">HttpGet</span>(<span class="string">"{id}"</span>)]
+    <span class="keyword">public async</span> <span class="keyword">Task</span>&lt;<span class="class-name">IActionResult</span>&gt; <span class="method">GetOrder</span>(<span class="keyword">int</span> id)
+        => <span class="method">Ok</span>(<span class="keyword">await</span> _mediator.Send(<span class="keyword">new</span> <span class="class-name">GetOrderQuery</span>(id)));
+}
+</code></pre>
+                            <p>
+                                We later moved queries to a Redis cache synced via an event bus. Performance improved 10x, and the codebase became much easier to reason about.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                CQRS isn't overkill—it's essential for complex domains or high-scale systems. In .NET Core, MediatR makes implementation clean 
+                                and testable. Show you understand when to use it (complex business logic, event sourcing, scale) vs. when it's over-engineering 
+                                (simple CRUD apps).
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">Microservices</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">Architecture</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Q3: Dependency Injection -->
+            <div class="qa-item" data-keywords="dependency injection di ioc inversion control container solid testability loose coupling lifetime scoped transient singleton">
+                <details>
+                    <summary>Dependency Injection Pattern - Inversion of Control</summary>
+                    <div class="answer">
+                        <div class="section">
+                            <h3>📖 Theory</h3>
+                            <p>
+                                Dependency Injection (DI) is a design pattern that implements Inversion of Control (IoC), where dependencies are provided 
+                                to a class rather than the class creating them itself. Instead of <code>new Service()</code> inside a class, you inject 
+                                <code>IService</code> via constructor, properties, or methods. This decouples your code, making it testable, maintainable, 
+                                and adhering to the SOLID principles—especially Dependency Inversion. A DI container manages object lifetimes and wires up 
+                                dependencies automatically at runtime.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p>
+                                .NET Core has built-in DI through <code>Microsoft.Extensions.DependencyInjection</code>. Key concepts:
+                            </p>
+                            <ul>
+                                <li><strong>Service Lifetimes:</strong>
+                                    <ul>
+                                        <li><code>Transient</code>: New instance every time it's requested</li>
+                                        <li><code>Scoped</code>: One instance per HTTP request (or scope)</li>
+                                        <li><code>Singleton</code>: One instance for the app's lifetime</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Registration:</strong> Done in <code>Program.cs</code> (or <code>Startup.cs</code> in older versions) using <code>builder.Services.Add*</code></li>
+                                <li><strong>Constructor Injection:</strong> The container automatically resolves dependencies declared in constructors</li>
+                                <li><strong>IServiceProvider:</strong> The underlying container that resolves services at runtime</li>
+                                <li><strong>Third-party Containers:</strong> You can replace the default with Autofac, Ninject, or others if needed</li>
+                            </ul>
+                            <p>
+                                In minimal APIs and controllers, DI is automatic. In console apps or workers, you manually build an <code>IHost</code> or <code>ServiceProvider</code>.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a real-time notification system I built, we needed to send alerts via email, SMS, and push notifications. Instead of 
+                                tight coupling, I used DI with the strategy pattern:
+                            </p>
+                            <pre><code><span class="comment">// Service interface</span>
+<span class="keyword">public interface</span> <span class="class-name">INotificationService</span>
+{
+    <span class="keyword">Task</span> <span class="method">SendAsync</span>(<span class="keyword">string</span> message);
+}
+
+<span class="comment">// Implementations</span>
+<span class="keyword">public class</span> <span class="class-name">EmailNotificationService</span> : <span class="class-name">INotificationService</span>
+{
+    <span class="keyword">public async</span> <span class="keyword">Task</span> <span class="method">SendAsync</span>(<span class="keyword">string</span> message)
+        => <span class="keyword">await</span> <span class="comment">/* Send email */</span>;
+}
+
+<span class="keyword">public class</span> <span class="class-name">SmsNotificationService</span> : <span class="class-name">INotificationService</span>
+{
+    <span class="keyword">public async</span> <span class="keyword">Task</span> <span class="method">SendAsync</span>(<span class="keyword">string</span> message)
+        => <span class="keyword">await</span> <span class="comment">/* Send SMS */</span>;
+}
+
+<span class="comment">// Consumer</span>
+<span class="keyword">public class</span> <span class="class-name">AlertService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IEnumerable</span>&lt;<span class="class-name">INotificationService</span>&gt; _notifiers;
+
+    <span class="keyword">public</span> <span class="method">AlertService</span>(<span class="class-name">IEnumerable</span>&lt;<span class="class-name">INotificationService</span>&gt; notifiers)
+    {
+        _notifiers = notifiers;
+    }
+
+    <span class="keyword">public async</span> <span class="keyword">Task</span> <span class="method">BroadcastAlertAsync</span>(<span class="keyword">string</span> message)
+    {
+        <span class="keyword">foreach</span> (<span class="keyword">var</span> notifier <span class="keyword">in</span> _notifiers)
+        {
+            <span class="keyword">await</span> notifier.SendAsync(message);
+        }
+    }
+}
+
+<span class="comment">// DI Registration in Program.cs</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// Register multiple implementations</span>
+builder.Services.AddTransient&lt;<span class="class-name">INotificationService</span>, <span class="class-name">EmailNotificationService</span>&gt;();
+builder.Services.AddTransient&lt;<span class="class-name">INotificationService</span>, <span class="class-name">SmsNotificationService</span>&gt;();
+builder.Services.AddScoped&lt;<span class="class-name">AlertService</span>&gt;();
+
+<span class="keyword">var</span> app = builder.Build();
+</code></pre>
+                            <p>
+                                The container automatically injected all <code>INotificationService</code> implementations into <code>AlertService</code>. 
+                                For unit tests, I could mock <code>INotificationService</code> easily without touching production code. When we added push 
+                                notifications later, it was just one new registration—no changes to <code>AlertService</code>.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Dependency Injection is non-negotiable in modern .NET. Understand service lifetimes (Transient/Scoped/Singleton) cold—interviewers 
+                                will ask when to use each. DI makes your code testable and loosely coupled, which is critical for maintainability and scaling teams.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">C-Sharp Concepts</span>
+                            <span class="category-tag">Unit Testing</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <div class="no-results" id="noResults">
+            No matching questions found. Try different keywords.
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchBar = document.getElementById('searchBar');
+        const qaItems = document.querySelectorAll('.qa-item');
+        const noResults = document.getElementById('noResults');
+
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            qaItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords').toLowerCase();
+                const summaryText = item.querySelector('summary').textContent.toLowerCase();
+                const matchesSearch = keywords.includes(searchTerm) || summaryText.includes(searchTerm);
+
+                if (matchesSearch) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = visibleCount === 0 && searchTerm !== '' ? 'block' : 'none';
+        });
+
+        // Optional: Auto-expand on direct search match
+        searchBar.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const firstVisible = Array.from(qaItems).find(item => item.style.display !== 'none');
+                if (firstVisible) {
+                    const details = firstVisible.querySelector('details');
+                    details.open = true;
+                    firstVisible.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

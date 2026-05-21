@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Concepts Part 3 - Interview Q&A</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #252526;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #c586c0;
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 10px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #c586c0;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background: #252526;
+            border: 2px solid #3e3e42;
+            border-radius: 5px;
+            color: #d4d4d4;
+            transition: border-color 0.3s;
+        }
+
+        #searchBox:focus {
+            outline: none;
+            border-color: #c586c0;
+        }
+
+        .question-item {
+            background: #252526;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #3e3e42;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .question-item:hover {
+            transform: translateX(5px);
+            border-color: #c586c0;
+        }
+
+        details {
+            cursor: pointer;
+        }
+
+        summary {
+            padding: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #4ec9b0;
+            background: #2d2d30;
+            user-select: none;
+            list-style: none;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::before {
+            content: '▶';
+            position: absolute;
+            left: 15px;
+            transition: transform 0.3s;
+            color: #c586c0;
+        }
+
+        details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .answer-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section h3 {
+            color: #569cd6;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #3e3e42;
+            padding-bottom: 5px;
+        }
+
+        .section p, .section ul {
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .section ul {
+            margin-left: 20px;
+        }
+
+        .section li {
+            margin-bottom: 8px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #ce9178;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .class-name {
+            color: #4ec9b0;
+        }
+
+        .method {
+            color: #dcdcaa;
+        }
+
+        .key-takeaway {
+            background: #3b2f4a;
+            border-left: 4px solid #c586c0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background: #3e3e42;
+            color: #4ec9b0;
+            padding: 5px 12px;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+            display: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            padding: 10px 20px;
+            background: #2d2d30;
+            color: #4ec9b0;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid #3e3e42;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: #3e3e42;
+            border-color: #c586c0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #858585;
+            border-top: 1px solid #3e3e42;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            color: #cccccc;
+        }
+
+        th, td {
+            border: 1px solid #3e3e42;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #2d2d30;
+            color: #4ec9b0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            .answer-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ .NET Core Concepts Part 3 - Interview Questions</h1>
+            <div class="category-badge">Questions 10-13</div>
+            <p style="margin-top: 15px; color: #858585;">Localization, IQueryable, Exception Handling</p>
+        </header>
+
+        <div class="nav-links">
+            <a href="DotNetCoreConcepts_Part1.html">← Part 1 (Q1-Q5)</a>
+            <a href="DotNetCoreConcepts_Part2.html">← Part 2 (Q6-Q9)</a>
+            <a href="DotNetCoreConcepts_Part4.html">Part 4 (Q14-Q18) →</a>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchBox" placeholder="🔍 Search questions by keyword (e.g., localization, IQueryable, exception, UseApp...)">
+        </div>
+
+        <div id="questionsContainer">
+            <!-- Question 10 -->
+            <div class="question-item" data-keywords="localization globalization culture internationalization i18n l10n resource files resx language translation">
+                <details>
+                    <summary>Q10: What is Localization and Globalization in .NET Core?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                <strong>Globalization (i18n)</strong> is designing apps to support multiple cultures and languages without code changes. 
+                                <strong>Localization (l10n)</strong> is adapting apps for specific cultures by translating content, formatting dates/numbers, 
+                                and adjusting for cultural conventions. .NET Core uses <strong>resource files (.resx)</strong> for translations, 
+                                <strong>CultureInfo</strong> for culture-specific formatting, and <strong>RequestLocalizationMiddleware</strong> to detect 
+                                user culture from query strings, cookies, or Accept-Language headers.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Key Concepts:</strong></p>
+                            <ul>
+                                <li><strong>Globalization:</strong> Designing culture-neutral apps (e.g., using resource keys instead of hardcoded text)</li>
+                                <li><strong>Localization:</strong> Providing culture-specific resources (e.g., English, French, Spanish translations)</li>
+                                <li><strong>CultureInfo:</strong> Represents culture (e.g., en-US, fr-FR, es-ES) for formatting dates, numbers, currency</li>
+                                <li><strong>Resource Files:</strong> .resx files with key-value pairs for translations (e.g., Resources.en.resx, Resources.fr.resx)</li>
+                            </ul>
+
+                            <p><strong>Setup Steps:</strong></p>
+                            <ol>
+                                <li><strong>Install Package:</strong> <code>Microsoft.Extensions.Localization</code></li>
+                                <li><strong>Create Resource Files:</strong> SharedResource.en.resx, SharedResource.fr.resx</li>
+                                <li><strong>Configure Services:</strong> <code>AddLocalization()</code> and <code>AddRequestLocalization()</code></li>
+                                <li><strong>Add Middleware:</strong> <code>UseRequestLocalization()</code></li>
+                                <li><strong>Inject IStringLocalizer:</strong> Use in controllers/views to retrieve localized strings</li>
+                            </ol>
+
+                            <p><strong>Configuration:</strong></p>
+                            <pre><code><span class="comment">// Program.cs</span>
+<span class="keyword">var</span> builder = <span class="class-name">WebApplication</span>.<span class="method">CreateBuilder</span>(args);
+
+<span class="comment">// 1. Add Localization Services</span>
+builder.Services.<span class="method">AddLocalization</span>(options => options.ResourcesPath = <span class="string">"Resources"</span>);
+
+<span class="comment">// 2. Configure Supported Cultures</span>
+<span class="keyword">var</span> supportedCultures = <span class="keyword">new</span>[] { <span class="string">"en-US"</span>, <span class="string">"fr-FR"</span>, <span class="string">"es-ES"</span> };
+builder.Services.<span class="method">Configure</span>&lt;<span class="class-name">RequestLocalizationOptions</span>&gt;(options =>
+{
+    options.<span class="method">SetDefaultCulture</span>(supportedCultures[<span class="keyword">0</span>]);
+    options.<span class="method">AddSupportedCultures</span>(supportedCultures);
+    options.<span class="method">AddSupportedUICultures</span>(supportedCultures);
+    
+    <span class="comment">// Culture detection order: Query String → Cookie → Accept-Language Header</span>
+    options.RequestCultureProviders.<span class="method">Insert</span>(<span class="keyword">0</span>, <span class="keyword">new</span> <span class="class-name">QueryStringRequestCultureProvider</span>());
+});
+
+builder.Services.<span class="method">AddControllers</span>()
+    .<span class="method">AddViewLocalization</span>(); <span class="comment">// For Razor views</span>
+
+<span class="keyword">var</span> app = builder.<span class="method">Build</span>();
+
+<span class="comment">// 3. Add Middleware (before routing)</span>
+app.<span class="method">UseRequestLocalization</span>();
+app.<span class="method">UseRouting</span>();
+app.<span class="method">MapControllers</span>();</code></pre>
+
+                            <p><strong>Resource Files (Resources/SharedResource.en.resx):</strong></p>
+                            <pre><code><span class="comment">&lt;!-- XML structure --&gt;</span>
+&lt;data name=<span class="string">"Welcome"</span> xml:space=<span class="string">"preserve"</span>&gt;
+  &lt;value&gt;Welcome to our application&lt;/value&gt;
+&lt;/data&gt;
+&lt;data name=<span class="string">"Goodbye"</span> xml:space=<span class="string">"preserve"</span>&gt;
+  &lt;value&gt;Goodbye&lt;/value&gt;
+&lt;/data&gt;</code></pre>
+
+                            <p><strong>Resource Files (Resources/SharedResource.fr.resx):</strong></p>
+                            <pre><code>&lt;data name=<span class="string">"Welcome"</span> xml:space=<span class="string">"preserve"</span>&gt;
+  &lt;value&gt;Bienvenue dans notre application&lt;/value&gt;
+&lt;/data&gt;
+&lt;data name=<span class="string">"Goodbye"</span> xml:space=<span class="string">"preserve"</span>&gt;
+  &lt;value&gt;Au revoir&lt;/value&gt;
+&lt;/data&gt;</code></pre>
+
+                            <p><strong>Usage in Controllers:</strong></p>
+                            <pre><code><span class="keyword">public class</span> <span class="class-name">HomeController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IStringLocalizer</span>&lt;<span class="class-name">SharedResource</span>&gt; _localizer;
+
+    <span class="keyword">public</span> <span class="method">HomeController</span>(<span class="class-name">IStringLocalizer</span>&lt;<span class="class-name">SharedResource</span>&gt; localizer)
+    {
+        _localizer = localizer;
+    }
+
+    [<span class="class-name">HttpGet</span>]
+    <span class="keyword">public</span> <span class="class-name">IActionResult</span> <span class="method">Index</span>()
+    {
+        <span class="keyword">var</span> welcomeMessage = _localizer[<span class="string">"Welcome"</span>]; <span class="comment">// Auto-selects based on culture</span>
+        <span class="keyword">return</span> <span class="method">Ok</span>(<span class="keyword">new</span> { message = welcomeMessage.<span class="method">ToString</span>() });
+    }
+}
+
+<span class="comment">// Accessing: /api/home?culture=fr-FR</span>
+<span class="comment">// Returns: { "message": "Bienvenue dans notre application" }</span></code></pre>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we built a multi-tenant SaaS app serving customers in <strong>US, France, and Spain</strong>. 
+                                We used <strong>resource files</strong> for all UI text (validation messages, labels, emails). The culture was detected from 
+                                user preferences stored in the database, passed via <strong>cookie</strong>. For dates and currency, we used 
+                                <strong>CultureInfo</strong> to format correctly (e.g., $1,000.00 in US vs 1 000,00 € in France). This eliminated 
+                                hardcoded strings and made adding new languages trivial.
+                            </p>
+                            <pre><code><span class="comment">// Real-World Example: Date/Currency Formatting</span>
+<span class="keyword">public class</span> <span class="class-name">OrderService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IStringLocalizer</span>&lt;<span class="class-name">SharedResource</span>&gt; _localizer;
+
+    <span class="keyword">public</span> <span class="method">OrderService</span>(<span class="class-name">IStringLocalizer</span>&lt;<span class="class-name">SharedResource</span>&gt; localizer)
+    {
+        _localizer = localizer;
+    }
+
+    <span class="keyword">public string</span> <span class="method">GetOrderSummary</span>(<span class="keyword">decimal</span> total, <span class="class-name">DateTime</span> orderDate)
+    {
+        <span class="keyword">var</span> culture = <span class="class-name">CultureInfo</span>.CurrentCulture;
+        
+        <span class="comment">// Format currency based on culture</span>
+        <span class="keyword">var</span> formattedTotal = total.<span class="method">ToString</span>(<span class="string">"C"</span>, culture);
+        <span class="comment">// en-US: $1,000.00</span>
+        <span class="comment">// fr-FR: 1 000,00 €</span>
+        
+        <span class="comment">// Format date based on culture</span>
+        <span class="keyword">var</span> formattedDate = orderDate.<span class="method">ToString</span>(<span class="string">"d"</span>, culture);
+        <span class="comment">// en-US: 12/31/2023</span>
+        <span class="comment">// fr-FR: 31/12/2023</span>
+        
+        <span class="comment">// Get localized string</span>
+        <span class="keyword">var</span> message = _localizer[<span class="string">"OrderSummary"</span>, formattedTotal, formattedDate];
+        <span class="keyword">return</span> message;
+    }
+}
+
+<span class="comment">// Resource file (SharedResource.en.resx):</span>
+<span class="comment">// Key: "OrderSummary"</span>
+<span class="comment">// Value: "Your order total is {0} on {1}"</span>
+
+<span class="comment">// Resource file (SharedResource.fr.resx):</span>
+<span class="comment">// Key: "OrderSummary"</span>
+<span class="comment">// Value: "Le total de votre commande est {0} le {1}"</span></code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Globalization = culture-neutral design. Localization = culture-specific content. Use .resx resource files for translations, 
+                                <code>IStringLocalizer</code> for retrieving localized strings, and <code>UseRequestLocalization()</code> middleware to detect culture 
+                                from query strings, cookies, or headers. CultureInfo handles date/number/currency formatting automatically.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">.NET Core Concepts</span>
+                            <span class="tag">Localization</span>
+                            <span class="tag">Globalization</span>
+                            <span class="tag">i18n</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 11 -->
+            <div class="question-item" data-keywords="use app run app middleware pipeline terminating middleware short circuit next delegate">
+                <details>
+                    <summary>Q11: What is the difference between Use() and Run() in .NET Core middleware?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                <strong>Use()</strong> adds middleware that can <strong>pass control to the next middleware</strong> by calling <code>next()</code>, 
+                                allowing the pipeline to continue. <strong>Run()</strong> adds <strong>terminal middleware</strong> that <strong>short-circuits</strong> 
+                                the pipeline—it never calls <code>next()</code>, so subsequent middleware is never executed. Use() for chaining middleware, 
+                                Run() for final response handlers. There's also <strong>Map()</strong> for branching pipelines based on request paths.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Key Differences:</strong></p>
+                            <table>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Calls next()?</th>
+                                    <th>Purpose</th>
+                                    <th>Use Case</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>Use()</strong></td>
+                                    <td>Yes (optional)</td>
+                                    <td>Chain middleware</td>
+                                    <td>Logging, auth, request processing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Run()</strong></td>
+                                    <td>No (terminal)</td>
+                                    <td>End pipeline</td>
+                                    <td>Final response, error pages</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Map()</strong></td>
+                                    <td>N/A (branches)</td>
+                                    <td>Branch pipeline</td>
+                                    <td>Path-based routing</td>
+                                </tr>
+                            </table>
+
+                            <p><strong>Use() - Chains Middleware:</strong></p>
+                            <pre><code>app.<span class="method">Use</span>(<span class="keyword">async</span> (context, next) =>
+{
+    <span class="comment">// Before next middleware</span>
+    Console.<span class="method">WriteLine</span>(<span class="string">"Request received"</span>);
+    
+    <span class="keyword">await</span> <span class="method">next</span>(context); <span class="comment">// Call next middleware (IMPORTANT!)</span>
+    
+    <span class="comment">// After next middleware</span>
+    Console.<span class="method">WriteLine</span>(<span class="string">"Response sent"</span>);
+});</code></pre>
+
+                            <p><strong>Run() - Terminal Middleware:</strong></p>
+                            <pre><code>app.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+{
+    <span class="comment">// No next() call - pipeline ends here</span>
+    <span class="keyword">await</span> context.Response.<span class="method">WriteAsync</span>(<span class="string">"Hello World!"</span>);
+    <span class="comment">// Any middleware after Run() is NEVER executed</span>
+});</code></pre>
+
+                            <p><strong>Pipeline Execution Order:</strong></p>
+                            <pre><code><span class="comment">// Example Pipeline</span>
+app.<span class="method">Use</span>(<span class="keyword">async</span> (context, next) =>
+{
+    Console.<span class="method">WriteLine</span>(<span class="string">"Middleware 1 - Before"</span>);
+    <span class="keyword">await</span> <span class="method">next</span>(context);
+    Console.<span class="method">WriteLine</span>(<span class="string">"Middleware 1 - After"</span>);
+});
+
+app.<span class="method">Use</span>(<span class="keyword">async</span> (context, next) =>
+{
+    Console.<span class="method">WriteLine</span>(<span class="string">"Middleware 2 - Before"</span>);
+    <span class="keyword">await</span> <span class="method">next</span>(context);
+    Console.<span class="method">WriteLine</span>(<span class="string">"Middleware 2 - After"</span>);
+});
+
+app.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+{
+    Console.<span class="method">WriteLine</span>(<span class="string">"Terminal Middleware"</span>);
+    <span class="keyword">await</span> context.Response.<span class="method">WriteAsync</span>(<span class="string">"Response"</span>);
+});
+
+<span class="comment">// Output:</span>
+<span class="comment">// Middleware 1 - Before</span>
+<span class="comment">// Middleware 2 - Before</span>
+<span class="comment">// Terminal Middleware</span>
+<span class="comment">// Middleware 2 - After</span>
+<span class="comment">// Middleware 1 - After</span></code></pre>
+
+                            <p><strong>Map() - Branch Pipeline:</strong></p>
+                            <pre><code><span class="comment">// Branch based on path</span>
+app.<span class="method">Map</span>(<span class="string">"/api"</span>, apiApp =>
+{
+    apiApp.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+    {
+        <span class="keyword">await</span> context.Response.<span class="method">WriteAsync</span>(<span class="string">"API Response"</span>);
+    });
+});
+
+app.<span class="method">Map</span>(<span class="string">"/admin"</span>, adminApp =>
+{
+    adminApp.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+    {
+        <span class="keyword">await</span> context.Response.<span class="method">WriteAsync</span>(<span class="string">"Admin Panel"</span>);
+    });
+});
+
+<span class="comment">// Default route</span>
+app.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+{
+    <span class="keyword">await</span> context.Response.<span class="method">WriteAsync</span>(<span class="string">"Home Page"</span>);
+});</code></pre>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, I accidentally used <strong>Run()</strong> instead of <strong>Use()</strong> for a logging middleware. 
+                                The pipeline stopped after logging, and authentication/authorization never ran—all requests returned "Logged" without checking permissions! 
+                                The fix was changing <code>app.Run()</code> to <code>app.Use()</code> and calling <code>await next()</code>. Now I always use 
+                                <strong>Run()</strong> only for final handlers like 404 pages or health check endpoints.
+                            </p>
+                            <pre><code><span class="comment">// WRONG - Run() stops pipeline</span>
+app.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+{
+    Console.<span class="method">WriteLine</span>(<span class="string">"Logging request"</span>);
+    <span class="comment">// No next() - authentication never runs!</span>
+});
+
+app.<span class="method">UseAuthentication</span>(); <span class="comment">// NEVER EXECUTED!</span>
+app.<span class="method">UseAuthorization</span>(); <span class="comment">// NEVER EXECUTED!</span>
+
+<span class="comment">// CORRECT - Use() chains middleware</span>
+app.<span class="method">Use</span>(<span class="keyword">async</span> (context, next) =>
+{
+    Console.<span class="method">WriteLine</span>(<span class="string">"Logging request"</span>);
+    <span class="keyword">await</span> <span class="method">next</span>(context); <span class="comment">// Continue to next middleware</span>
+    Console.<span class="method">WriteLine</span>(<span class="string">"Request completed"</span>);
+});
+
+app.<span class="method">UseAuthentication</span>(); <span class="comment">// NOW EXECUTES</span>
+app.<span class="method">UseAuthorization</span>(); <span class="comment">// NOW EXECUTES</span>
+app.<span class="method">MapControllers</span>();
+
+<span class="comment">// Use Run() only at the end for fallback responses</span>
+app.<span class="method">Run</span>(<span class="keyword">async</span> context =>
+{
+    context.Response.StatusCode = <span class="keyword">404</span>;
+    <span class="keyword">await</span> context.Response.<span class="method">WriteAsync</span>(<span class="string">"404 - Not Found"</span>);
+});</code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Use() chains middleware by calling <code>await next()</code>—use for logging, auth, request processing. 
+                                Run() terminates the pipeline without calling next()—use only for final responses like 404 pages or health checks. 
+                                Never use Run() in the middle of the pipeline. Map() branches pipelines based on request paths.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">.NET Core Concepts</span>
+                            <span class="tag">Middleware</span>
+                            <span class="tag">Use vs Run</span>
+                            <span class="tag">Pipeline</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 12 -->
+            <div class="question-item" data-keywords="iqueryable ienumerable linq deferred execution query optimization entity framework performance database">
+                <details>
+                    <summary>Q12: What is the difference between IQueryable and IEnumerable?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                <strong>IEnumerable&lt;T&gt;</strong> executes queries <strong>in-memory</strong> using LINQ-to-Objects—data is fetched from the database first, 
+                                then filtered in C#. <strong>IQueryable&lt;T&gt;</strong> executes queries <strong>at the database</strong> using LINQ-to-SQL/EF—filters 
+                                are translated to SQL and executed server-side. IQueryable supports <strong>deferred execution</strong> (builds expression tree) and 
+                                <strong>query optimization</strong>. Use IQueryable for database queries (EF Core), IEnumerable for in-memory collections. 
+                                Converting IQueryable → IEnumerable (.ToList()) executes the query immediately.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Key Differences:</strong></p>
+                            <table>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>IEnumerable&lt;T&gt;</th>
+                                    <th>IQueryable&lt;T&gt;</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>Namespace</strong></td>
+                                    <td>System.Collections</td>
+                                    <td>System.Linq</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Execution</strong></td>
+                                    <td>In-memory (client-side)</td>
+                                    <td>Database (server-side)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Query Provider</strong></td>
+                                    <td>LINQ-to-Objects</td>
+                                    <td>LINQ-to-SQL/EF</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Expression</strong></td>
+                                    <td>Func&lt;T, bool&gt;</td>
+                                    <td>Expression&lt;Func&lt;T, bool&gt;&gt;</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Deferred Execution</strong></td>
+                                    <td>Yes</td>
+                                    <td>Yes (+ optimized)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Performance</strong></td>
+                                    <td>Slower (fetches all data)</td>
+                                    <td>Faster (filters at DB)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Use Case</strong></td>
+                                    <td>In-memory collections</td>
+                                    <td>Database queries</td>
+                                </tr>
+                            </table>
+
+                            <p><strong>IEnumerable Example (Bad for DB queries):</strong></p>
+                            <pre><code><span class="comment">// BAD: Fetches ALL orders, then filters in C#</span>
+<span class="class-name">IEnumerable</span>&lt;<span class="class-name">Order</span>&gt; orders = _context.Orders; <span class="comment">// All records loaded to memory!</span>
+<span class="keyword">var</span> result = orders.<span class="method">Where</span>(o => o.Total > <span class="keyword">1000</span>); <span class="comment">// Filters in C# (slow)</span>
+
+<span class="comment">// Generated SQL: SELECT * FROM Orders (all rows)</span>
+<span class="comment">// Then filters in memory</span></code></pre>
+
+                            <p><strong>IQueryable Example (Good for DB queries):</strong></p>
+                            <pre><code><span class="comment">// GOOD: Filters at database</span>
+<span class="class-name">IQueryable</span>&lt;<span class="class-name">Order</span>&gt; orders = _context.Orders; <span class="comment">// No data fetched yet</span>
+<span class="keyword">var</span> result = orders.<span class="method">Where</span>(o => o.Total > <span class="keyword">1000</span>); <span class="comment">// Builds expression tree</span>
+<span class="keyword">var</span> list = <span class="keyword">await</span> result.<span class="method">ToListAsync</span>(); <span class="comment">// NOW executes</span>
+
+<span class="comment">// Generated SQL: SELECT * FROM Orders WHERE Total > 1000 (efficient)</span></code></pre>
+
+                            <p><strong>Deferred Execution:</strong></p>
+                            <pre><code><span class="comment">// Query is NOT executed until enumeration</span>
+<span class="class-name">IQueryable</span>&lt;<span class="class-name">Order</span>&gt; query = _context.Orders
+    .<span class="method">Where</span>(o => o.Total > <span class="keyword">1000</span>)
+    .<span class="method">OrderBy</span>(o => o.OrderDate); <span class="comment">// No DB hit yet</span>
+
+<span class="comment">// Can add more filters</span>
+<span class="keyword">if</span> (includeShipped)
+{
+    query = query.<span class="method">Where</span>(o => o.Status == <span class="string">"Shipped"</span>); <span class="comment">// Still no DB hit</span>
+}
+
+<span class="comment">// Executes when enumerated</span>
+<span class="keyword">var</span> orders = <span class="keyword">await</span> query.<span class="method">ToListAsync</span>(); <span class="comment">// NOW hits database</span>
+
+<span class="comment">// Final SQL: </span>
+<span class="comment">// SELECT * FROM Orders </span>
+<span class="comment">// WHERE Total > 1000 AND Status = 'Shipped'</span>
+<span class="comment">// ORDER BY OrderDate</span></code></pre>
+
+                            <p><strong>Converting IQueryable to IEnumerable:</strong></p>
+                            <pre><code><span class="class-name">IQueryable</span>&lt;<span class="class-name">Order</span>&gt; queryable = _context.Orders.<span class="method">Where</span>(o => o.Total > <span class="keyword">1000</span>);
+
+<span class="comment">// Convert to IEnumerable (executes query immediately)</span>
+<span class="class-name">IEnumerable</span>&lt;<span class="class-name">Order</span>&gt; enumerable = queryable.<span class="method">ToList</span>(); <span class="comment">// DB query executes</span>
+
+<span class="comment">// Further filtering happens in-memory (not at DB)</span>
+<span class="keyword">var</span> filtered = enumerable.<span class="method">Where</span>(o => o.Status == <span class="string">"Shipped"</span>); <span class="comment">// In-memory filter</span></code></pre>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we had a slow API endpoint loading <strong>100,000 orders</strong>. The developer used 
+                                <strong>IEnumerable</strong> and filtered with <code>.Where()</code> in C#—it loaded all 100K rows into memory, then filtered! 
+                                I changed it to <strong>IQueryable</strong>, which generated optimized SQL with WHERE clause at the database. Query time dropped 
+                                from <strong>30 seconds to 200ms</strong>. Lesson: always use IQueryable for EF Core queries, convert to IEnumerable only when needed.
+                            </p>
+                            <pre><code><span class="comment">// BEFORE (Slow) - IEnumerable</span>
+<span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">List</span>&lt;<span class="class-name">Order</span>&gt;&gt; <span class="method">GetOrdersAsync</span>(<span class="keyword">decimal</span> minTotal, <span class="keyword">string</span> status)
+{
+    <span class="comment">// BAD: Loads all orders into memory first!</span>
+    <span class="class-name">IEnumerable</span>&lt;<span class="class-name">Order</span>&gt; orders = <span class="keyword">await</span> _context.Orders.<span class="method">ToListAsync</span>(); <span class="comment">// 100K rows</span>
+    
+    <span class="comment">// Filters in C# (slow)</span>
+    <span class="keyword">return</span> orders
+        .<span class="method">Where</span>(o => o.Total > minTotal)
+        .<span class="method">Where</span>(o => o.Status == status)
+        .<span class="method">ToList</span>();
+}
+
+<span class="comment">// AFTER (Fast) - IQueryable</span>
+<span class="keyword">public async</span> <span class="class-name">Task</span>&lt;<span class="class-name">List</span>&lt;<span class="class-name">Order</span>&gt;&gt; <span class="method">GetOrdersAsync</span>(<span class="keyword">decimal</span> minTotal, <span class="keyword">string</span> status)
+{
+    <span class="comment">// GOOD: Filters at database</span>
+    <span class="class-name">IQueryable</span>&lt;<span class="class-name">Order</span>&gt; query = _context.Orders
+        .<span class="method">Where</span>(o => o.Total > minTotal)
+        .<span class="method">Where</span>(o => o.Status == status);
+    
+    <span class="keyword">return await</span> query.<span class="method">ToListAsync</span>(); <span class="comment">// Executes optimized SQL</span>
+}
+
+<span class="comment">// Generated SQL (optimized):</span>
+<span class="comment">// SELECT * FROM Orders </span>
+<span class="comment">// WHERE Total > @minTotal AND Status = @status</span></code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>IEnumerable executes queries in-memory (C#), IQueryable executes at database (SQL). Always use IQueryable for EF Core 
+                                database queries to enable server-side filtering and optimization. Convert to IEnumerable (.ToList()) only when needed. 
+                                IQueryable supports deferred execution—query builds until enumerated. Performance difference is massive for large datasets.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">.NET Core Concepts</span>
+                            <span class="tag">IQueryable</span>
+                            <span class="tag">IEnumerable</span>
+                            <span class="tag">LINQ</span>
+                            <span class="tag">Performance</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 13 -->
+            <div class="question-item" data-keywords="exception handling global error handling middleware exception filter try catch problemdetails useexceptionhandler">
+                <details>
+                    <summary>Q13: How do you implement global exception handling in an API?</summary>
+                    <div class="answer-content">
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Global exception handling centralizes error processing, returning consistent error responses instead of crashing or leaking stack traces. 
+                                .NET Core provides three approaches: <strong>UseExceptionHandler middleware</strong> (recommended for production), 
+                                <strong>Exception Filters</strong> (MVC-specific), and <strong>Custom Exception Middleware</strong> (most flexible). 
+                                Best practices: log exceptions, return standard error format (ProblemDetails), hide sensitive info in production, use appropriate HTTP status codes.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How It Works in .NET Core</h3>
+                            <p><strong>Three Approaches:</strong></p>
+                            
+                            <p><strong>1. UseExceptionHandler Middleware (Simplest):</strong></p>
+                            <pre><code><span class="comment">// Program.cs</span>
+<span class="keyword">var</span> app = builder.<span class="method">Build</span>();
+
+<span class="keyword">if</span> (app.Environment.<span class="method">IsDevelopment</span>())
+{
+    app.<span class="method">UseDeveloperExceptionPage</span>(); <span class="comment">// Detailed errors in dev</span>
+}
+<span class="keyword">else</span>
+{
+    app.<span class="method">UseExceptionHandler</span>(<span class="string">"/error"</span>); <span class="comment">// Redirect to error endpoint</span>
+}
+
+<span class="comment">// Error handling endpoint</span>
+app.<span class="method">Map</span>(<span class="string">"/error"</span>, (HttpContext context) =>
+{
+    <span class="keyword">var</span> exception = context.Features.<span class="method">Get</span>&lt;<span class="class-name">IExceptionHandlerFeature</span>&gt;()?.Error;
+    
+    <span class="keyword">return</span> <span class="class-name">Results</span>.<span class="method">Problem</span>(
+        title: <span class="string">"An error occurred"</span>,
+        statusCode: <span class="keyword">500</span>,
+        detail: exception?.Message);
+});</code></pre>
+
+                            <p><strong>2. Exception Filter (MVC/API Controllers):</strong></p>
+                            <pre><code><span class="comment">// Custom Exception Filter</span>
+<span class="keyword">public class</span> <span class="class-name">GlobalExceptionFilter</span> : <span class="class-name">IExceptionFilter</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span>&lt;<span class="class-name">GlobalExceptionFilter</span>&gt; _logger;
+    <span class="keyword">private readonly</span> <span class="class-name">IHostEnvironment</span> _env;
+
+    <span class="keyword">public</span> <span class="method">GlobalExceptionFilter</span>(<span class="class-name">ILogger</span>&lt;<span class="class-name">GlobalExceptionFilter</span>&gt; logger, <span class="class-name">IHostEnvironment</span> env)
+    {
+        _logger = logger;
+        _env = env;
+    }
+
+    <span class="keyword">public void</span> <span class="method">OnException</span>(<span class="class-name">ExceptionContext</span> context)
+    {
+        <span class="comment">// Log exception</span>
+        _logger.<span class="method">LogError</span>(context.Exception, <span class="string">"Unhandled exception occurred"</span>);
+
+        <span class="comment">// Create error response</span>
+        <span class="keyword">var</span> problemDetails = <span class="keyword">new</span> <span class="class-name">ProblemDetails</span>
+        {
+            Status = <span class="keyword">500</span>,
+            Title = <span class="string">"An error occurred"</span>,
+            Detail = _env.<span class="method">IsDevelopment</span>() ? context.Exception.Message : <span class="string">"Internal server error"</span>
+        };
+
+        context.Result = <span class="keyword">new</span> <span class="class-name">ObjectResult</span>(problemDetails)
+        {
+            StatusCode = <span class="keyword">500</span>
+        };
+
+        context.ExceptionHandled = <span class="keyword">true</span>; <span class="comment">// Mark as handled</span>
+    }
+}
+
+<span class="comment">// Register globally</span>
+builder.Services.<span class="method">AddControllers</span>(options =>
+{
+    options.Filters.<span class="method">Add</span>&lt;<span class="class-name">GlobalExceptionFilter</span>&gt;();
+});</code></pre>
+
+                            <p><strong>3. Custom Exception Middleware (Most Flexible):</strong></p>
+                            <pre><code><span class="comment">// Custom Exception Middleware</span>
+<span class="keyword">public class</span> <span class="class-name">ExceptionHandlingMiddleware</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">RequestDelegate</span> _next;
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span>&lt;<span class="class-name">ExceptionHandlingMiddleware</span>&gt; _logger;
+
+    <span class="keyword">public</span> <span class="method">ExceptionHandlingMiddleware</span>(<span class="class-name">RequestDelegate</span> next, <span class="class-name">ILogger</span>&lt;<span class="class-name">ExceptionHandlingMiddleware</span>&gt; logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    <span class="keyword">public async</span> <span class="class-name">Task</span> <span class="method">InvokeAsync</span>(<span class="class-name">HttpContext</span> context)
+    {
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">await</span> <span class="method">_next</span>(context); <span class="comment">// Call next middleware</span>
+        }
+        <span class="keyword">catch</span> (<span class="class-name">Exception</span> ex)
+        {
+            _logger.<span class="method">LogError</span>(ex, <span class="string">"Unhandled exception: {Message}"</span>, ex.Message);
+            <span class="keyword">await</span> <span class="method">HandleExceptionAsync</span>(context, ex);
+        }
+    }
+
+    <span class="keyword">private static async</span> <span class="class-name">Task</span> <span class="method">HandleExceptionAsync</span>(<span class="class-name">HttpContext</span> context, <span class="class-name">Exception</span> exception)
+    {
+        context.Response.ContentType = <span class="string">"application/json"</span>;
+        
+        <span class="comment">// Custom status codes based on exception type</span>
+        context.Response.StatusCode = exception <span class="keyword">switch</span>
+        {
+            <span class="class-name">NotFoundException</span> => <span class="keyword">404</span>,
+            <span class="class-name">UnauthorizedException</span> => <span class="keyword">401</span>,
+            <span class="class-name">ValidationException</span> => <span class="keyword">400</span>,
+            _ => <span class="keyword">500</span>
+        };
+
+        <span class="keyword">var</span> response = <span class="keyword">new</span>
+        {
+            status = context.Response.StatusCode,
+            message = exception.Message,
+            timestamp = <span class="class-name">DateTime</span>.UtcNow
+        };
+
+        <span class="keyword">await</span> context.Response.<span class="method">WriteAsJsonAsync</span>(response);
+    }
+}
+
+<span class="comment">// Extension method</span>
+<span class="keyword">public static class</span> <span class="class-name">ExceptionMiddlewareExtensions</span>
+{
+    <span class="keyword">public static</span> <span class="class-name">IApplicationBuilder</span> <span class="method">UseGlobalExceptionHandler</span>(<span class="keyword">this</span> <span class="class-name">IApplicationBuilder</span> app)
+    {
+        <span class="keyword">return</span> app.<span class="method">UseMiddleware</span>&lt;<span class="class-name">ExceptionHandlingMiddleware</span>&gt;();
+    }
+}
+
+<span class="comment">// Usage in Program.cs</span>
+app.<span class="method">UseGlobalExceptionHandler</span>(); <span class="comment">// Add at the top of pipeline</span>
+app.<span class="method">UseRouting</span>();
+app.<span class="method">MapControllers</span>();</code></pre>
+
+                            <p><strong>Using ProblemDetails (RFC 7807 Standard):</strong></p>
+                            <pre><code><span class="comment">// Configure ProblemDetails</span>
+builder.Services.<span class="method">AddProblemDetails</span>();
+
+<span class="comment">// Custom ProblemDetails response</span>
+<span class="keyword">var</span> problemDetails = <span class="keyword">new</span> <span class="class-name">ProblemDetails</span>
+{
+    Status = <span class="keyword">500</span>,
+    Title = <span class="string">"Internal Server Error"</span>,
+    Detail = <span class="string">"An unexpected error occurred"</span>,
+    Instance = context.Request.Path,
+    Type = <span class="string">"https://tools.ietf.org/html/rfc7231#section-6.6.1"</span>
+};
+
+<span class="comment">// Response format:</span>
+<span class="comment">// {</span>
+<span class="comment">//   "type": "https://tools.ietf.org/html/rfc7231#section-6.6.1",</span>
+<span class="comment">//   "title": "Internal Server Error",</span>
+<span class="comment">//   "status": 500,</span>
+<span class="comment">//   "detail": "An unexpected error occurred",</span>
+<span class="comment">//   "instance": "/api/orders/123"</span>
+<span class="comment">// }</span></code></pre>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we had exceptions exposing sensitive data (SQL connection strings, stack traces) to clients in production. 
+                                I implemented <strong>custom exception middleware</strong> that logged full details (including stack traces) to Azure Application Insights 
+                                but returned generic messages to clients. For known exceptions (NotFoundException, ValidationException), we returned appropriate 
+                                status codes (404, 400). For unexpected errors, we returned 500 with a correlation ID for debugging. This reduced support tickets 
+                                by 40% because users got meaningful error messages.
+                            </p>
+                            <pre><code><span class="comment">// Production-Ready Exception Middleware</span>
+<span class="keyword">public class</span> <span class="class-name">ProductionExceptionMiddleware</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">RequestDelegate</span> _next;
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span>&lt;<span class="class-name">ProductionExceptionMiddleware</span>&gt; _logger;
+
+    <span class="keyword">public</span> <span class="method">ProductionExceptionMiddleware</span>(<span class="class-name">RequestDelegate</span> next, <span class="class-name">ILogger</span>&lt;<span class="class-name">ProductionExceptionMiddleware</span>&gt; logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    <span class="keyword">public async</span> <span class="class-name">Task</span> <span class="method">InvokeAsync</span>(<span class="class-name">HttpContext</span> context)
+    {
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">await</span> <span class="method">_next</span>(context);
+        }
+        <span class="keyword">catch</span> (<span class="class-name">Exception</span> ex)
+        {
+            <span class="keyword">var</span> correlationId = <span class="class-name">Guid</span>.<span class="method">NewGuid</span>().<span class="method">ToString</span>();
+            
+            <span class="comment">// Log full details with correlation ID</span>
+            _logger.<span class="method">LogError</span>(ex, 
+                <span class="string">"[CorrelationId: {CorrelationId}] Unhandled exception: {Message}. StackTrace: {StackTrace}"</span>,
+                correlationId, ex.Message, ex.StackTrace);
+
+            <span class="comment">// Return safe error to client</span>
+            context.Response.ContentType = <span class="string">"application/json"</span>;
+            context.Response.StatusCode = ex <span class="keyword">switch</span>
+            {
+                <span class="class-name">NotFoundException</span> => <span class="keyword">404</span>,
+                <span class="class-name">UnauthorizedException</span> => <span class="keyword">401</span>,
+                <span class="class-name">ValidationException</span> => <span class="keyword">400</span>,
+                _ => <span class="keyword">500</span>
+            };
+
+            <span class="keyword">var</span> response = <span class="keyword">new</span>
+            {
+                status = context.Response.StatusCode,
+                message = ex <span class="keyword">is</span> <span class="class-name">ValidationException</span> ? ex.Message : <span class="string">"An error occurred"</span>,
+                correlationId = correlationId, <span class="comment">// For support/debugging</span>
+                timestamp = <span class="class-name">DateTime</span>.UtcNow
+            };
+
+            <span class="keyword">await</span> context.Response.<span class="method">WriteAsJsonAsync</span>(response);
+        }
+    }
+}
+
+<span class="comment">// Usage</span>
+app.<span class="method">UseMiddleware</span>&lt;<span class="class-name">ProductionExceptionMiddleware</span>&gt;();
+app.<span class="method">UseAuthentication</span>();
+app.<span class="method">UseAuthorization</span>();
+app.<span class="method">MapControllers</span>();</code></pre>
+                        </div>
+
+                        <div class="section key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Implement global exception handling using UseExceptionHandler (simple), Exception Filters (MVC-only), or Custom Middleware (flexible). 
+                                Always log full exception details but return safe messages to clients. Use ProblemDetails for standard error format. 
+                                Return appropriate HTTP status codes (404, 400, 401, 500). Include correlation IDs for debugging. Never expose stack traces in production.</strong>
+                            </p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">.NET Core Concepts</span>
+                            <span class="tag">Exception Handling</span>
+                            <span class="tag">Middleware</span>
+                            <span class="tag">Error Handling</span>
+                            <span class="tag">ProblemDetails</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <div class="no-results" id="noResults">
+            <h2>🔍 No matching questions found</h2>
+            <p>Try different keywords or clear the search</p>
+        </div>
+
+        <footer>
+            <p>💡 <strong>Tip:</strong> These advanced .NET Core concepts are critical for building production-ready, maintainable applications.</p>
+            <p style="margin-top: 10px;">Generated for senior .NET Core developer interview preparation</p>
+        </footer>
+    </div>
+
+    <script>
+        const searchBox = document.getElementById('searchBox');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const noResults = document.getElementById('noResults');
+        const questionItems = document.querySelectorAll('.question-item');
+
+        searchBox.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            questionItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords').toLowerCase();
+                const questionText = item.querySelector('summary').textContent.toLowerCase();
+                
+                if (keywords.includes(searchTerm) || questionText.includes(searchTerm) || searchTerm === '') {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResults.style.display = 'block';
+                questionsContainer.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                questionsContainer.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

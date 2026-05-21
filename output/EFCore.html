@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Questions - Q79-84</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #569cd6;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #3c3c3c;
+            border-radius: 5px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            outline: none;
+        }
+
+        #searchBar:focus {
+            border-color: #569cd6;
+        }
+
+        .question-item {
+            background: #252526;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #3c3c3c;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .question-item:hover {
+            border-color: #569cd6;
+            box-shadow: 0 2px 8px rgba(86, 156, 214, 0.2);
+        }
+
+        details summary {
+            padding: 20px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4ec9b0;
+            background: #2d2d30;
+            user-select: none;
+            list-style: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary:before {
+            content: '▶ ';
+            display: inline-block;
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+
+        details[open] summary:before {
+            transform: rotate(90deg);
+        }
+
+        details[open] summary {
+            border-bottom: 2px solid #3c3c3c;
+            color: #569cd6;
+        }
+
+        .answer-content {
+            padding: 25px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            color: #dcdcaa;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .section p {
+            color: #d4d4d4;
+            margin-bottom: 10px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .category-tag {
+            background: #0e639c;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .class-name { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+
+        .key-takeaway {
+            background: #1a3a1a;
+            border-left: 4px solid #4ec9b0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #resultCount {
+            text-align: center;
+            margin-top: 10px;
+            color: #858585;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 .NET Core Interview Questions (79-84)</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="🔍 Search questions by keyword (e.g., 'LINQ', 'Entity Framework', 'lambda')...">
+            <div id="resultCount"></div>
+        </div>
+
+        <div id="questionsContainer">
+            
+            <!-- Question 79 -->
+            <div class="question-item" data-keywords="add attach update ef core entity framework dbcontext tracking">
+                <details>
+                    <summary>Q79: Add, Attach and Update of EF Core</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                EF Core tracks entity state changes using the <code>ChangeTracker</code>. <strong>Add()</strong> marks an entity as <code>Added</code> (for new records), 
+                                <strong>Attach()</strong> marks it as <code>Unchanged</code> (useful for disconnected scenarios where you want to track an existing entity without querying), 
+                                and <strong>Update()</strong> marks it as <code>Modified</code> (tells EF Core the entity has changed and should be updated in the database). 
+                                These methods control how EF Core generates SQL INSERT, UPDATE, or does nothing during <code>SaveChanges()</code>.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                • <strong>Add()</strong> → <code>EntityState.Added</code> → Generates <code>INSERT</code><br>
+                                • <strong>Attach()</strong> → <code>EntityState.Unchanged</code> → No SQL until you modify properties<br>
+                                • <strong>Update()</strong> → <code>EntityState.Modified</code> → Generates <code>UPDATE</code> for all columns<br>
+                                Use <code>DbContext.Entry(entity).State</code> to manually inspect or set entity state. 
+                                In disconnected scenarios (like Web APIs), <code>Attach()</code> is crucial before modifying specific properties.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In one of my projects, we had a REST API where clients sent updated employee data without fetching it first. 
+                                I used <code>Attach()</code> to tell EF Core the entity exists, then marked specific properties as modified to avoid updating the entire row.
+                            </p>
+                            <pre><code><span class="comment">// Client sends updated employee (disconnected)</span>
+<span class="keyword">public async</span> Task UpdateEmployeeSalary(<span class="class-name">Employee</span> employee)
+{
+    <span class="comment">// Attach marks as Unchanged - no query to DB</span>
+    _context.<span class="method">Attach</span>(employee);
+    
+    <span class="comment">// Mark only Salary as modified</span>
+    _context.<span class="method">Entry</span>(employee).Property(e => e.Salary).IsModified = <span class="keyword">true</span>;
+    
+    <span class="keyword">await</span> _context.<span class="method">SaveChangesAsync</span>();
+    <span class="comment">// Generates: UPDATE Employees SET Salary = @p0 WHERE Id = @p1</span>
+}
+
+<span class="comment">// VS using Update() which updates ALL columns</span>
+<span class="keyword">public async</span> Task UpdateEmployeeFull(<span class="class-name">Employee</span> employee)
+{
+    _context.<span class="method">Update</span>(employee); <span class="comment">// Marks entire entity as Modified</span>
+    <span class="keyword">await</span> _context.<span class="method">SaveChangesAsync</span>();
+    <span class="comment">// Generates: UPDATE Employees SET Name = @p0, Salary = @p1, Dept = @p2... WHERE Id = @pN</span>
+}</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Use <strong>Add()</strong> for new entities, <strong>Attach()</strong> + property-level modifications for efficient disconnected updates, 
+                                and <strong>Update()</strong> when you're sure the entire entity has changed. Understanding entity state management prevents unnecessary database round-trips and optimizes SQL generation.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">EF Core</span>
+                            <span class="category-tag">API</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 80 -->
+            <div class="question-item" data-keywords="linq query employee salary average group aggregate">
+                <details>
+                    <summary>Q80: LINQ query to get employees having salary greater than avg salary of the group</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                This is a classic grouped aggregation problem where you need to calculate the average salary per group (e.g., by Department), 
+                                then filter employees whose salary exceeds their group's average. In LINQ, you use <code>GroupBy()</code> to create groups, 
+                                <code>Average()</code> to compute the mean, and <code>SelectMany()</code> or nested queries to flatten results and apply the filter.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                LINQ provides two syntaxes: <strong>query syntax</strong> (<code>from...where...select</code>) and <strong>method syntax</strong> (lambda-based). 
+                                For this problem, method syntax with <code>GroupBy()</code>, <code>Where()</code>, and <code>SelectMany()</code> is cleaner. 
+                                If using EF Core, this translates to SQL with subqueries or window functions (depending on provider support).
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a payroll system I worked on, we needed to identify high performers (above-average earners) per department for bonus calculations. 
+                                Here's how I solved it with LINQ:
+                            </p>
+                            <pre><code><span class="keyword">public class</span> <span class="class-name">Employee</span>
+{
+    <span class="keyword">public int</span> Id { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public string</span> Name { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public string</span> Department { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public decimal</span> Salary { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+}
+
+<span class="comment">// Method 1: Using GroupBy + SelectMany</span>
+<span class="keyword">var</span> result = employees
+    .<span class="method">GroupBy</span>(e => e.Department)
+    .<span class="method">SelectMany</span>(group => 
+    {
+        <span class="keyword">var</span> avgSalary = group.<span class="method">Average</span>(e => e.Salary);
+        <span class="keyword">return</span> group.<span class="method">Where</span>(e => e.Salary > avgSalary);
+    });
+
+<span class="comment">// Method 2: Query Syntax (more readable for some)</span>
+<span class="keyword">var</span> result2 = <span class="keyword">from</span> emp <span class="keyword">in</span> employees
+                <span class="keyword">group</span> emp <span class="keyword">by</span> emp.Department <span class="keyword">into</span> deptGroup
+                <span class="keyword">let</span> avgSalary = deptGroup.<span class="method">Average</span>(e => e.Salary)
+                <span class="keyword">from</span> emp <span class="keyword">in</span> deptGroup
+                <span class="keyword">where</span> emp.Salary > avgSalary
+                <span class="keyword">select</span> emp;
+
+<span class="comment">// Method 3: Join with grouped averages (EF Core friendly)</span>
+<span class="keyword">var</span> avgSalaries = employees
+    .<span class="method">GroupBy</span>(e => e.Department)
+    .<span class="method">Select</span>(g => <span class="keyword">new</span> { Department = g.Key, AvgSalary = g.<span class="method">Average</span>(e => e.Salary) });
+
+<span class="keyword">var</span> result3 = employees
+    .<span class="method">Join</span>(avgSalaries, 
+        e => e.Department, 
+        avg => avg.Department,
+        (e, avg) => <span class="keyword">new</span> { Employee = e, avg.AvgSalary })
+    .<span class="method">Where</span>(x => x.Employee.Salary > x.AvgSalary)
+    .<span class="method">Select</span>(x => x.Employee);</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Use <code>GroupBy()</code> + <code>SelectMany()</code> for in-memory collections or <code>Join()</code> with pre-computed averages for better EF Core SQL generation. 
+                                This pattern shows mastery of LINQ aggregation and grouping—critical for data processing tasks.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">C-Sharp Concepts</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">SQL</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 81 -->
+            <div class="question-item" data-keywords="lambda expression delegate func action predicate anonymous">
+                <details>
+                    <summary>Q81: Can you explain lambda expressions with example?</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Lambda expressions are anonymous functions written using the <code>=></code> (lambda operator). They're syntactic sugar for delegates and are heavily used with LINQ, event handlers, and functional programming. 
+                                The format is <code>(parameters) => expression</code> or <code>(parameters) => { statements }</code>. 
+                                Lambdas can capture variables from the enclosing scope (closures), making them powerful but requiring careful memory management.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                Lambdas compile to delegates like <code>Func&lt;T, TResult&gt;</code>, <code>Action&lt;T&gt;</code>, or <code>Predicate&lt;T&gt;</code>. 
+                                The compiler infers types using type inference. Common uses:<br>
+                                • <strong>LINQ</strong>: <code>.Where(x => x.Age > 18)</code><br>
+                                • <strong>Events</strong>: <code>button.Click += (s, e) => Console.WriteLine("Clicked");</code><br>
+                                • <strong>Async</strong>: <code>await Task.Run(() => DoWork());</code><br>
+                                Expression-bodied members (<code>int Square(int x) => x * x;</code>) are a related feature.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a microservice I built, we used lambdas extensively for filtering, validation, and background tasks. Here are real scenarios:
+                            </p>
+                            <pre><code><span class="comment">// 1. LINQ filtering (most common)</span>
+<span class="keyword">var</span> activeUsers = users.<span class="method">Where</span>(u => u.IsActive && u.LastLogin > DateTime.Now.AddDays(-<span class="number">30</span>));
+
+<span class="comment">// 2. Func delegate for reusable logic</span>
+<span class="class-name">Func</span>&lt;<span class="keyword">int</span>, <span class="keyword">int</span>, <span class="keyword">int</span>&gt; add = (x, y) => x + y;
+<span class="keyword">int</span> result = add(<span class="number">5</span>, <span class="number">3</span>); <span class="comment">// 8</span>
+
+<span class="comment">// 3. Multi-line lambda with block body</span>
+<span class="class-name">Action</span>&lt;<span class="keyword">string</span>&gt; processOrder = (orderId) =>
+{
+    _logger.<span class="method">LogInformation</span>(<span class="string">$"Processing {orderId}"</span>);
+    <span class="keyword">var</span> order = _repo.<span class="method">GetOrder</span>(orderId);
+    order.<span class="method">Ship</span>();
+};
+
+<span class="comment">// 4. Closure (capturing variable from outer scope)</span>
+<span class="keyword">int</span> threshold = <span class="number">100</span>;
+<span class="keyword">var</span> expensive = products.<span class="method">Where</span>(p => p.Price > threshold); <span class="comment">// threshold captured</span>
+
+<span class="comment">// 5. Expression-bodied member (not technically lambda, but similar)</span>
+<span class="keyword">public class</span> <span class="class-name">Product</span>
+{
+    <span class="keyword">public decimal</span> Price { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public decimal</span> TaxAmount => Price * <span class="number">0.08m</span>; <span class="comment">// Expression body</span>
+}
+
+<span class="comment">// 6. Async lambda in Task.Run</span>
+<span class="keyword">await</span> Task.<span class="method">Run</span>(<span class="keyword">async</span> () => 
+{
+    <span class="keyword">await</span> Task.<span class="method">Delay</span>(<span class="number">1000</span>);
+    <span class="keyword">return</span> <span class="string">"Done"</span>;
+});</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Lambdas are essential for modern C# development, especially with LINQ and async programming. They improve code readability and reduce boilerplate. 
+                                Understanding closures and delegate types (<code>Func</code>, <code>Action</code>) is key to using them effectively.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">C-Sharp Concepts</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 82 -->
+            <div class="question-item" data-keywords="count frequency character string dictionary groupby linq">
+                <details>
+                    <summary>Q82: Write the code to count frequency of the char in a string</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Counting character frequency is a common string manipulation problem. You iterate through the string and maintain a count for each character. 
+                                Common approaches: <code>Dictionary&lt;char, int&gt;</code> for manual counting, or LINQ's <code>GroupBy()</code> for a functional approach. 
+                                Edge cases include case sensitivity, whitespace handling, and Unicode characters.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                .NET provides multiple ways:<br>
+                                • <strong>Dictionary approach</strong>: Loop through string, use <code>TryGetValue()</code> or <code>ContainsKey()</code><br>
+                                • <strong>LINQ GroupBy</strong>: <code>str.GroupBy(c => c).ToDictionary(g => g.Key, g => g.Count())</code><br>
+                                • <strong>LINQ aggregate</strong>: More advanced with <code>Aggregate()</code><br>
+                                For performance-critical code, <code>Dictionary</code> is faster than LINQ due to fewer allocations.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                I used this pattern in a text analytics feature where we analyzed customer feedback. Here are 3 implementations I've used in production:
+                            </p>
+                            <pre><code><span class="comment">// Method 1: Dictionary (most efficient)</span>
+<span class="keyword">public static</span> <span class="class-name">Dictionary</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt; CountCharacterFrequency(<span class="keyword">string</span> input)
+{
+    <span class="keyword">var</span> frequency = <span class="keyword">new</span> <span class="class-name">Dictionary</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt;();
+    
+    <span class="keyword">foreach</span> (<span class="keyword">char</span> c <span class="keyword">in</span> input)
+    {
+        <span class="keyword">if</span> (frequency.<span class="method">ContainsKey</span>(c))
+            frequency[c]++;
+        <span class="keyword">else</span>
+            frequency[c] = <span class="number">1</span>;
+    }
+    
+    <span class="keyword">return</span> frequency;
+}
+
+<span class="comment">// Method 2: Dictionary with TryGetValue (cleaner)</span>
+<span class="keyword">public static</span> <span class="class-name">Dictionary</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt; CountCharFrequency2(<span class="keyword">string</span> input)
+{
+    <span class="keyword">var</span> frequency = <span class="keyword">new</span> <span class="class-name">Dictionary</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt;();
+    
+    <span class="keyword">foreach</span> (<span class="keyword">char</span> c <span class="keyword">in</span> input)
+    {
+        frequency.<span class="method">TryGetValue</span>(c, <span class="keyword">out int</span> count);
+        frequency[c] = count + <span class="number">1</span>;
+    }
+    
+    <span class="keyword">return</span> frequency;
+}
+
+<span class="comment">// Method 3: LINQ GroupBy (most readable, slightly slower)</span>
+<span class="keyword">public static</span> <span class="class-name">Dictionary</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt; CountCharFrequency3(<span class="keyword">string</span> input)
+{
+    <span class="keyword">return</span> input
+        .<span class="method">GroupBy</span>(c => c)
+        .<span class="method">ToDictionary</span>(g => g.Key, g => g.<span class="method">Count</span>());
+}
+
+<span class="comment">// Method 4: Case-insensitive with whitespace filtering</span>
+<span class="keyword">public static</span> <span class="class-name">Dictionary</span>&lt;<span class="keyword">char</span>, <span class="keyword">int</span>&gt; CountCharFrequency4(<span class="keyword">string</span> input)
+{
+    <span class="keyword">return</span> input
+        .<span class="method">Where</span>(c => !<span class="class-name">Char</span>.<span class="method">IsWhiteSpace</span>(c))
+        .<span class="method">Select</span>(c => <span class="class-name">Char</span>.<span class="method">ToLower</span>(c))
+        .<span class="method">GroupBy</span>(c => c)
+        .<span class="method">ToDictionary</span>(g => g.Key, g => g.<span class="method">Count</span>());
+}
+
+<span class="comment">// Usage example</span>
+<span class="keyword">string</span> text = <span class="string">"hello world"</span>;
+<span class="keyword">var</span> result = <span class="method">CountCharacterFrequency</span>(text);
+
+<span class="keyword">foreach</span> (<span class="keyword">var</span> kvp <span class="keyword">in</span> result)
+{
+    <span class="class-name">Console</span>.<span class="method">WriteLine</span>(<span class="string">$"{kvp.Key}: {kvp.Value}"</span>);
+}
+<span class="comment">// Output: h:1, e:1, l:3, o:2, (space):1, w:1, r:1, d:1</span></code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                For interviews, show multiple approaches. Dictionary with <code>TryGetValue()</code> is efficient and production-ready. 
+                                LINQ <code>GroupBy()</code> demonstrates functional programming knowledge. Mention edge cases like case sensitivity and special characters.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">C-Sharp Concepts</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 83 -->
+            <div class="question-item" data-keywords="raw query sql entity framework fromsqlraw executesqlraw sqlquery">
+                <details>
+                    <summary>Q83: How to write raw query in Entity Framework?</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Sometimes LINQ doesn't generate optimal SQL or you need database-specific features (stored procedures, window functions, CTEs). 
+                                EF Core provides raw SQL execution through <code>FromSqlRaw()</code> and <code>FromSqlInterpolated()</code> for queries, 
+                                and <code>ExecuteSqlRaw()</code>/<code>ExecuteSqlInterpolated()</code> for non-query commands (INSERT/UPDATE/DELETE). 
+                                Always use parameterized queries to prevent SQL injection.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                EF Core 5+ methods:<br>
+                                • <strong>FromSqlRaw/FromSqlInterpolated</strong>: Compose-able queries returning entities (can add <code>.Where()</code>, <code>.OrderBy()</code> after)<br>
+                                • <strong>ExecuteSqlRaw/ExecuteSqlInterpolated</strong>: Non-query commands returning affected row count<br>
+                                • <strong>FromSqlRaw</strong>: Use with string.Format-style placeholders (<code>{0}, {1}</code>)<br>
+                                • <strong>FromSqlInterpolated</strong>: Use with string interpolation (<code>$"...{param}"</code>)—automatically parameterized<br>
+                                For stored procedures, use <code>FromSqlRaw("EXEC ProcName @p0", param)</code>
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a reporting system, I used raw SQL for complex analytics queries that EF Core couldn't optimize. Here's how I handled it:
+                            </p>
+                            <pre><code><span class="comment">// 1. FromSqlInterpolated - Query entities (SAFE - auto-parameterized)</span>
+<span class="keyword">public async</span> Task&lt;<span class="class-name">List</span>&lt;<span class="class-name">Employee</span>&gt;&gt; GetEmployeesBySalary(<span class="keyword">decimal</span> minSalary)
+{
+    <span class="keyword">return await</span> _context.Employees
+        .<span class="method">FromSqlInterpolated</span>(<span class="string">$"SELECT * FROM Employees WHERE Salary > {minSalary}"</span>)
+        .<span class="method">ToListAsync</span>();
+}
+
+<span class="comment">// 2. FromSqlRaw with parameters (SAFE - manual parameterization)</span>
+<span class="keyword">public async</span> Task&lt;<span class="class-name">List</span>&lt;<span class="class-name">Employee</span>&gt;&gt; GetEmployeesByDept(<span class="keyword">string</span> dept)
+{
+    <span class="keyword">return await</span> _context.Employees
+        .<span class="method">FromSqlRaw</span>(<span class="string">"SELECT * FROM Employees WHERE Department = {0}"</span>, dept)
+        .<span class="method">ToListAsync</span>();
+}
+
+<span class="comment">// 3. Composable query - can chain LINQ after raw SQL</span>
+<span class="keyword">public async</span> Task&lt;<span class="class-name">List</span>&lt;<span class="class-name">Employee</span>&gt;&gt; GetTopEarners()
+{
+    <span class="keyword">return await</span> _context.Employees
+        .<span class="method">FromSqlInterpolated</span>(<span class="string">$"SELECT * FROM Employees WHERE IsActive = 1"</span>)
+        .<span class="method">OrderByDescending</span>(e => e.Salary)
+        .<span class="method">Take</span>(<span class="number">10</span>)
+        .<span class="method">ToListAsync</span>();
+}
+
+<span class="comment">// 4. ExecuteSqlRaw - for non-query commands (INSERT/UPDATE/DELETE)</span>
+<span class="keyword">public async</span> Task&lt;<span class="keyword">int</span>&gt; GiveBonusToDept(<span class="keyword">string</span> dept, <span class="keyword">decimal</span> bonus)
+{
+    <span class="keyword">return await</span> _context.Database
+        .<span class="method">ExecuteSqlInterpolatedAsync</span>(
+            <span class="string">$"UPDATE Employees SET Salary = Salary + {bonus} WHERE Department = {dept}"</span>);
+    <span class="comment">// Returns number of affected rows</span>
+}
+
+<span class="comment">// 5. Stored Procedure execution</span>
+<span class="keyword">public async</span> Task&lt;<span class="class-name">List</span>&lt;<span class="class-name">Employee</span>&gt;&gt; GetEmployeesByStoredProc(<span class="keyword">int</span> departmentId)
+{
+    <span class="keyword">return await</span> _context.Employees
+        .<span class="method">FromSqlInterpolated</span>(<span class="string">$"EXEC GetEmployeesByDepartment {departmentId}"</span>)
+        .<span class="method">ToListAsync</span>();
+}
+
+<span class="comment">// 6. DANGER ⚠️ - Never do this (SQL injection vulnerability)</span>
+<span class="keyword">public async</span> Task&lt;<span class="class-name">List</span>&lt;<span class="class-name">Employee</span>&gt;&gt; UNSAFE_GetEmployees(<span class="keyword">string</span> userInput)
+{
+    <span class="comment">// DON'T: String concatenation = SQL INJECTION RISK!</span>
+    <span class="keyword">return await</span> _context.Employees
+        .<span class="method">FromSqlRaw</span>(<span class="string">$"SELECT * FROM Employees WHERE Name = '</span>{userInput}<span class="string">'"</span>)
+        .<span class="method">ToListAsync</span>();
+}</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Use <code>FromSqlInterpolated()</code> for queries and <code>ExecuteSqlInterpolated()</code> for commands—they're safe from SQL injection. 
+                                Raw SQL is useful for performance optimization and database-specific features, but always validate the generated SQL and use parameters.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">EF Core</span>
+                            <span class="category-tag">SQL</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 84 -->
+            <div class="question-item" data-keywords="entity framework approach database first code first model first scaffold migration">
+                <details>
+                    <summary>Q84: What are different Entity Framework approaches?</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                Entity Framework supports three development approaches: <strong>Database First</strong> (generate models from existing DB), 
+                                <strong>Code First</strong> (create DB from C# classes), and <strong>Model First</strong> (design via visual designer—deprecated in EF Core). 
+                                Code First is dominant in modern .NET Core development due to version control friendliness, testability, and migration support. 
+                                Database First is used when working with legacy databases or DBA-controlled schemas.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                <strong>Code First (Recommended in EF Core)</strong>:<br>
+                                • Define POCOs (entities) → Configure via Fluent API or Data Annotations → Generate DB via Migrations<br>
+                                • Commands: <code>dotnet ef migrations add InitialCreate</code>, <code>dotnet ef database update</code><br>
+                                • Full control over schema, works great with Git, supports CI/CD<br><br>
+
+                                <strong>Database First (EF Core 5+)</strong>:<br>
+                                • Reverse engineer existing DB → Generate DbContext and entities via scaffolding<br>
+                                • Command: <code>dotnet ef dbcontext scaffold "ConnectionString" Microsoft.EntityFrameworkCore.SqlServer</code><br>
+                                • Useful for brownfield projects, but changes require re-scaffolding<br><br>
+
+                                <strong>Model First</strong>:<br>
+                                • Visual designer in VS (EF6 only, NOT supported in EF Core)<br>
+                                • Generate DB from .edmx file—legacy approach, avoid in new projects
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                I've used both approaches depending on the project. Here's how I applied them:
+                            </p>
+                            <pre><code><span class="comment">// ========== CODE FIRST (My go-to for greenfield projects) ==========</span>
+
+<span class="comment">// 1. Define entity</span>
+<span class="keyword">public class</span> <span class="class-name">Order</span>
+{
+    <span class="keyword">public int</span> Id { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public string</span> CustomerName { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public decimal</span> TotalAmount { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public</span> <span class="class-name">List</span>&lt;<span class="class-name">OrderItem</span>&gt; Items { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+}
+
+<span class="comment">// 2. Configure in DbContext</span>
+<span class="keyword">public class</span> <span class="class-name">AppDbContext</span> : <span class="class-name">DbContext</span>
+{
+    <span class="keyword">public</span> <span class="class-name">DbSet</span>&lt;<span class="class-name">Order</span>&gt; Orders { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    
+    <span class="keyword">protected override void</span> <span class="method">OnModelCreating</span>(<span class="class-name">ModelBuilder</span> modelBuilder)
+    {
+        modelBuilder.Entity&lt;<span class="class-name">Order</span>&gt;()
+            .<span class="method">Property</span>(o => o.CustomerName)
+            .<span class="method">IsRequired</span>()
+            .<span class="method">HasMaxLength</span>(<span class="number">200</span>);
+            
+        modelBuilder.Entity&lt;<span class="class-name">Order</span>&gt;()
+            .<span class="method">HasMany</span>(o => o.Items)
+            .<span class="method">WithOne</span>()
+            .<span class="method">OnDelete</span>(DeleteBehavior.Cascade);
+    }
+}
+
+<span class="comment">// 3. Generate migration</span>
+<span class="comment">// Terminal: dotnet ef migrations add CreateOrderTable</span>
+<span class="comment">// Terminal: dotnet ef database update</span>
+
+<span class="comment">// ========== DATABASE FIRST (Used in a legacy system migration) ==========</span>
+
+<span class="comment">// Scaffold from existing database</span>
+<span class="comment">// Terminal command I used:</span>
+<span class="comment">/*
+dotnet ef dbcontext scaffold 
+    "Server=.;Database=LegacyDB;Trusted_Connection=True;" 
+    Microsoft.EntityFrameworkCore.SqlServer 
+    --output-dir Models 
+    --context-dir Data 
+    --context LegacyDbContext
+*/</span>
+
+<span class="comment">// Generated DbContext (auto-generated, don't modify directly)</span>
+<span class="keyword">public partial class</span> <span class="class-name">LegacyDbContext</span> : <span class="class-name">DbContext</span>
+{
+    <span class="keyword">public</span> <span class="class-name">DbSet</span>&lt;<span class="class-name">Customer</span>&gt; Customers { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public</span> <span class="class-name">DbSet</span>&lt;<span class="class-name">Order</span>&gt; Orders { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    
+    <span class="comment">// Auto-generated configuration...</span>
+}
+
+<span class="comment">// Pro tip: Extend generated context using partial classes</span>
+<span class="keyword">public partial class</span> <span class="class-name">LegacyDbContext</span>
+{
+    <span class="comment">// Add custom methods here - safe from re-scaffolding</span>
+    <span class="keyword">public async</span> Task&lt;<span class="class-name">List</span>&lt;<span class="class-name">Order</span>&gt;&gt; GetRecentOrders()
+    {
+        <span class="keyword">return await</span> Orders
+            .<span class="method">Where</span>(o => o.OrderDate > DateTime.Now.AddDays(-<span class="number">30</span>))
+            .<span class="method">ToListAsync</span>();
+    }
+}</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                <strong>Code First</strong> is the modern standard for EF Core—it's version control friendly, supports migrations, and works well in Agile teams. 
+                                <strong>Database First</strong> is for legacy systems or when DBAs own schema design. Avoid Model First in EF Core (not supported). 
+                                Knowing both approaches shows versatility in brownfield vs. greenfield projects.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">EF Core</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">SQL</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchBar = document.getElementById('searchBar');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const questionItems = document.querySelectorAll('.question-item');
+        const resultCount = document.getElementById('resultCount');
+
+        searchBar.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            questionItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords');
+                const summaryText = item.querySelector('summary').textContent.toLowerCase();
+                const contentText = item.querySelector('.answer-content').textContent.toLowerCase();
+                
+                const matches = keywords.includes(searchTerm) || 
+                               summaryText.includes(searchTerm) || 
+                               contentText.includes(searchTerm);
+
+                if (matches || searchTerm === '') {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            if (searchTerm === '') {
+                resultCount.textContent = '';
+            } else {
+                resultCount.textContent = `Found ${visibleCount} of ${questionItems.length} questions`;
+            }
+        });
+
+        // Expand all / Collapse all (Ctrl+E / Ctrl+C shortcuts)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                document.querySelectorAll('details').forEach(d => d.open = true);
+            }
+            if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                document.querySelectorAll('details').forEach(d => d.open = false);
+            }
+        });
+    </script>
+</body>
+</html>

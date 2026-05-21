@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Q&A - Microservices</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #0f1419;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            color: #61dafb;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #2d3748;
+            border-radius: 8px;
+            background: #1a202c;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        #searchBar:focus {
+            outline: none;
+            border-color: #61dafb;
+            box-shadow: 0 0 15px rgba(97, 218, 251, 0.2);
+        }
+
+        #searchBar::placeholder {
+            color: #718096;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            pointer-events: none;
+        }
+
+        details {
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        details:hover {
+            border-color: #4a5568;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        details[open] {
+            background: #1e2835;
+            border-color: #61dafb;
+        }
+
+        summary {
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #61dafb;
+            padding: 10px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        summary:hover {
+            color: #4fa8c5;
+        }
+
+        summary::before {
+            content: "▶";
+            display: inline-block;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .question-content {
+            padding: 20px 10px 10px 35px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "●";
+            margin-right: 8px;
+            color: #61dafb;
+        }
+
+        .section-content {
+            color: #d0d0d0;
+            padding-left: 20px;
+            text-align: justify;
+        }
+
+        .category-tags {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .tag.microservices {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .tag.dotnet {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .tag.api {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 15px 0;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c9d1d9;
+        }
+
+        .keyword { color: #ff79c6; font-weight: bold; }
+        .string { color: #50fa7b; }
+        .comment { color: #6272a4; font-style: italic; }
+        .type { color: #8be9fd; }
+        .method { color: #f1fa8c; }
+        .number { color: #bd93f9; }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            summary {
+                font-size: 1em;
+            }
+        }
+
+        .highlight {
+            background-color: rgba(255, 215, 0, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 .NET Core Interview Guide</h1>
+        <p class="subtitle">Microservices Architecture - Expert Level Answers</p>
+
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Search questions by keyword (e.g., 'circuit breaker', 'REST', 'service discovery')...">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div id="questionsContainer">
+            <!-- Question 49: Microservices Basics -->
+            <details class="question-item">
+                <summary>Q49: Explain the microservices concept</summary>
+                <div class="question-content">
+                    <div class="section">
+                        <div class="section-title">1. Theory</div>
+                        <div class="section-content">
+                            Microservices is an architectural pattern where an application is decomposed into small, independent services that run as separate processes and communicate over lightweight protocols (typically HTTP/REST or messaging). Each microservice owns its data, can be deployed independently, and is organized around specific business capabilities. This contrasts with monolithic architecture where all functionality exists in a single deployable unit. The pattern emphasizes loose coupling, high cohesion, and autonomous teams owning individual services.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">2. How it Works in .NET Core</div>
+                        <div class="section-content">
+                            In .NET, we build microservices using <strong>ASP.NET Core Web API</strong> or <strong>gRPC</strong> templates. Key components include:
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li><strong>ASP.NET Core Minimal APIs or Controllers</strong> - for REST endpoints</li>
+                                <li><strong>HttpClientFactory</strong> - for inter-service communication</li>
+                                <li><strong>MassTransit/NServiceBus/RabbitMQ</strong> - for async messaging</li>
+                                <li><strong>Entity Framework Core</strong> - with separate databases per service</li>
+                                <li><strong>Docker</strong> + <strong>Kubernetes</strong> - for containerization and orchestration</li>
+                                <li><strong>API Gateway</strong> - using Ocelot, YARP, or Azure API Management</li>
+                                <li><strong>Service Discovery</strong> - Consul, Eureka, or built-in Kubernetes DNS</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">3. Practical Example</div>
+                        <div class="section-content">
+                            In one of my projects, we migrated a monolithic e-commerce platform to microservices. We split it into: <strong>OrderService</strong>, <strong>InventoryService</strong>, <strong>PaymentService</strong>, and <strong>NotificationService</strong>. Each service had its own PostgreSQL database and was deployed in separate Docker containers on AKS (Azure Kubernetes Service).
+
+<pre><code><span class="comment">// OrderService - Program.cs (.NET 10)</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// Register HttpClient for calling InventoryService</span>
+builder.Services.AddHttpClient&lt;<span class="type">IInventoryClient</span>, <span class="type">InventoryClient</span>&gt;(client =>
+{
+    client.BaseAddress = <span class="keyword">new</span> Uri(builder.Configuration[<span class="string">"Services:Inventory:Url"</span>]);
+});
+
+<span class="comment">// Register MassTransit for async communication</span>
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration[<span class="string">"RabbitMQ:Host"</span>]);
+    });
+});
+
+builder.Services.AddDbContext&lt;<span class="type">OrderDbContext</span>&gt;(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString(<span class="string">"OrderDb"</span>)));
+
+<span class="keyword">var</span> app = builder.Build();
+
+<span class="comment">// Minimal API endpoint</span>
+app.MapPost(<span class="string">"/api/orders"</span>, <span class="keyword">async</span> (
+    <span class="type">CreateOrderRequest</span> request,
+    <span class="type">OrderDbContext</span> db,
+    <span class="type">IInventoryClient</span> inventoryClient,
+    <span class="type">IPublishEndpoint</span> publisher) =>
+{
+    <span class="comment">// Check inventory via synchronous HTTP call</span>
+    <span class="keyword">var</span> available = <span class="keyword">await</span> inventoryClient.CheckAvailabilityAsync(request.ProductId, request.Quantity);
+    
+    <span class="keyword">if</span> (!available)
+        <span class="keyword">return</span> Results.BadRequest(<span class="string">"Insufficient inventory"</span>);
+
+    <span class="keyword">var</span> order = <span class="keyword">new</span> Order
+    {
+        ProductId = request.ProductId,
+        Quantity = request.Quantity,
+        Status = <span class="string">"Pending"</span>
+    };
+
+    db.Orders.Add(order);
+    <span class="keyword">await</span> db.SaveChangesAsync();
+
+    <span class="comment">// Publish event asynchronously to NotificationService</span>
+    <span class="keyword">await</span> publisher.Publish(<span class="keyword">new</span> OrderCreatedEvent { OrderId = order.Id });
+
+    <span class="keyword">return</span> Results.Created($<span class="string">"/api/orders/{order.Id}"</span>, order);
+});
+
+app.Run();
+</code></pre>
+
+                            The key lesson learned: <strong>data consistency across services is hard</strong>. We implemented the Saga pattern using MassTransit to handle distributed transactions. When an order failed at the payment stage, we'd publish compensating events to roll back inventory reservations.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">4. Key Takeaway</div>
+                        <div class="section-content">
+                            Microservices enable independent deployment and scaling but introduce complexity in distributed systems—focus on clear service boundaries, robust inter-service communication, and eventual consistency patterns. You trade operational complexity for development agility.
+                        </div>
+                    </div>
+
+                    <div class="category-tags">
+                        <span class="tag microservices">Microservices</span>
+                        <span class="tag dotnet">.NET Core Concepts</span>
+                        <span class="tag api">API</span>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Question 45: Service Discovery -->
+            <details class="question-item">
+                <summary>Q45: Explain service registry in Service Discovery</summary>
+                <div class="question-content">
+                    <div class="section">
+                        <div class="section-title">1. Theory</div>
+                        <div class="section-content">
+                            A service registry is a centralized database that maintains the network locations (IP addresses and ports) of all available service instances in a microservices architecture. Services register themselves on startup and deregister on shutdown. Client services query the registry to discover available instances before making calls. This enables dynamic scaling since new instances automatically join the registry, and failed instances are removed through health checks. It's the backbone of client-side or server-side load balancing in distributed systems.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">2. How it Works in .NET Core</div>
+                        <div class="section-content">
+                            Common implementations in .NET:
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li><strong>Consul</strong> - with <code>Consul.AspNetCore</code> NuGet package for registration and <code>Consul</code> client for discovery</li>
+                                <li><strong>Eureka</strong> - using <code>Steeltoe.Discovery.Eureka</code> for Netflix OSS integration</li>
+                                <li><strong>Kubernetes DNS</strong> - built-in service discovery via DNS names (e.g., <code>http://order-service:8080</code>)</li>
+                                <li><strong>Azure Service Fabric</strong> - native service registry via Naming Service</li>
+                                <li><strong>Service Mesh</strong> - Istio/Linkerd handles discovery transparently</li>
+                            </ul>
+                            For HTTP clients, use <strong>HttpClientFactory</strong> with dynamic address resolution from the registry.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">3. Practical Example</div>
+                        <div class="section-content">
+                            In a multi-tenant SaaS platform I worked on, we used <strong>Consul</strong> for service discovery across 15+ microservices running in Docker Swarm (before we migrated to Kubernetes). Each service registered itself on startup with health check endpoints.
+
+<pre><code><span class="comment">// Program.cs - Service Registration with Consul</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton&lt;<span class="type">IConsulClient</span>, <span class="type">ConsulClient</span>&gt;(p => <span class="keyword">new</span> ConsulClient(cfg =>
+{
+    cfg.Address = <span class="keyword">new</span> Uri(builder.Configuration[<span class="string">"Consul:Host"</span>]);
+}));
+
+<span class="keyword">var</span> app = builder.Build();
+
+<span class="comment">// Register service on startup</span>
+<span class="keyword">var</span> lifetime = app.Services.GetRequiredService&lt;<span class="type">IHostApplicationLifetime</span>&gt;();
+<span class="keyword">var</span> consul = app.Services.GetRequiredService&lt;<span class="type">IConsulClient</span>&gt;();
+<span class="keyword">var</span> serviceName = <span class="string">"payment-service"</span>;
+<span class="keyword">var</span> serviceId = $<span class="string">"{serviceName}-{Guid.NewGuid()}"</span>;
+
+lifetime.ApplicationStarted.Register(<span class="keyword">async</span> () =>
+{
+    <span class="keyword">var</span> registration = <span class="keyword">new</span> AgentServiceRegistration
+    {
+        ID = serviceId,
+        Name = serviceName,
+        Address = <span class="string">"192.168.1.10"</span>,
+        Port = <span class="number">5001</span>,
+        Check = <span class="keyword">new</span> AgentServiceCheck
+        {
+            HTTP = <span class="string">"http://192.168.1.10:5001/health"</span>,
+            Interval = TimeSpan.FromSeconds(<span class="number">10</span>),
+            Timeout = TimeSpan.FromSeconds(<span class="number">5</span>)
+        }
+    };
+
+    <span class="keyword">await</span> consul.Agent.ServiceRegister(registration);
+});
+
+lifetime.ApplicationStopping.Register(<span class="keyword">async</span> () =>
+{
+    <span class="keyword">await</span> consul.Agent.ServiceDeregister(serviceId);
+});
+
+app.MapGet(<span class="string">"/health"</span>, () => Results.Ok(<span class="string">"Healthy"</span>));
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// Consuming service - Discovery and Load Balancing</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">PaymentServiceClient</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IConsulClient</span> _consul;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">HttpClient</span> _httpClient;
+
+    <span class="keyword">public</span> PaymentServiceClient(<span class="type">IConsulClient</span> consul, <span class="type">HttpClient</span> httpClient)
+    {
+        _consul = consul;
+        _httpClient = httpClient;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">PaymentResult</span>&gt; ProcessPaymentAsync(<span class="type">PaymentRequest</span> request)
+    {
+        <span class="comment">// Query Consul for healthy instances</span>
+        <span class="keyword">var</span> services = <span class="keyword">await</span> _consul.Health.Service(<span class="string">"payment-service"</span>, <span class="string">""</span>, <span class="keyword">true</span>);
+        
+        <span class="keyword">if</span> (!services.Response.Any())
+            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"No healthy payment service instances"</span>);
+
+        <span class="comment">// Simple random load balancing</span>
+        <span class="keyword">var</span> service = services.Response[Random.Shared.Next(services.Response.Length)];
+        <span class="keyword">var</span> baseUrl = $<span class="string">"http://{service.Service.Address}:{service.Service.Port}"</span>;
+
+        <span class="keyword">var</span> response = <span class="keyword">await</span> _httpClient.PostAsJsonAsync($<span class="string">"{baseUrl}/api/payments"</span>, request);
+        <span class="keyword">return</span> <span class="keyword">await</span> response.Content.ReadFromJsonAsync&lt;<span class="type">PaymentResult</span>&gt;();
+    }
+}
+</code></pre>
+
+                            We had a bug where services weren't deregistering properly on crashes, causing 503 errors. Fixed it by reducing Consul's health check interval to 10 seconds and implementing proper graceful shutdown.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">4. Key Takeaway</div>
+                        <div class="section-content">
+                            Service registries solve the "how do I find other services" problem in dynamic environments. Always implement health checks, handle registry unavailability gracefully, and consider using Kubernetes' built-in DNS for simpler deployments.
+                        </div>
+                    </div>
+
+                    <div class="category-tags">
+                        <span class="tag microservices">Microservices</span>
+                        <span class="tag dotnet">.NET Core Concepts</span>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Question 47: REST vs gRPC -->
+            <details class="question-item">
+                <summary>Q47: Communication - REST vs gRPC basics</summary>
+                <div class="question-content">
+                    <div class="section">
+                        <div class="section-title">1. Theory</div>
+                        <div class="section-content">
+                            <strong>REST</strong> (Representational State Transfer) uses HTTP/1.1 with JSON/XML payloads, text-based communication, and standard HTTP verbs (GET, POST, PUT, DELETE). It's human-readable, widely supported, and works well for public APIs. <strong>gRPC</strong> (Google Remote Procedure Call) uses HTTP/2 with Protocol Buffers (binary serialization), supports bidirectional streaming, and generates strongly-typed client/server code from .proto files. gRPC is significantly faster due to binary serialization and multiplexing but requires HTTP/2 support and isn't browser-friendly without a proxy.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">2. How it Works in .NET Core</div>
+                        <div class="section-content">
+                            <strong>REST in .NET:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Create APIs with <code>WebApplication.CreateBuilder()</code> and Minimal APIs or Controllers</li>
+                                <li>Use <code>Results.Ok()</code>, <code>Results.BadRequest()</code> for responses</li>
+                                <li>Consume with <code>HttpClient</code> via <code>HttpClientFactory</code></li>
+                                <li>Serialize with <code>System.Text.Json</code> (default in .NET 5+)</li>
+                            </ul>
+
+                            <strong>gRPC in .NET:</strong>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Add <code>Grpc.AspNetCore</code> NuGet package</li>
+                                <li>Define services in <code>.proto</code> files (Protocol Buffers)</li>
+                                <li>Build generates C# service base classes and clients</li>
+                                <li>Register with <code>app.MapGrpcService&lt;MyService&gt;()</code></li>
+                                <li>Create clients with <code>GrpcChannel</code> and generated stubs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">3. Practical Example</div>
+                        <div class="section-content">
+                            In a real-time trading platform, we used <strong>REST for external client APIs</strong> (mobile apps, web dashboards) and <strong>gRPC for internal service-to-service communication</strong> between the OrderEngine, RiskService, and MarketDataService. The performance difference was massive—gRPC reduced latency from ~50ms to ~8ms for high-frequency calls.
+
+<pre><code><span class="comment">// REST API Example - Order Controller</span>
+app.MapPost(<span class="string">"/api/orders"</span>, <span class="keyword">async</span> (<span class="type">CreateOrderRequest</span> request, <span class="type">IOrderService</span> orderService) =>
+{
+    <span class="keyword">var</span> result = <span class="keyword">await</span> orderService.CreateOrderAsync(request);
+    <span class="keyword">return</span> Results.Ok(result);
+});
+
+<span class="comment">// Consuming REST API with HttpClient</span>
+<span class="keyword">var</span> response = <span class="keyword">await</span> _httpClient.PostAsJsonAsync(<span class="string">"/api/orders"</span>, orderRequest);
+<span class="keyword">var</span> result = <span class="keyword">await</span> response.Content.ReadFromJsonAsync&lt;<span class="type">OrderResponse</span>&gt;();
+</code></pre>
+
+<pre><code><span class="comment">// gRPC Example - order.proto file</span>
+syntax = <span class="string">"proto3"</span>;
+
+<span class="keyword">option</span> csharp_namespace = <span class="string">"TradingPlatform.Orders"</span>;
+
+<span class="keyword">service</span> <span class="type">OrderService</span> {
+  <span class="keyword">rpc</span> CreateOrder (<span class="type">CreateOrderRequest</span>) <span class="keyword">returns</span> (<span class="type">OrderResponse</span>);
+  <span class="keyword">rpc</span> StreamMarketData (<span class="type">SubscribeRequest</span>) <span class="keyword">returns</span> (<span class="keyword">stream</span> <span class="type">MarketUpdate</span>);
+}
+
+<span class="keyword">message</span> <span class="type">CreateOrderRequest</span> {
+  <span class="type">string</span> symbol = <span class="number">1</span>;
+  <span class="type">int32</span> quantity = <span class="number">2</span>;
+  <span class="type">double</span> price = <span class="number">3</span>;
+}
+
+<span class="keyword">message</span> <span class="type">OrderResponse</span> {
+  <span class="type">string</span> order_id = <span class="number">1</span>;
+  <span class="type">string</span> status = <span class="number">2</span>;
+}
+</code></pre>
+
+<pre><code><span class="comment">// gRPC Server Implementation</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">OrderServiceImpl</span> : OrderService.OrderServiceBase
+{
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">async</span> Task&lt;<span class="type">OrderResponse</span>&gt; CreateOrder(
+        <span class="type">CreateOrderRequest</span> request, 
+        <span class="type">ServerCallContext</span> context)
+    {
+        <span class="comment">// Process order logic</span>
+        <span class="keyword">return</span> <span class="keyword">new</span> OrderResponse 
+        { 
+            OrderId = Guid.NewGuid().ToString(), 
+            Status = <span class="string">"Pending"</span> 
+        };
+    }
+
+    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">async</span> Task StreamMarketData(
+        <span class="type">SubscribeRequest</span> request,
+        <span class="type">IServerStreamWriter</span>&lt;<span class="type">MarketUpdate</span>&gt; responseStream,
+        <span class="type">ServerCallContext</span> context)
+    {
+        <span class="keyword">while</span> (!context.CancellationToken.IsCancellationRequested)
+        {
+            <span class="keyword">await</span> responseStream.WriteAsync(<span class="keyword">new</span> MarketUpdate { Price = GetLatestPrice() });
+            <span class="keyword">await</span> Task.Delay(<span class="number">100</span>);
+        }
+    }
+}
+
+<span class="comment">// Program.cs registration</span>
+app.MapGrpcService&lt;<span class="type">OrderServiceImpl</span>&gt;();
+</code></pre>
+
+<pre><code><span class="comment">// gRPC Client Usage</span>
+<span class="keyword">var</span> channel = GrpcChannel.ForAddress(<span class="string">"https://localhost:5001"</span>);
+<span class="keyword">var</span> client = <span class="keyword">new</span> OrderService.OrderServiceClient(channel);
+
+<span class="keyword">var</span> response = <span class="keyword">await</span> client.CreateOrderAsync(<span class="keyword">new</span> CreateOrderRequest 
+{ 
+    Symbol = <span class="string">"AAPL"</span>, 
+    Quantity = <span class="number">100</span>, 
+    Price = <span class="number">150.50</span> 
+});
+
+Console.WriteLine($<span class="string">"Order ID: {response.OrderId}"</span>);
+</code></pre>
+
+                            Key lesson: <strong>gRPC streaming was perfect for real-time market data</strong>. We pushed 1000+ price updates/second to clients without the overhead of WebSocket handshakes. But debugging gRPC is harder—we used Wireshark and grpcurl for troubleshooting.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">4. Key Takeaway</div>
+                        <div class="section-content">
+                            Use REST for public APIs and browser compatibility; use gRPC for high-performance internal service communication, especially when you need streaming or sub-10ms latency. You can run both in the same ASP.NET Core app.
+                        </div>
+                    </div>
+
+                    <div class="category-tags">
+                        <span class="tag microservices">Microservices</span>
+                        <span class="tag api">API</span>
+                        <span class="tag dotnet">.NET Core Concepts</span>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Question 48: Circuit Breaker -->
+            <details class="question-item">
+                <summary>Q48: Resilience - Circuit breaker pattern</summary>
+                <div class="question-content">
+                    <div class="section">
+                        <div class="section-title">1. Theory</div>
+                        <div class="section-content">
+                            The Circuit Breaker pattern prevents an application from repeatedly attempting to execute an operation that's likely to fail, protecting downstream services from cascading failures. It has three states: <strong>Closed</strong> (normal operation, requests pass through), <strong>Open</strong> (after threshold failures, requests fail immediately without calling the service), and <strong>Half-Open</strong> (after timeout, allows limited test requests to check if the service recovered). If test requests succeed, it transitions back to Closed; otherwise, it reopens. This improves system resilience and prevents resource exhaustion from retrying failed operations.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">2. How it Works in .NET Core</div>
+                        <div class="section-content">
+                            .NET implements circuit breakers via <strong>Polly</strong> library (now part of Microsoft.Extensions.Http.Resilience in .NET 8+):
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li><strong>Polly</strong> - <code>AddPolicyHandler()</code> with <code>CircuitBreakerAsync</code> policy</li>
+                                <li><strong>Microsoft.Extensions.Http.Resilience</strong> (.NET 8+) - <code>AddStandardResilienceHandler()</code> includes circuit breaker, retry, and timeout</li>
+                                <li>Configure failure thresholds, break duration, and sampling duration</li>
+                                <li>Combine with retry policies for comprehensive resilience</li>
+                                <li>Monitor circuit state via <code>OnBreak</code>, <code>OnReset</code> callbacks</li>
+                            </ul>
+                            In .NET 10, the <code>AddStandardResilienceHandler</code> is the recommended approach.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">3. Practical Example</div>
+                        <div class="section-content">
+                            In a payment processing system, we integrated with a third-party fraud detection API that occasionally had outages. Without circuit breakers, our entire checkout flow would grind to a halt waiting for timeouts. We implemented Polly's circuit breaker to fail fast and fallback to a simplified fraud check.
+
+<pre><code><span class="comment">// Program.cs - Circuit Breaker with Polly (.NET 10)</span>
+<span class="keyword">using</span> Polly;
+<span class="keyword">using</span> Polly.CircuitBreaker;
+
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// Modern approach with Microsoft.Extensions.Http.Resilience</span>
+builder.Services.AddHttpClient&lt;<span class="type">IFraudDetectionClient</span>, <span class="type">FraudDetectionClient</span>&gt;(client =>
+{
+    client.BaseAddress = <span class="keyword">new</span> Uri(<span class="string">"https://api.fraudcheck.com"</span>);
+})
+.AddStandardResilienceHandler(options =>
+{
+    <span class="comment">// Configure circuit breaker behavior</span>
+    options.CircuitBreaker.FailureRatio = <span class="number">0.5</span>; <span class="comment">// Open after 50% failures</span>
+    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(<span class="number">30</span>);
+    options.CircuitBreaker.MinimumThroughput = <span class="number">10</span>; <span class="comment">// Need 10 requests before evaluating</span>
+    options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(<span class="number">60</span>); <span class="comment">// Stay open for 60s</span>
+
+    <span class="comment">// Retry configuration</span>
+    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(<span class="number">5</span>);
+    options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(<span class="number">15</span>);
+});
+
+<span class="comment">// Legacy Polly approach (still valid)</span>
+<span class="comment">/*
+builder.Services.AddHttpClient<IFraudDetectionClient, FraudDetectionClient>()
+    .AddPolicyHandler(Policy
+        .Handle<HttpRequestException>()
+        .Or<TimeoutException>()
+        .CircuitBreakerAsync(
+            handledEventsAllowedBeforeBreaking: 5,
+            durationOfBreak: TimeSpan.FromMinutes(1),
+            onBreak: (outcome, timespan) =>
+            {
+                Log.Warning($"Circuit breaker opened for {timespan.TotalSeconds}s");
+            },
+            onReset: () =>
+            {
+                Log.Information("Circuit breaker reset");
+            }
+        ));
+*/</span>
+
+<span class="keyword">var</span> app = builder.Build();
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// Client Implementation with Fallback Logic</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">FraudDetectionClient</span> : <span class="type">IFraudDetectionClient</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">HttpClient</span> _httpClient;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">ILogger</span>&lt;<span class="type">FraudDetectionClient</span>&gt; _logger;
+
+    <span class="keyword">public</span> FraudDetectionClient(<span class="type">HttpClient</span> httpClient, <span class="type">ILogger</span>&lt;<span class="type">FraudDetectionClient</span>&gt; logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">FraudCheckResult</span>&gt; CheckTransactionAsync(<span class="type">Transaction</span> transaction)
+    {
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">var</span> response = <span class="keyword">await</span> _httpClient.PostAsJsonAsync(<span class="string">"/api/check"</span>, transaction);
+            response.EnsureSuccessStatusCode();
+            <span class="keyword">return</span> <span class="keyword">await</span> response.Content.ReadFromJsonAsync&lt;<span class="type">FraudCheckResult</span>&gt;();
+        }
+        <span class="keyword">catch</span> (BrokenCircuitException ex)
+        {
+            <span class="comment">// Circuit is open - fail fast with fallback</span>
+            _logger.LogWarning(<span class="string">"Circuit breaker open, using fallback fraud check"</span>);
+            <span class="keyword">return</span> FallbackFraudCheck(transaction);
+        }
+        <span class="keyword">catch</span> (HttpRequestException ex)
+        {
+            <span class="comment">// This will be counted towards circuit breaker threshold</span>
+            _logger.LogError(ex, <span class="string">"Fraud API call failed"</span>);
+            <span class="keyword">throw</span>;
+        }
+    }
+
+    <span class="keyword">private</span> <span class="type">FraudCheckResult</span> FallbackFraudCheck(<span class="type">Transaction</span> transaction)
+    {
+        <span class="comment">// Simple rule-based check as fallback</span>
+        <span class="keyword">var</span> isHighRisk = transaction.Amount > <span class="number">10000</span> || 
+                        transaction.Country == <span class="string">"RU"</span> || 
+                        transaction.IsNewCustomer;
+
+        <span class="keyword">return</span> <span class="keyword">new</span> FraudCheckResult 
+        { 
+            IsFraudulent = isHighRisk, 
+            Confidence = <span class="number">0.5</span>,
+            Source = <span class="string">"Fallback"</span>
+        };
+    }
+}
+</code></pre>
+
+                            We learned this the hard way: during a Black Friday outage of the fraud API, the circuit breaker saved us. Instead of 30-second checkout timeouts, we degraded gracefully with basic fraud checks and processed orders in under 2 seconds. Revenue impact was minimal compared to complete downtime.
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">4. Key Takeaway</div>
+                        <div class="section-content">
+                            Circuit breakers prevent cascading failures by failing fast when downstream services are unhealthy. Always combine with fallback strategies and monitoring. In .NET 8+, use <code>AddStandardResilienceHandler</code> for production-ready resilience out of the box.
+                        </div>
+                    </div>
+
+                    <div class="category-tags">
+                        <span class="tag microservices">Microservices</span>
+                        <span class="tag dotnet">.NET Core Concepts</span>
+                        <span class="tag">Design Patterns</span>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            No questions match your search. Try different keywords.
+        </div>
+    </div>
+
+    <script>
+        const searchBar = document.getElementById('searchBar');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const noResults = document.getElementById('noResults');
+        const questionItems = document.querySelectorAll('.question-item');
+
+        searchBar.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            let visibleCount = 0;
+
+            questionItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                    
+                    // Highlight matching text
+                    if (searchTerm.length > 2) {
+                        highlightText(item, searchTerm);
+                    } else {
+                        removeHighlight(item);
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+                questionsContainer.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                questionsContainer.style.display = 'block';
+            }
+        });
+
+        function highlightText(element, searchTerm) {
+            // Simple highlight implementation
+            const summary = element.querySelector('summary');
+            if (summary) {
+                const text = summary.textContent;
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                summary.innerHTML = text.replace(regex, '<span class="highlight">$1</span>');
+            }
+        }
+
+        function removeHighlight(element) {
+            const summary = element.querySelector('summary');
+            if (summary) {
+                summary.innerHTML = summary.textContent;
+            }
+        }
+    </script>
+</body>
+</html>

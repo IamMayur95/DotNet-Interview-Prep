@@ -1,0 +1,811 @@
+<!-- Question 54: Authentication & Authorization Methods -->
+<details class="question-item">
+    <summary>Q54: Different ways to authenticate and authorize users for a Web API</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                Web API authentication/authorization can be implemented using multiple approaches: <strong>JWT Bearer Tokens</strong> (stateless, scalable, best for SPAs and mobile apps), <strong>OAuth 2.0/OpenID Connect</strong> (delegated authorization via third-party providers like Azure AD, Google, Auth0), <strong>API Keys</strong> (simple but less secure, for service-to-service communication), <strong>Cookie-based Authentication</strong> (session-based, for traditional web apps), <strong>Windows Authentication</strong> (for intranet apps using Active Directory), <strong>Certificate-based Authentication</strong> (mutual TLS for high-security scenarios), and <strong>Basic Authentication</strong> (username/password encoded in headers, only over HTTPS). Modern APIs typically use JWT for internal services and OAuth 2.0 for external integrations. The choice depends on security requirements, client types (browser, mobile, server), and whether you need single sign-on (SSO) or federated identity.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                .NET Core supports multiple authentication schemes via middleware:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><strong>JWT Bearer</strong> - <code>AddJwtBearer()</code> for token-based auth</li>
+                    <li><strong>OAuth 2.0/OpenID Connect</strong> - <code>AddOpenIdConnect()</code>, <code>AddGoogle()</code>, <code>AddMicrosoftAccount()</code></li>
+                    <li><strong>API Keys</strong> - Custom middleware or <code>IAuthenticationHandler</code></li>
+                    <li><strong>Cookie Authentication</strong> - <code>AddCookie()</code> for session-based auth</li>
+                    <li><strong>Windows Authentication</strong> - <code>AddNegotiate()</code> for AD integration</li>
+                    <li><strong>Certificate Authentication</strong> - <code>AddCertificate()</code> for mutual TLS</li>
+                    <li><strong>Multiple Schemes</strong> - <code>AddAuthentication().AddJwtBearer().AddCookie()</code> with default scheme</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In a B2B SaaS platform, we implemented <strong>multiple authentication methods</strong>: JWT tokens for the React SPA and mobile apps, OAuth 2.0 (Azure AD) for enterprise SSO customers, and API keys for server-to-server integrations. We used <code>AddAuthentication()</code> with multiple schemes and <code>[Authorize(AuthenticationSchemes = ...)]</code> to specify which endpoints accept which authentication methods.
+
+<pre><code><span class="comment">// Program.cs - Multiple Authentication Schemes</span>
+<span class="keyword">using</span> Microsoft.AspNetCore.Authentication.JwtBearer;
+<span class="keyword">using</span> Microsoft.AspNetCore.Authentication.Cookies;
+<span class="keyword">using</span> Microsoft.IdentityModel.Tokens;
+<span class="keyword">using</span> System.Text;
+
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// 1. JWT Bearer Authentication (for SPAs and mobile apps)</span>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = <span class="keyword">new</span> TokenValidationParameters
+        {
+            ValidateIssuer = <span class="keyword">true</span>,
+            ValidateAudience = <span class="keyword">true</span>,
+            ValidateLifetime = <span class="keyword">true</span>,
+            ValidateIssuerSigningKey = <span class="keyword">true</span>,
+            ValidIssuer = builder.Configuration[<span class="string">"Jwt:Issuer"</span>],
+            ValidAudience = builder.Configuration[<span class="string">"Jwt:Audience"</span>],
+            IssuerSigningKey = <span class="keyword">new</span> SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration[<span class="string">"Jwt:SecretKey"</span>]))
+        };
+    })
+    
+    <span class="comment">// 2. OAuth 2.0 / OpenID Connect (Azure AD)</span>
+    .AddOpenIdConnect(<span class="string">"AzureAD"</span>, options =>
+    {
+        options.Authority = $<span class="string">"https://login.microsoftonline.com/{builder.Configuration["AzureAd:TenantId"]}"</span>;
+        options.ClientId = builder.Configuration[<span class="string">"AzureAd:ClientId"</span>];
+        options.ClientSecret = builder.Configuration[<span class="string">"AzureAd:ClientSecret"</span>];
+        options.ResponseType = <span class="string">"code"</span>;
+        options.SaveTokens = <span class="keyword">true</span>;
+        options.GetClaimsFromUserInfoEndpoint = <span class="keyword">true</span>;
+    })
+    
+    <span class="comment">// 3. Google OAuth 2.0</span>
+    .AddGoogle(<span class="string">"Google"</span>, options =>
+    {
+        options.ClientId = builder.Configuration[<span class="string">"Google:ClientId"</span>];
+        options.ClientSecret = builder.Configuration[<span class="string">"Google:ClientSecret"</span>];
+    })
+    
+    <span class="comment">// 4. Cookie Authentication (for traditional web apps)</span>
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.Cookie.HttpOnly = <span class="keyword">true</span>;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(<span class="number">30</span>);
+        options.SlidingExpiration = <span class="keyword">true</span>;
+    });
+
+<span class="comment">// 5. Custom API Key Authentication</span>
+builder.Services.AddAuthentication()
+    .AddScheme&lt;<span class="type">ApiKeyAuthenticationOptions</span>, <span class="type">ApiKeyAuthenticationHandler</span>&gt;(
+        <span class="string">"ApiKey"</span>, options => { });
+
+builder.Services.AddAuthorization();
+
+<span class="keyword">var</span> app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+<span class="comment">// Endpoints with different authentication schemes</span>
+
+<span class="comment">// JWT Bearer only</span>
+app.MapGet(<span class="string">"/api/profile"</span>, 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
+    (<span class="type">HttpContext</span> context) =>
+{
+    <span class="keyword">var</span> userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    <span class="keyword">return</span> Results.Ok(<span class="keyword">new</span> { userId, message = <span class="string">"JWT authenticated"</span> });
+});
+
+<span class="comment">// API Key only (for service-to-service)</span>
+app.MapPost(<span class="string">"/api/webhooks"</span>, 
+    [Authorize(AuthenticationSchemes = <span class="string">"ApiKey"</span>)] 
+    (<span class="type">WebhookPayload</span> payload) =>
+{
+    <span class="keyword">return</span> Results.Ok(<span class="string">"Webhook received"</span>);
+});
+
+<span class="comment">// Multiple schemes allowed (JWT OR API Key)</span>
+app.MapGet(<span class="string">"/api/data"</span>, 
+    [Authorize(AuthenticationSchemes = $<span class="string">"{JwtBearerDefaults.AuthenticationScheme},ApiKey"</span>)]
+    () =>
+{
+    <span class="keyword">return</span> Results.Ok(<span class="string">"Data accessible via JWT or API Key"</span>);
+});
+
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// Custom API Key Authentication Handler</span>
+<span class="keyword">using</span> Microsoft.AspNetCore.Authentication;
+<span class="keyword">using</span> Microsoft.Extensions.Options;
+<span class="keyword">using</span> System.Security.Claims;
+<span class="keyword">using</span> System.Text.Encodings.Web;
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ApiKeyAuthenticationOptions</span> : <span class="type">AuthenticationSchemeOptions</span>
+{
+    <span class="keyword">public</span> <span class="type">string</span> HeaderName { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="string">"X-API-Key"</span>;
+}
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ApiKeyAuthenticationHandler</span> : <span class="type">AuthenticationHandler</span>&lt;<span class="type">ApiKeyAuthenticationOptions</span>&gt;
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IApiKeyValidator</span> _apiKeyValidator;
+
+    <span class="keyword">public</span> ApiKeyAuthenticationHandler(
+        <span class="type">IOptionsMonitor</span>&lt;<span class="type">ApiKeyAuthenticationOptions</span>&gt; options,
+        <span class="type">ILoggerFactory</span> logger,
+        <span class="type">UrlEncoder</span> encoder,
+        <span class="type">IApiKeyValidator</span> apiKeyValidator)
+        : <span class="keyword">base</span>(options, logger, encoder)
+    {
+        _apiKeyValidator = apiKeyValidator;
+    }
+
+    <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task&lt;<span class="type">AuthenticateResult</span>&gt; HandleAuthenticateAsync()
+    {
+        <span class="keyword">if</span> (!Request.Headers.TryGetValue(Options.HeaderName, <span class="keyword">out</span> <span class="keyword">var</span> apiKeyHeaderValues))
+        {
+            <span class="keyword">return</span> AuthenticateResult.NoResult(); <span class="comment">// No API key provided</span>
+        }
+
+        <span class="keyword">var</span> apiKey = apiKeyHeaderValues.FirstOrDefault();
+        <span class="keyword">if</span> (<span class="type">string</span>.IsNullOrEmpty(apiKey))
+        {
+            <span class="keyword">return</span> AuthenticateResult.Fail(<span class="string">"Invalid API Key"</span>);
+        }
+
+        <span class="keyword">var</span> apiKeyInfo = <span class="keyword">await</span> _apiKeyValidator.ValidateAsync(apiKey);
+        <span class="keyword">if</span> (apiKeyInfo == <span class="keyword">null</span>)
+        {
+            <span class="keyword">return</span> AuthenticateResult.Fail(<span class="string">"Invalid API Key"</span>);
+        }
+
+        <span class="comment">// Create claims principal</span>
+        <span class="keyword">var</span> claims = <span class="keyword">new</span>[]
+        {
+            <span class="keyword">new</span> Claim(ClaimTypes.Name, apiKeyInfo.ClientName),
+            <span class="keyword">new</span> Claim(ClaimTypes.NameIdentifier, apiKeyInfo.ClientId),
+            <span class="keyword">new</span> Claim(<span class="string">"api_key_id"</span>, apiKeyInfo.KeyId)
+        };
+
+        <span class="keyword">var</span> identity = <span class="keyword">new</span> ClaimsIdentity(claims, Scheme.Name);
+        <span class="keyword">var</span> principal = <span class="keyword">new</span> ClaimsPrincipal(identity);
+        <span class="keyword">var</span> ticket = <span class="keyword">new</span> AuthenticationTicket(principal, Scheme.Name);
+
+        <span class="keyword">return</span> AuthenticateResult.Success(ticket);
+    }
+}
+
+<span class="keyword">public</span> <span class="keyword">interface</span> <span class="type">IApiKeyValidator</span>
+{
+    Task&lt;<span class="type">ApiKeyInfo</span>?&gt; ValidateAsync(<span class="type">string</span> apiKey);
+}
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ApiKeyValidator</span> : <span class="type">IApiKeyValidator</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">AppDbContext</span> _context;
+
+    <span class="keyword">public</span> ApiKeyValidator(<span class="type">AppDbContext</span> context)
+    {
+        _context = context;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">ApiKeyInfo</span>?&gt; ValidateAsync(<span class="type">string</span> apiKey)
+    {
+        <span class="comment">// Hash the API key and look up in database</span>
+        <span class="keyword">var</span> hashedKey = HashApiKey(apiKey);
+        
+        <span class="keyword">var</span> storedKey = <span class="keyword">await</span> _context.ApiKeys
+            .FirstOrDefaultAsync(k => k.HashedKey == hashedKey && k.IsActive);
+
+        <span class="keyword">if</span> (storedKey == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;
+
+        <span class="keyword">return</span> <span class="keyword">new</span> ApiKeyInfo
+        {
+            KeyId = storedKey.Id.ToString(),
+            ClientId = storedKey.ClientId,
+            ClientName = storedKey.ClientName
+        };
+    }
+
+    <span class="keyword">private</span> <span class="type">string</span> HashApiKey(<span class="type">string</span> apiKey)
+    {
+        <span class="keyword">using</span> <span class="keyword">var</span> sha256 = SHA256.Create();
+        <span class="keyword">var</span> bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(apiKey));
+        <span class="keyword">return</span> Convert.ToBase64String(bytes);
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Windows Authentication (for intranet apps)</span>
+<span class="comment">// In Program.cs</span>
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+    .AddNegotiate(); <span class="comment">// Windows/Kerberos authentication</span>
+
+<span class="comment">// In launchSettings.json</span>
+{
+  <span class="string">"iisSettings"</span>: {
+    <span class="string">"windowsAuthentication"</span>: <span class="keyword">true</span>,
+    <span class="string">"anonymousAuthentication"</span>: <span class="keyword">false</span>
+  }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Certificate Authentication (mutual TLS)</span>
+builder.Services.AddAuthentication(
+    CertificateAuthenticationDefaults.AuthenticationScheme)
+    .AddCertificate(options =>
+    {
+        options.AllowedCertificateTypes = CertificateTypes.All;
+        options.Events = <span class="keyword">new</span> CertificateAuthenticationEvents
+        {
+            OnCertificateValidated = context =>
+            {
+                <span class="keyword">var</span> claims = <span class="keyword">new</span>[]
+                {
+                    <span class="keyword">new</span> Claim(ClaimTypes.Name, context.ClientCertificate.Subject)
+                };
+                context.Principal = <span class="keyword">new</span> ClaimsPrincipal(
+                    <span class="keyword">new</span> ClaimsIdentity(claims, context.Scheme.Name));
+                context.Success();
+                <span class="keyword">return</span> Task.CompletedTask;
+            }
+        };
+    });
+</code></pre>
+
+                Production lesson: We had an enterprise customer requiring Azure AD SSO but our mobile app used JWT. Supporting multiple schemes was critical. The key gotcha: when multiple schemes are registered, you must specify <code>AuthenticationSchemes</code> in <code>[Authorize]</code> or set a default scheme, otherwise authentication always fails.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                Choose authentication based on client type: <strong>JWT</strong> for SPAs/mobile, <strong>OAuth 2.0/OpenID Connect</strong> for SSO/federated auth, <strong>API Keys</strong> for service-to-service, <strong>Cookies</strong> for traditional web apps. .NET supports multiple authentication schemes simultaneously via <code>AddAuthentication()</code>. Always use HTTPS, hash API keys, validate JWT signatures, and implement token expiration.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag">Authentication and Authorization</span>
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag api">API</span>
+        </div>
+    </div>
+</details>
+
+<!-- Question 55: OAuth 2.0 Implementation -->
+<details class="question-item">
+    <summary>Q55: Simple code example in C# on how to implement OAuth 2.0</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                OAuth 2.0 is an authorization framework that enables third-party applications to obtain limited access to a user's resources without exposing credentials. It uses four roles: <strong>Resource Owner</strong> (user), <strong>Client</strong> (your app), <strong>Authorization Server</strong> (issues tokens, e.g., Azure AD, Google), and <strong>Resource Server</strong> (your API). The most common flow is <strong>Authorization Code Flow with PKCE</strong>: (1) Client redirects user to authorization server, (2) User logs in and consents, (3) Authorization server redirects back with an authorization code, (4) Client exchanges code for access token, (5) Client uses access token to call APIs. OAuth 2.0 provides <strong>authorization</strong> (what you can access), while <strong>OpenID Connect</strong> (built on OAuth 2.0) adds <strong>authentication</strong> (who you are) via ID tokens. Never store client secrets in frontend code—use PKCE for SPAs and mobile apps.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                Implementing OAuth 2.0 in .NET involves:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><strong>As OAuth Client</strong> - <code>AddOpenIdConnect()</code> or <code>AddGoogle()</code>, <code>AddMicrosoftAccount()</code></li>
+                    <li><strong>As OAuth Server</strong> - Use <strong>IdentityServer</strong>, <strong>Duende IdentityServer</strong>, or <strong>Azure AD</strong></li>
+                    <li><code>Microsoft.AspNetCore.Authentication.OpenIdConnect</code> - for OpenID Connect</li>
+                    <li><code>Microsoft.Identity.Web</code> - for Azure AD/Microsoft Identity Platform</li>
+                    <li><strong>PKCE Support</strong> - automatically enabled in modern libraries</li>
+                    <li><strong>Token Storage</strong> - <code>SaveTokens = true</code> stores access/refresh tokens in auth properties</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In a healthcare portal, we implemented <strong>OAuth 2.0 with Azure AD</strong> for hospital staff and <strong>Google OAuth</strong> for patients. Staff used their enterprise Azure AD credentials for SSO, while patients logged in with Google accounts. This eliminated password management and leveraged existing identity providers.
+
+<pre><code><span class="comment">// Program.cs - OAuth 2.0 Client Implementation (Azure AD)</span>
+<span class="keyword">using</span> Microsoft.AspNetCore.Authentication.OpenIdConnect;
+<span class="keyword">using</span> Microsoft.Identity.Web;
+
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// 1. AZURE AD OAUTH 2.0 / OPENID CONNECT</span>
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(<span class="string">"AzureAd"</span>));
+
+<span class="comment">// Alternative: Manual OpenID Connect configuration</span>
+<span class="comment">/*
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddOpenIdConnect(options =>
+    {
+        options.Authority = $"https://login.microsoftonline.com/{builder.Configuration["AzureAd:TenantId"]}/v2.0";
+        options.ClientId = builder.Configuration["AzureAd:ClientId"];
+        options.ClientSecret = builder.Configuration["AzureAd:ClientSecret"];
+        options.ResponseType = "code"; // Authorization Code Flow
+        options.SaveTokens = true; // Store access token for later use
+        options.GetClaimsFromUserInfoEndpoint = true;
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+        
+        // PKCE is enabled by default in .NET 6+
+        options.UsePkce = true;
+
+        // Handle token response
+        options.Events = new OpenIdConnectEvents
+        {
+            OnTokenValidated = context =>
+            {
+                // Access token is available here
+                var accessToken = context.TokenEndpointResponse?.AccessToken;
+                // Store in claims if needed
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = context =>
+            {
+                context.Response.Redirect("/error");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            }
+        };
+    });
+*/</span>
+
+builder.Services.AddAuthorization();
+builder.Services.AddRazorPages();
+
+<span class="keyword">var</span> app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+<span class="comment">// Login endpoint</span>
+app.MapGet(<span class="string">"/login"</span>, () =>
+{
+    <span class="keyword">return</span> Results.Challenge(<span class="keyword">new</span> AuthenticationProperties 
+    { 
+        RedirectUri = <span class="string">"/dashboard"</span> 
+    });
+});
+
+<span class="comment">// Logout endpoint</span>
+app.MapGet(<span class="string">"/logout"</span>, () =>
+{
+    <span class="keyword">return</span> Results.SignOut(
+        <span class="keyword">new</span> AuthenticationProperties { RedirectUri = <span class="string">"/"</span> },
+        OpenIdConnectDefaults.AuthenticationScheme,
+        CookieAuthenticationDefaults.AuthenticationScheme);
+});
+
+<span class="comment">// Protected endpoint</span>
+app.MapGet(<span class="string">"/dashboard"</span>, [Authorize] (<span class="type">HttpContext</span> context) =>
+{
+    <span class="keyword">var</span> userName = context.User.FindFirst(<span class="string">"name"</span>)?.Value;
+    <span class="keyword">var</span> email = context.User.FindFirst(<span class="string">"preferred_username"</span>)?.Value;
+    
+    <span class="comment">// Get stored access token</span>
+    <span class="keyword">var</span> accessToken = context.GetTokenAsync(<span class="string">"access_token"</span>).Result;
+    
+    <span class="keyword">return</span> Results.Ok(<span class="keyword">new</span> { userName, email, hasToken = !<span class="type">string</span>.IsNullOrEmpty(accessToken) });
+});
+
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// appsettings.json - Azure AD Configuration</span>
+{
+  <span class="string">"AzureAd"</span>: {
+    <span class="string">"Instance"</span>: <span class="string">"https://login.microsoftonline.com/"</span>,
+    <span class="string">"TenantId"</span>: <span class="string">"your-tenant-id"</span>,
+    <span class="string">"ClientId"</span>: <span class="string">"your-client-id"</span>,
+    <span class="string">"ClientSecret"</span>: <span class="string">"your-client-secret"</span>,
+    <span class="string">"CallbackPath"</span>: <span class="string">"/signin-oidc"</span>,
+    <span class="string">"SignedOutCallbackPath"</span>: <span class="string">"/signout-callback-oidc"</span>
+  }
+}
+</code></pre>
+
+<pre><code><span class="comment">// 2. GOOGLE OAUTH 2.0 IMPLEMENTATION</span>
+builder.Services.AddAuthentication()
+    .AddGoogle(<span class="string">"Google"</span>, options =>
+    {
+        options.ClientId = builder.Configuration[<span class="string">"Google:ClientId"</span>];
+        options.ClientSecret = builder.Configuration[<span class="string">"Google:ClientSecret"</span>];
+        options.CallbackPath = <span class="string">"/signin-google"</span>;
+        
+        <span class="comment">// Request additional scopes</span>
+        options.Scope.Add(<span class="string">"https://www.googleapis.com/auth/userinfo.profile"</span>);
+        options.Scope.Add(<span class="string">"https://www.googleapis.com/auth/userinfo.email"</span>);
+        
+        <span class="comment">// Save tokens for later API calls</span>
+        options.SaveTokens = <span class="keyword">true</span>;
+
+        options.Events.OnCreatingTicket = context =>
+        {
+            <span class="comment">// Access Google user info</span>
+            <span class="keyword">var</span> email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+            <span class="keyword">var</span> name = context.Principal?.FindFirst(ClaimTypes.Name)?.Value;
+            
+            <span class="comment">// You can call Google APIs here with context.AccessToken</span>
+            <span class="keyword">return</span> Task.CompletedTask;
+        };
+    });
+
+<span class="comment">// Login with Google</span>
+app.MapGet(<span class="string">"/login-google"</span>, () =>
+{
+    <span class="keyword">return</span> Results.Challenge(
+        <span class="keyword">new</span> AuthenticationProperties { RedirectUri = <span class="string">"/dashboard"</span> },
+        <span class="keyword">new</span>[] { <span class="string">"Google"</span> });
+});
+</code></pre>
+
+<pre><code><span class="comment">// 3. CALLING AN EXTERNAL API WITH OAUTH 2.0 ACCESS TOKEN</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">GraphApiService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">HttpClient</span> _httpClient;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IHttpContextAccessor</span> _httpContextAccessor;
+
+    <span class="keyword">public</span> GraphApiService(<span class="type">HttpClient</span> httpClient, <span class="type">IHttpContextAccessor</span> httpContextAccessor)
+    {
+        _httpClient = httpClient;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">string</span>&gt; GetUserProfileAsync()
+    {
+        <span class="comment">// Get access token from authenticated user</span>
+        <span class="keyword">var</span> accessToken = <span class="keyword">await</span> _httpContextAccessor.HttpContext
+            .GetTokenAsync(<span class="string">"access_token"</span>);
+
+        <span class="keyword">if</span> (<span class="type">string</span>.IsNullOrEmpty(accessToken))
+            <span class="keyword">throw</span> <span class="keyword">new</span> UnauthorizedAccessException(<span class="string">"No access token available"</span>);
+
+        <span class="comment">// Call Microsoft Graph API</span>
+        _httpClient.DefaultRequestHeaders.Authorization = 
+            <span class="keyword">new</span> AuthenticationHeaderValue(<span class="string">"Bearer"</span>, accessToken);
+
+        <span class="keyword">var</span> response = <span class="keyword">await</span> _httpClient.GetAsync(<span class="string">"https://graph.microsoft.com/v1.0/me"</span>);
+        response.EnsureSuccessStatusCode();
+
+        <span class="keyword">return</span> <span class="keyword">await</span> response.Content.ReadAsStringAsync();
+    }
+}
+
+<span class="comment">// Register service</span>
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient&lt;<span class="type">GraphApiService</span>&gt;();
+
+<span class="comment">// Use in endpoint</span>
+app.MapGet(<span class="string">"/api/me"</span>, [Authorize] <span class="keyword">async</span> (<span class="type">GraphApiService</span> graphService) =>
+{
+    <span class="keyword">var</span> profile = <span class="keyword">await</span> graphService.GetUserProfileAsync();
+    <span class="keyword">return</span> Results.Ok(profile);
+});
+</code></pre>
+
+<pre><code><span class="comment">// 4. PROTECTING YOUR OWN API WITH OAUTH 2.0 TOKENS</span>
+<span class="comment">// (For when YOUR API is the resource server)</span>
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(<span class="string">"AzureAd"</span>));
+
+<span class="comment">// Validate tokens from Azure AD</span>
+builder.Services.Configure&lt;<span class="type">JwtBearerOptions</span>&gt;(
+    JwtBearerDefaults.AuthenticationScheme,
+    options =>
+    {
+        options.TokenValidationParameters.ValidAudiences = <span class="keyword">new</span>[]
+        {
+            builder.Configuration[<span class="string">"AzureAd:ClientId"</span>],
+            $<span class="string">"api://{builder.Configuration["AzureAd:ClientId"]}"</span>
+        };
+    });
+
+<span class="comment">// API endpoint that validates OAuth 2.0 access tokens</span>
+app.MapGet(<span class="string">"/api/data"</span>, [Authorize] () =>
+{
+    <span class="keyword">return</span> Results.Ok(<span class="keyword">new</span> { data = <span class="string">"Protected data"</span> });
+});
+</code></pre>
+
+                Real-world scenario: We had a security audit fail because we stored the OAuth <code>ClientSecret</code> in <code>appsettings.json</code> on GitHub. We moved all secrets to <strong>Azure Key Vault</strong> and used Managed Identity. Another gotcha: token expiration—access tokens expire quickly (1 hour), so we implemented automatic token refresh using the refresh token stored in the authentication properties.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                OAuth 2.0 in .NET: Use <code>AddMicrosoftIdentityWebApp()</code> for Azure AD or <code>AddOpenIdConnect()</code> for generic OAuth providers. Enable <code>SaveTokens = true</code> to access tokens later. Use <strong>Authorization Code Flow with PKCE</strong> for security. Never expose <code>ClientSecret</code> in frontend code—store in Azure Key Vault. For APIs as resource servers, use <code>AddMicrosoftIdentityWebApi()</code> to validate tokens.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag">Authentication and Authorization</span>
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag api">API</span>
+        </div>
+    </div>
+</details>
+
+<!-- Question 56: Role-based Authorization -->
+<details class="question-item">
+    <summary>Q56: Authorization - Role-based authorization</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                Role-based authorization (RBAC) restricts access based on a user's assigned roles (e.g., Admin, Manager, User). Roles are typically stored as claims in the authentication token (JWT or cookie) with claim type <code>ClaimTypes.Role</code> or <code>"role"</code>. In .NET, you protect endpoints using <code>[Authorize(Roles = "Admin")]</code> to allow only users with the specified role(s). Multiple roles can be specified with comma separation (<code>Roles = "Admin,Manager"</code>), which acts as an OR condition. RBAC is simpler than policy-based authorization but less flexible—you can't easily implement complex rules like "Admin OR (Manager AND verified)". For enterprise apps, roles often come from Active Directory groups or external identity providers (Azure AD, Auth0). The key advantage: easy to understand and implement. The limitation: doesn't support fine-grained permissions without combining with claims or policies.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                Role-based authorization in .NET:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><code>[Authorize(Roles = "Admin")]</code> - requires specific role(s)</li>
+                    <li><code>User.IsInRole("Admin")</code> - manually check role in code</li>
+                    <li><code>ClaimTypes.Role</code> - standard claim type for roles</li>
+                    <li><strong>ASP.NET Identity</strong> - <code>UserManager.AddToRoleAsync()</code> for role management</li>
+                    <li><strong>JWT tokens</strong> - include roles in payload: <code>new Claim(ClaimTypes.Role, "Admin")</code></li>
+                    <li><strong>Azure AD</strong> - roles from app registrations or directory roles</li>
+                    <li><strong>Policy-based alternative</strong> - <code>RequireRole()</code> in authorization policies</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In an inventory management system, we implemented role-based authorization with four roles: <strong>Admin</strong> (full access), <strong>Manager</strong> (read/write inventory), <strong>Staff</strong> (read inventory, create orders), and <strong>Viewer</strong> (read-only). Admins could manage users, Managers could approve orders, Staff could process orders, and Viewers could only view reports. We stored roles in JWT claims and enforced them using <code>[Authorize(Roles)]</code>.
+
+<pre><code><span class="comment">// Program.cs - Role-based Authorization Setup</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        <span class="comment">// JWT configuration...</span>
+    });
+
+<span class="comment">// Role-based authorization is enabled by default</span>
+builder.Services.AddAuthorization();
+
+<span class="keyword">var</span> app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+<span class="comment">// 1. SINGLE ROLE REQUIREMENT</span>
+app.MapGet(<span class="string">"/api/admin/settings"</span>, 
+    [Authorize(Roles = <span class="string">"Admin"</span>)] () =>
+{
+    <span class="keyword">return</span> Results.Ok(<span class="string">"Admin settings"</span>);
+});
+
+<span class="comment">// 2. MULTIPLE ROLES (OR condition - Admin OR Manager)</span>
+app.MapGet(<span class="string">"/api/inventory"</span>, 
+    [Authorize(Roles = <span class="string">"Admin,Manager"</span>)] () =>
+{
+    <span class="keyword">return</span> Results.Ok(<span class="string">"Inventory data"</span>);
+});
+
+<span class="comment">// 3. READ-ONLY ENDPOINTS (all authenticated users)</span>
+app.MapGet(<span class="string">"/api/products"</span>, 
+    [Authorize(Roles = <span class="string">"Admin,Manager,Staff,Viewer"</span>)] () =>
+{
+    <span class="keyword">return</span> Results.Ok(<span class="string">"Product list"</span>);
+});
+
+<span class="comment">// 4. WRITE ENDPOINTS (Admin and Manager only)</span>
+app.MapPost(<span class="string">"/api/products"</span>, 
+    [Authorize(Roles = <span class="string">"Admin,Manager"</span>)] (<span class="type">Product</span> product) =>
+{
+    <span class="keyword">return</span> Results.Created($<span class="string">"/api/products/{product.Id}"</span>, product);
+});
+
+<span class="comment">// 5. DELETE ENDPOINTS (Admin only)</span>
+app.MapDelete(<span class="string">"/api/products/{id}"</span>, 
+    [Authorize(Roles = <span class="string">"Admin"</span>)] (<span class="type">int</span> id) =>
+{
+    <span class="keyword">return</span> Results.NoContent();
+});
+
+<span class="comment">// 6. MANUAL ROLE CHECK IN CODE</span>
+app.MapGet(<span class="string">"/api/dashboard"</span>, [Authorize] (<span class="type">HttpContext</span> context) =>
+{
+    <span class="keyword">var</span> isAdmin = context.User.IsInRole(<span class="string">"Admin"</span>);
+    <span class="keyword">var</span> isManager = context.User.IsInRole(<span class="string">"Manager"</span>);
+
+    <span class="keyword">return</span> Results.Ok(<span class="keyword">new</span>
+    {
+        canManageUsers = isAdmin,
+        canApproveOrders = isAdmin || isManager,
+        canViewReports = <span class="keyword">true</span>
+    });
+});
+
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// JWT Token Generation with Roles</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">JwtService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IConfiguration</span> _configuration;
+
+    <span class="keyword">public</span> JwtService(<span class="type">IConfiguration</span> configuration)
+    {
+        _configuration = configuration;
+    }
+
+    <span class="keyword">public</span> <span class="type">string</span> GenerateToken(<span class="type">User</span> user, <span class="type">IEnumerable</span>&lt;<span class="type">string</span>&gt; roles)
+    {
+        <span class="keyword">var</span> securityKey = <span class="keyword">new</span> SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_configuration[<span class="string">"Jwt:SecretKey"</span>]));
+        
+        <span class="keyword">var</span> credentials = <span class="keyword">new</span> SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        <span class="comment">// Create role claims (one claim per role)</span>
+        <span class="keyword">var</span> claims = <span class="keyword">new</span> List&lt;Claim&gt;
+        {
+            <span class="keyword">new</span> Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            <span class="keyword">new</span> Claim(JwtRegisteredClaimNames.Email, user.Email),
+            <span class="keyword">new</span> Claim(ClaimTypes.Name, user.Username)
+        };
+
+        <span class="comment">// Add each role as a separate claim</span>
+        <span class="keyword">foreach</span> (<span class="keyword">var</span> role <span class="keyword">in</span> roles)
+        {
+            claims.Add(<span class="keyword">new</span> Claim(ClaimTypes.Role, role));
+        }
+
+        <span class="keyword">var</span> token = <span class="keyword">new</span> JwtSecurityToken(
+            issuer: _configuration[<span class="string">"Jwt:Issuer"</span>],
+            audience: _configuration[<span class="string">"Jwt:Audience"</span>],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(<span class="number">15</span>),
+            signingCredentials: credentials
+        );
+
+        <span class="keyword">return</span> <span class="keyword">new</span> JwtSecurityTokenHandler().WriteToken(token);
+    }
+}
+
+<span class="comment">// Usage in login endpoint</span>
+app.MapPost(<span class="string">"/api/auth/login"</span>, <span class="keyword">async</span> (
+    <span class="type">LoginRequest</span> request,
+    <span class="type">IUserService</span> userService,
+    <span class="type">JwtService</span> jwtService) =>
+{
+    <span class="keyword">var</span> user = <span class="keyword">await</span> userService.ValidateCredentialsAsync(request.Email, request.Password);
+    <span class="keyword">if</span> (user == <span class="keyword">null</span>) <span class="keyword">return</span> Results.Unauthorized();
+
+    <span class="comment">// Get user roles from database</span>
+    <span class="keyword">var</span> roles = <span class="keyword">await</span> userService.GetUserRolesAsync(user.Id);
+    
+    <span class="keyword">var</span> token = jwtService.GenerateToken(user, roles);
+    
+    <span class="keyword">return</span> Results.Ok(<span class="keyword">new</span> { access_token = token, roles });
+});
+</code></pre>
+
+<pre><code><span class="comment">// ASP.NET Core Identity Integration</span>
+<span class="keyword">using</span> Microsoft.AspNetCore.Identity;
+
+<span class="comment">// Configure Identity with roles</span>
+builder.Services.AddIdentity&lt;<span class="type">ApplicationUser</span>, <span class="type">IdentityRole</span>&gt;(options =>
+{
+    options.Password.RequireDigit = <span class="keyword">true</span>;
+    options.Password.RequiredLength = <span class="number">8</span>;
+})
+.AddEntityFrameworkStores&lt;<span class="type">ApplicationDbContext</span>&gt;()
+.AddDefaultTokenProviders();
+
+<span class="comment">// Role Management Service</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">RoleManagementService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">UserManager</span>&lt;<span class="type">ApplicationUser</span>&gt; _userManager;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">RoleManager</span>&lt;<span class="type">IdentityRole</span>&gt; _roleManager;
+
+    <span class="keyword">public</span> RoleManagementService(
+        <span class="type">UserManager</span>&lt;<span class="type">ApplicationUser</span>&gt; userManager,
+        <span class="type">RoleManager</span>&lt;<span class="type">IdentityRole</span>&gt; roleManager)
+    {
+        _userManager = userManager;
+        _roleManager = roleManager;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task SeedRolesAsync()
+    {
+        <span class="keyword">var</span> roles = <span class="keyword">new</span>[] { <span class="string">"Admin"</span>, <span class="string">"Manager"</span>, <span class="string">"Staff"</span>, <span class="string">"Viewer"</span> };
+
+        <span class="keyword">foreach</span> (<span class="keyword">var</span> role <span class="keyword">in</span> roles)
+        {
+            <span class="keyword">if</span> (!<span class="keyword">await</span> _roleManager.RoleExistsAsync(role))
+            {
+                <span class="keyword">await</span> _roleManager.CreateAsync(<span class="keyword">new</span> IdentityRole(role));
+            }
+        }
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task AssignRoleToUserAsync(<span class="type">string</span> userId, <span class="type">string</span> roleName)
+    {
+        <span class="keyword">var</span> user = <span class="keyword">await</span> _userManager.FindByIdAsync(userId);
+        <span class="keyword">if</span> (user == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"User not found"</span>);
+
+        <span class="keyword">if</span> (!<span class="keyword">await</span> _roleManager.RoleExistsAsync(roleName))
+            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Role does not exist"</span>);
+
+        <span class="keyword">await</span> _userManager.AddToRoleAsync(user, roleName);
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">IList</span>&lt;<span class="type">string</span>&gt;&gt; GetUserRolesAsync(<span class="type">string</span> userId)
+    {
+        <span class="keyword">var</span> user = <span class="keyword">await</span> _userManager.FindByIdAsync(userId);
+        <span class="keyword">if</span> (user == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">new</span> List&lt;<span class="type">string</span>&gt;();
+
+        <span class="keyword">return</span> <span class="keyword">await</span> _userManager.GetRolesAsync(user);
+    }
+}
+
+<span class="comment">// Seed roles on startup</span>
+<span class="keyword">var</span> app = builder.Build();
+
+<span class="keyword">using</span> (<span class="keyword">var</span> scope = app.Services.CreateScope())
+{
+    <span class="keyword">var</span> roleService = scope.ServiceProvider.GetRequiredService&lt;<span class="type">RoleManagementService</span>&gt;();
+    <span class="keyword">await</span> roleService.SeedRolesAsync();
+}
+</code></pre>
+
+<pre><code><span class="comment">// API Endpoints for Role Management</span>
+<span class="comment">// Admin-only endpoint to assign roles</span>
+app.MapPost(<span class="string">"/api/users/{userId}/roles"</span>, 
+    [Authorize(Roles = <span class="string">"Admin"</span>)] <span class="keyword">async</span> (
+        <span class="type">string</span> userId,
+        <span class="type">AssignRoleRequest</span> request,
+        <span class="type">RoleManagementService</span> roleService) =>
+{
+    <span class="keyword">await</span> roleService.AssignRoleToUserAsync(userId, request.RoleName);
+    <span class="keyword">return</span> Results.Ok(<span class="keyword">new</span> { message = <span class="string">"Role assigned successfully"</span> });
+});
+
+<span class="comment">// Get user roles</span>
+app.MapGet(<span class="string">"/api/users/{userId}/roles"</span>, 
+    [Authorize(Roles = <span class="string">"Admin,Manager"</span>)] <span class="keyword">async</span> (
+        <span class="type">string</span> userId,
+        <span class="type">RoleManagementService</span> roleService) =>
+{
+    <span class="keyword">var</span> roles = <span class="keyword">await</span> roleService.GetUserRolesAsync(userId);
+    <span class="keyword">return</span> Results.Ok(roles);
+});
+</code></pre>
+
+                Production gotcha: We had a critical bug where a Manager could delete products because we forgot to add role checks on DELETE endpoints. After that incident, we implemented a <strong>default deny policy</strong>—every endpoint requires explicit authorization. We also added integration tests that verify role restrictions for all endpoints.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                Role-based authorization uses <code>[Authorize(Roles = "Admin")]</code> to restrict endpoint access. Roles are stored as <code>ClaimTypes.Role</code> claims in JWT or cookies. Use ASP.NET Identity's <code>UserManager</code> for role management. Multiple roles in <code>[Authorize]</code> act as OR (Admin OR Manager). For complex rules, combine with policy-based authorization. Always test role restrictions with automated tests.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag">Authentication and Authorization</span>
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag api">API</span>
+        </div>
+    </div>
+</details>

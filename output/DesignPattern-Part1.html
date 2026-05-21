@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.NET Core Interview Questions - Q85-88</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #569cd6;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #3c3c3c;
+            border-radius: 5px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            outline: none;
+        }
+
+        #searchBar:focus {
+            border-color: #569cd6;
+        }
+
+        .question-item {
+            background: #252526;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #3c3c3c;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .question-item:hover {
+            border-color: #569cd6;
+            box-shadow: 0 2px 8px rgba(86, 156, 214, 0.2);
+        }
+
+        details summary {
+            padding: 20px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4ec9b0;
+            background: #2d2d30;
+            user-select: none;
+            list-style: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary:before {
+            content: '▶ ';
+            display: inline-block;
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+
+        details[open] summary:before {
+            transform: rotate(90deg);
+        }
+
+        details[open] summary {
+            border-bottom: 2px solid #3c3c3c;
+            color: #569cd6;
+        }
+
+        .answer-content {
+            padding: 25px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            color: #dcdcaa;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .section p {
+            color: #d4d4d4;
+            margin-bottom: 10px;
+        }
+
+        .section ul, .section ol {
+            margin-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        .section li {
+            margin-bottom: 8px;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .category-tag {
+            background: #0e639c;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .class-name { color: #4ec9b0; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+
+        .key-takeaway {
+            background: #1a3a1a;
+            border-left: 4px solid #4ec9b0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #resultCount {
+            text-align: center;
+            margin-top: 10px;
+            color: #858585;
+            font-size: 0.9em;
+        }
+
+        .highlight-box {
+            background: #2d2d30;
+            border-left: 3px solid #569cd6;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 .NET Core Interview Questions (85-88)</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="🔍 Search questions by keyword (e.g., 'scalability', 'repository', 'SOLID', 'singleton')...">
+            <div id="resultCount"></div>
+        </div>
+
+        <div id="questionsContainer">
+            
+            <!-- Question 85 -->
+            <div class="question-item" data-keywords="api scalability design patterns microservices caching load balancing horizontal scaling cqrs">
+                <details>
+                    <summary>Q85: What do I need to do to make API scalable? What design patterns should be followed?</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                API scalability means handling increased load (more users, requests, data) without degrading performance. Key strategies include 
+                                <strong>horizontal scaling</strong> (add more servers), <strong>stateless design</strong> (no session data on API servers), 
+                                <strong>caching</strong> (reduce DB hits), <strong>async processing</strong> (offload long tasks), and <strong>database optimization</strong>. 
+                                Design patterns like CQRS (separate read/write operations), Repository (abstract data access), and Circuit Breaker (prevent cascading failures) 
+                                are essential for building scalable APIs.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                <strong>Infrastructure Level:</strong>
+                            </p>
+                            <ul>
+                                <li><strong>Load Balancers</strong>: Azure Load Balancer, Application Gateway, or NGINX to distribute traffic</li>
+                                <li><strong>Caching</strong>: Redis (IDistributedCache), In-Memory Cache, Response Caching Middleware</li>
+                                <li><strong>Message Queues</strong>: Azure Service Bus, RabbitMQ for async processing</li>
+                                <li><strong>Database</strong>: Read replicas, connection pooling, indexes, query optimization</li>
+                            </ul>
+                            <p>
+                                <strong>Code-Level Patterns:</strong>
+                            </p>
+                            <ul>
+                                <li><strong>Repository Pattern</strong>: Abstracts data access, enables testing and swapping data sources</li>
+                                <li><strong>CQRS</strong>: Separate read (queries) from write (commands) for optimization</li>
+                                <li><strong>Circuit Breaker</strong>: Polly library to handle transient failures gracefully</li>
+                                <li><strong>API Gateway</strong>: Ocelot or Azure API Management for routing, rate limiting, authentication</li>
+                                <li><strong>Asynchronous APIs</strong>: Use <code>async/await</code> everywhere, background jobs with Hangfire/Quartz</li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a high-traffic e-commerce API I worked on, we went from 100 req/sec to 10,000 req/sec. Here's what we implemented:
+                            </p>
+                            <pre><code><span class="comment">// 1. STATELESS DESIGN - Store JWT in client, no server sessions</span>
+<span class="keyword">public class</span> <span class="class-name">Startup</span>
+{
+    <span class="keyword">public void</span> <span class="method">ConfigureServices</span>(<span class="class-name">IServiceCollection</span> services)
+    {
+        <span class="comment">// JWT-based auth (stateless)</span>
+        services.<span class="method">AddAuthentication</span>(JwtBearerDefaults.AuthenticationScheme)
+            .<span class="method">AddJwtBearer</span>(options => { <span class="comment">/* config */</span> });
+        
+        <span class="comment">// Redis distributed cache</span>
+        services.<span class="method">AddStackExchangeRedisCache</span>(options =>
+        {
+            options.Configuration = <span class="string">"localhost:6379"</span>;
+        });
+    }
+}
+
+<span class="comment">// 2. CACHING STRATEGY - Redis for expensive queries</span>
+<span class="keyword">public class</span> <span class="class-name">ProductService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IDistributedCache</span> _cache;
+    <span class="keyword">private readonly</span> <span class="class-name">IProductRepository</span> _repo;
+    
+    <span class="keyword">public async</span> Task&lt;<span class="class-name">Product</span>&gt; GetProductById(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">var</span> cacheKey = <span class="string">$"product:{id}"</span>;
+        <span class="keyword">var</span> cached = <span class="keyword">await</span> _cache.<span class="method">GetStringAsync</span>(cacheKey);
+        
+        <span class="keyword">if</span> (cached != <span class="keyword">null</span>)
+            <span class="keyword">return</span> JsonSerializer.<span class="method">Deserialize</span>&lt;<span class="class-name">Product</span>&gt;(cached);
+        
+        <span class="keyword">var</span> product = <span class="keyword">await</span> _repo.<span class="method">GetByIdAsync</span>(id);
+        
+        <span class="keyword">await</span> _cache.<span class="method">SetStringAsync</span>(cacheKey, 
+            JsonSerializer.<span class="method">Serialize</span>(product),
+            <span class="keyword">new</span> <span class="class-name">DistributedCacheEntryOptions</span> { AbsoluteExpirationRelativeToNow = TimeSpan.<span class="method">FromMinutes</span>(<span class="number">10</span>) });
+        
+        <span class="keyword">return</span> product;
+    }
+}
+
+<span class="comment">// 3. ASYNC PROCESSING - Offload heavy tasks to queue</span>
+<span class="keyword">public class</span> <span class="class-name">OrderController</span> : <span class="class-name">ControllerBase</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IServiceBusClient</span> _serviceBus;
+    
+    [<span class="class-name">HttpPost</span>(<span class="string">"orders"</span>)]
+    <span class="keyword">public async</span> Task&lt;<span class="class-name">IActionResult</span>&gt; CreateOrder([<span class="class-name">FromBody</span>] <span class="class-name">Order</span> order)
+    {
+        <span class="comment">// Save to DB quickly</span>
+        <span class="keyword">await</span> _orderRepo.<span class="method">CreateAsync</span>(order);
+        
+        <span class="comment">// Send to queue for processing (email, inventory, etc.)</span>
+        <span class="keyword">await</span> _serviceBus.<span class="method">SendMessageAsync</span>(<span class="string">"order-processing"</span>, order);
+        
+        <span class="keyword">return</span> <span class="method">Accepted</span>(<span class="keyword">new</span> { orderId = order.Id }); <span class="comment">// Return immediately</span>
+    }
+}
+
+<span class="comment">// 4. CIRCUIT BREAKER PATTERN - Using Polly</span>
+<span class="keyword">public class</span> <span class="class-name">PaymentService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IAsyncPolicy</span>&lt;<span class="class-name">HttpResponseMessage</span>&gt; _circuitBreaker;
+    
+    <span class="keyword">public</span> <span class="method">PaymentService</span>()
+    {
+        _circuitBreaker = Policy
+            .<span class="method">HandleResult</span>&lt;<span class="class-name">HttpResponseMessage</span>&gt;(r => !r.IsSuccessStatusCode)
+            .<span class="method">CircuitBreakerAsync</span>(<span class="number">3</span>, TimeSpan.<span class="method">FromSeconds</span>(<span class="number">30</span>));
+    }
+    
+    <span class="keyword">public async</span> Task&lt;<span class="keyword">bool</span>&gt; ProcessPayment(<span class="keyword">decimal</span> amount)
+    {
+        <span class="keyword">var</span> response = <span class="keyword">await</span> _circuitBreaker.<span class="method">ExecuteAsync</span>(<span class="keyword">async</span> () =>
+            <span class="keyword">await</span> _httpClient.<span class="method">PostAsync</span>(<span class="string">"payment-gateway/charge"</span>, <span class="comment">/* data */</span>));
+        
+        <span class="keyword">return</span> response.IsSuccessStatusCode;
+    }
+}
+
+<span class="comment">// 5. DATABASE OPTIMIZATION - Connection pooling, async, indexes</span>
+<span class="keyword">public class</span> <span class="class-name">Startup</span>
+{
+    <span class="keyword">public void</span> <span class="method">ConfigureServices</span>(<span class="class-name">IServiceCollection</span> services)
+    {
+        services.<span class="method">AddDbContext</span>&lt;<span class="class-name">AppDbContext</span>&gt;(options =>
+            options.<span class="method">UseSqlServer</span>(connectionString, sqlOptions =>
+            {
+                sqlOptions.<span class="method">EnableRetryOnFailure</span>();
+                sqlOptions.<span class="method">CommandTimeout</span>(<span class="number">30</span>);
+            }));
+    }
+}
+
+<span class="comment">// 6. RESPONSE CACHING MIDDLEWARE</span>
+[<span class="class-name">HttpGet</span>(<span class="string">"products"</span>)]
+[<span class="class-name">ResponseCache</span>(Duration = <span class="number">300</span>, Location = ResponseCacheLocation.Any)]
+<span class="keyword">public async</span> Task&lt;<span class="class-name">IActionResult</span>&gt; GetProducts()
+{
+    <span class="keyword">var</span> products = <span class="keyword">await</span> _productService.<span class="method">GetAllAsync</span>();
+    <span class="keyword">return</span> <span class="method">Ok</span>(products);
+}</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Scalability requires <strong>stateless design, caching (Redis), async processing (queues), load balancing, and database optimization</strong>. 
+                                Use patterns like <strong>Repository, CQRS, Circuit Breaker</strong>, and <strong>API Gateway</strong>. Always measure with load testing (JMeter, k6) 
+                                and monitor with Application Insights or Prometheus. Horizontal scaling works only if your API is stateless.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">API</span>
+                            <span class="category-tag">Microservices</span>
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">Cloud</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 86 -->
+            <div class="question-item" data-keywords="repository pattern unit of work abstraction data access dependency injection irepository">
+                <details>
+                    <summary>Q86: Explain repository pattern in .NET Core</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                The Repository Pattern abstracts data access logic by creating an interface between the business logic and data layer. 
+                                It provides a collection-like interface for accessing domain objects, hiding database-specific code (EF Core, Dapper, ADO.NET). 
+                                Benefits include testability (mock repositories), separation of concerns, and easier data source swapping. 
+                                Often paired with <strong>Unit of Work pattern</strong> to manage transactions across multiple repositories.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                Typical structure:
+                            </p>
+                            <ul>
+                                <li><strong>IRepository&lt;T&gt;</strong>: Generic interface with CRUD methods (GetById, GetAll, Add, Update, Delete)</li>
+                                <li><strong>Repository&lt;T&gt;</strong>: Generic implementation using DbContext</li>
+                                <li><strong>IUnitOfWork</strong>: Manages DbContext lifetime and SaveChanges() across multiple repos</li>
+                                <li><strong>Specific Repositories</strong>: Like IProductRepository with custom queries (GetProductsInStock)</li>
+                            </ul>
+                            <p>
+                                Register in <code>Startup.cs</code> with dependency injection: <code>services.AddScoped&lt;IProductRepository, ProductRepository&gt;()</code>
+                            </p>
+                            <div class="highlight-box">
+                                <strong>⚠️ Debate:</strong> Some argue EF Core's DbSet already implements repository pattern, so adding another layer is over-engineering. 
+                                Use repositories when you need abstraction for testing or plan to swap data sources.
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                In a multi-tenant SaaS application, I used the repository pattern to abstract EF Core, making it easy to write unit tests 
+                                and later switch some data access to Dapper for performance-critical reads.
+                            </p>
+                            <pre><code><span class="comment">// 1. Generic Repository Interface</span>
+<span class="keyword">public interface</span> <span class="class-name">IRepository</span>&lt;T&gt; <span class="keyword">where</span> T : <span class="keyword">class</span>
+{
+    Task&lt;T&gt; <span class="method">GetByIdAsync</span>(<span class="keyword">int</span> id);
+    Task&lt;<span class="class-name">IEnumerable</span>&lt;T&gt;&gt; <span class="method">GetAllAsync</span>();
+    Task&lt;T&gt; <span class="method">AddAsync</span>(T entity);
+    Task <span class="method">UpdateAsync</span>(T entity);
+    Task <span class="method">DeleteAsync</span>(<span class="keyword">int</span> id);
+}
+
+<span class="comment">// 2. Generic Repository Implementation</span>
+<span class="keyword">public class</span> <span class="class-name">Repository</span>&lt;T&gt; : <span class="class-name">IRepository</span>&lt;T&gt; <span class="keyword">where</span> T : <span class="keyword">class</span>
+{
+    <span class="keyword">protected readonly</span> <span class="class-name">AppDbContext</span> _context;
+    <span class="keyword">protected readonly</span> <span class="class-name">DbSet</span>&lt;T&gt; _dbSet;
+    
+    <span class="keyword">public</span> <span class="method">Repository</span>(<span class="class-name">AppDbContext</span> context)
+    {
+        _context = context;
+        _dbSet = context.<span class="method">Set</span>&lt;T&gt;();
+    }
+    
+    <span class="keyword">public virtual async</span> Task&lt;T&gt; <span class="method">GetByIdAsync</span>(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">return await</span> _dbSet.<span class="method">FindAsync</span>(id);
+    }
+    
+    <span class="keyword">public virtual async</span> Task&lt;<span class="class-name">IEnumerable</span>&lt;T&gt;&gt; <span class="method">GetAllAsync</span>()
+    {
+        <span class="keyword">return await</span> _dbSet.<span class="method">ToListAsync</span>();
+    }
+    
+    <span class="keyword">public virtual async</span> Task&lt;T&gt; <span class="method">AddAsync</span>(T entity)
+    {
+        <span class="keyword">await</span> _dbSet.<span class="method">AddAsync</span>(entity);
+        <span class="keyword">return</span> entity;
+    }
+    
+    <span class="keyword">public virtual async</span> Task <span class="method">UpdateAsync</span>(T entity)
+    {
+        _dbSet.<span class="method">Update</span>(entity);
+        <span class="keyword">await</span> Task.<span class="method">CompletedTask</span>;
+    }
+    
+    <span class="keyword">public virtual async</span> Task <span class="method">DeleteAsync</span>(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">var</span> entity = <span class="keyword">await</span> <span class="method">GetByIdAsync</span>(id);
+        <span class="keyword">if</span> (entity != <span class="keyword">null</span>)
+            _dbSet.<span class="method">Remove</span>(entity);
+    }
+}
+
+<span class="comment">// 3. Specific Repository with Custom Methods</span>
+<span class="keyword">public interface</span> <span class="class-name">IProductRepository</span> : <span class="class-name">IRepository</span>&lt;<span class="class-name">Product</span>&gt;
+{
+    Task&lt;<span class="class-name">IEnumerable</span>&lt;<span class="class-name">Product</span>&gt;&gt; <span class="method">GetProductsInStockAsync</span>();
+    Task&lt;<span class="class-name">Product</span>&gt; <span class="method">GetProductWithCategoryAsync</span>(<span class="keyword">int</span> id);
+}
+
+<span class="keyword">public class</span> <span class="class-name">ProductRepository</span> : <span class="class-name">Repository</span>&lt;<span class="class-name">Product</span>&gt;, <span class="class-name">IProductRepository</span>
+{
+    <span class="keyword">public</span> <span class="method">ProductRepository</span>(<span class="class-name">AppDbContext</span> context) : <span class="keyword">base</span>(context) { }
+    
+    <span class="keyword">public async</span> Task&lt;<span class="class-name">IEnumerable</span>&lt;<span class="class-name">Product</span>&gt;&gt; <span class="method">GetProductsInStockAsync</span>()
+    {
+        <span class="keyword">return await</span> _dbSet
+            .<span class="method">Where</span>(p => p.Stock > <span class="number">0</span>)
+            .<span class="method">ToListAsync</span>();
+    }
+    
+    <span class="keyword">public async</span> Task&lt;<span class="class-name">Product</span>&gt; <span class="method">GetProductWithCategoryAsync</span>(<span class="keyword">int</span> id)
+    {
+        <span class="keyword">return await</span> _dbSet
+            .<span class="method">Include</span>(p => p.Category)
+            .<span class="method">FirstOrDefaultAsync</span>(p => p.Id == id);
+    }
+}
+
+<span class="comment">// 4. Unit of Work Pattern (Manage transactions)</span>
+<span class="keyword">public interface</span> <span class="class-name">IUnitOfWork</span> : <span class="class-name">IDisposable</span>
+{
+    <span class="class-name">IProductRepository</span> Products { <span class="keyword">get</span>; }
+    <span class="class-name">IOrderRepository</span> Orders { <span class="keyword">get</span>; }
+    Task&lt;<span class="keyword">int</span>&gt; <span class="method">SaveChangesAsync</span>();
+}
+
+<span class="keyword">public class</span> <span class="class-name">UnitOfWork</span> : <span class="class-name">IUnitOfWork</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">AppDbContext</span> _context;
+    
+    <span class="keyword">public</span> <span class="class-name">IProductRepository</span> Products { <span class="keyword">get</span>; }
+    <span class="keyword">public</span> <span class="class-name">IOrderRepository</span> Orders { <span class="keyword">get</span>; }
+    
+    <span class="keyword">public</span> <span class="method">UnitOfWork</span>(<span class="class-name">AppDbContext</span> context)
+    {
+        _context = context;
+        Products = <span class="keyword">new</span> <span class="class-name">ProductRepository</span>(context);
+        Orders = <span class="keyword">new</span> <span class="class-name">OrderRepository</span>(context);
+    }
+    
+    <span class="keyword">public async</span> Task&lt;<span class="keyword">int</span>&gt; <span class="method">SaveChangesAsync</span>()
+    {
+        <span class="keyword">return await</span> _context.<span class="method">SaveChangesAsync</span>();
+    }
+    
+    <span class="keyword">public void</span> <span class="method">Dispose</span>()
+    {
+        _context.<span class="method">Dispose</span>();
+    }
+}
+
+<span class="comment">// 5. Service Layer Using Repository</span>
+<span class="keyword">public class</span> <span class="class-name">ProductService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IUnitOfWork</span> _unitOfWork;
+    
+    <span class="keyword">public</span> <span class="method">ProductService</span>(<span class="class-name">IUnitOfWork</span> unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+    
+    <span class="keyword">public async</span> Task&lt;<span class="class-name">Product</span>&gt; CreateProduct(<span class="class-name">Product</span> product)
+    {
+        <span class="keyword">await</span> _unitOfWork.Products.<span class="method">AddAsync</span>(product);
+        <span class="keyword">await</span> _unitOfWork.<span class="method">SaveChangesAsync</span>();
+        <span class="keyword">return</span> product;
+    }
+}
+
+<span class="comment">// 6. Dependency Injection Registration</span>
+<span class="keyword">public void</span> <span class="method">ConfigureServices</span>(<span class="class-name">IServiceCollection</span> services)
+{
+    services.<span class="method">AddScoped</span>&lt;<span class="class-name">IUnitOfWork</span>, <span class="class-name">UnitOfWork</span>&gt;();
+    services.<span class="method">AddScoped</span>&lt;<span class="class-name">IProductRepository</span>, <span class="class-name">ProductRepository</span>&gt;();
+    services.<span class="method">AddScoped</span>&lt;<span class="class-name">ProductService</span>&gt;();
+}</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                Repository pattern abstracts data access, making code testable and maintainable. Use <strong>generic repositories</strong> for common CRUD, 
+                                <strong>specific repositories</strong> for custom queries, and <strong>Unit of Work</strong> for transaction management. 
+                                Recognize that EF Core DbContext is already a repository, so only add this layer when you need abstraction for testing or switching data sources.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">EF Core</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 87 -->
+            <div class="question-item" data-keywords="solid principles srp single responsibility ocp open closed lsp liskov isp interface segregation dip dependency inversion">
+                <details>
+                    <summary>Q87: SOLID principles in .NET with example</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                SOLID is an acronym for five design principles that make software more maintainable, flexible, and testable:
+                            </p>
+                            <ul>
+                                <li><strong>S</strong> - Single Responsibility Principle: A class should have one reason to change</li>
+                                <li><strong>O</strong> - Open/Closed Principle: Open for extension, closed for modification</li>
+                                <li><strong>L</strong> - Liskov Substitution Principle: Subtypes must be substitutable for their base types</li>
+                                <li><strong>I</strong> - Interface Segregation Principle: Don't force clients to depend on unused interfaces</li>
+                                <li><strong>D</strong> - Dependency Inversion Principle: Depend on abstractions, not concretions</li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                .NET Core's architecture embraces SOLID through:
+                            </p>
+                            <ul>
+                                <li><strong>Dependency Injection</strong>: Built-in DI container promotes DIP</li>
+                                <li><strong>Interfaces</strong>: ILogger, IConfiguration, IHostedService follow ISP</li>
+                                <li><strong>Middleware Pipeline</strong>: OCP - add middleware without modifying existing code</li>
+                                <li><strong>Generic Constraints</strong>: LSP - ensure type safety in generics</li>
+                            </ul>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                I'll demonstrate each SOLID principle with real-world scenarios from projects I've worked on:
+                            </p>
+                            <pre><code><span class="comment">// ========== S - SINGLE RESPONSIBILITY PRINCIPLE ==========</span>
+<span class="comment">// BAD: Class doing too many things</span>
+<span class="keyword">public class</span> <span class="class-name">UserService</span>
+{
+    <span class="keyword">public void</span> <span class="method">RegisterUser</span>(<span class="class-name">User</span> user)
+    {
+        <span class="comment">// Validate user</span>
+        <span class="comment">// Save to database</span>
+        <span class="comment">// Send email</span>
+        <span class="comment">// Log activity</span>
+    }
+}
+
+<span class="comment">// GOOD: Separate responsibilities</span>
+<span class="keyword">public class</span> <span class="class-name">UserService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IUserRepository</span> _repo;
+    <span class="keyword">private readonly</span> <span class="class-name">IEmailService</span> _emailService;
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span> _logger;
+    
+    <span class="keyword">public async</span> Task <span class="method">RegisterUserAsync</span>(<span class="class-name">User</span> user)
+    {
+        <span class="keyword">await</span> _repo.<span class="method">AddAsync</span>(user); <span class="comment">// Data access responsibility</span>
+        <span class="keyword">await</span> _emailService.<span class="method">SendWelcomeEmailAsync</span>(user); <span class="comment">// Email responsibility</span>
+        _logger.<span class="method">LogInformation</span>(<span class="string">$"User {user.Email} registered"</span>); <span class="comment">// Logging responsibility</span>
+    }
+}
+
+<span class="comment">// ========== O - OPEN/CLOSED PRINCIPLE ==========</span>
+<span class="comment">// BAD: Modifying class for new payment methods</span>
+<span class="keyword">public class</span> <span class="class-name">PaymentProcessor</span>
+{
+    <span class="keyword">public void</span> <span class="method">ProcessPayment</span>(<span class="keyword">string</span> type, <span class="keyword">decimal</span> amount)
+    {
+        <span class="keyword">if</span> (type == <span class="string">"CreditCard"</span>)
+            <span class="comment">// Process credit card</span>
+        <span class="keyword">else if</span> (type == <span class="string">"PayPal"</span>)
+            <span class="comment">// Process PayPal</span>
+        <span class="comment">// Adding new method requires modifying this class!</span>
+    }
+}
+
+<span class="comment">// GOOD: Open for extension via abstraction</span>
+<span class="keyword">public interface</span> <span class="class-name">IPaymentMethod</span>
+{
+    Task <span class="method">ProcessPaymentAsync</span>(<span class="keyword">decimal</span> amount);
+}
+
+<span class="keyword">public class</span> <span class="class-name">CreditCardPayment</span> : <span class="class-name">IPaymentMethod</span>
+{
+    <span class="keyword">public async</span> Task <span class="method">ProcessPaymentAsync</span>(<span class="keyword">decimal</span> amount)
+    {
+        <span class="comment">// Credit card logic</span>
+    }
+}
+
+<span class="keyword">public class</span> <span class="class-name">PayPalPayment</span> : <span class="class-name">IPaymentMethod</span>
+{
+    <span class="keyword">public async</span> Task <span class="method">ProcessPaymentAsync</span>(<span class="keyword">decimal</span> amount)
+    {
+        <span class="comment">// PayPal logic</span>
+    }
+}
+
+<span class="keyword">public class</span> <span class="class-name">PaymentProcessor</span>
+{
+    <span class="keyword">public async</span> Task <span class="method">ProcessPayment</span>(<span class="class-name">IPaymentMethod</span> paymentMethod, <span class="keyword">decimal</span> amount)
+    {
+        <span class="keyword">await</span> paymentMethod.<span class="method">ProcessPaymentAsync</span>(amount);
+        <span class="comment">// Add new payment methods without modifying this class!</span>
+    }
+}
+
+<span class="comment">// ========== L - LISKOV SUBSTITUTION PRINCIPLE ==========</span>
+<span class="comment">// BAD: Subclass violates base class contract</span>
+<span class="keyword">public class</span> <span class="class-name">Bird</span>
+{
+    <span class="keyword">public virtual void</span> <span class="method">Fly</span>() { <span class="comment">/* fly logic */</span> }
+}
+
+<span class="keyword">public class</span> <span class="class-name">Penguin</span> : <span class="class-name">Bird</span>
+{
+    <span class="keyword">public override void</span> <span class="method">Fly</span>()
+    {
+        <span class="keyword">throw new</span> <span class="class-name">NotImplementedException</span>(<span class="string">"Penguins can't fly!"</span>);
+        <span class="comment">// Violates LSP - can't substitute Penguin for Bird</span>
+    }
+}
+
+<span class="comment">// GOOD: Proper abstraction</span>
+<span class="keyword">public abstract class</span> <span class="class-name">Bird</span>
+{
+    <span class="keyword">public abstract void</span> <span class="method">Move</span>();
+}
+
+<span class="keyword">public class</span> <span class="class-name">Sparrow</span> : <span class="class-name">Bird</span>
+{
+    <span class="keyword">public override void</span> <span class="method">Move</span>() => <span class="method">Fly</span>();
+    <span class="keyword">private void</span> <span class="method">Fly</span>() { <span class="comment">/* fly logic */</span> }
+}
+
+<span class="keyword">public class</span> <span class="class-name">Penguin</span> : <span class="class-name">Bird</span>
+{
+    <span class="keyword">public override void</span> <span class="method">Move</span>() => <span class="method">Swim</span>();
+    <span class="keyword">private void</span> <span class="method">Swim</span>() { <span class="comment">/* swim logic */</span> }
+}
+
+<span class="comment">// ========== I - INTERFACE SEGREGATION PRINCIPLE ==========</span>
+<span class="comment">// BAD: Fat interface forcing unnecessary implementations</span>
+<span class="keyword">public interface</span> <span class="class-name">IWorker</span>
+{
+    <span class="keyword">void</span> <span class="method">Work</span>();
+    <span class="keyword">void</span> <span class="method">Eat</span>();
+    <span class="keyword">void</span> <span class="method">Sleep</span>();
+}
+
+<span class="keyword">public class</span> <span class="class-name">Robot</span> : <span class="class-name">IWorker</span>
+{
+    <span class="keyword">public void</span> <span class="method">Work</span>() { <span class="comment">/* work */</span> }
+    <span class="keyword">public void</span> <span class="method">Eat</span>() { <span class="keyword">throw new</span> <span class="class-name">NotImplementedException</span>(); } <span class="comment">// Robots don't eat!</span>
+    <span class="keyword">public void</span> <span class="method">Sleep</span>() { <span class="keyword">throw new</span> <span class="class-name">NotImplementedException</span>(); }
+}
+
+<span class="comment">// GOOD: Segregated interfaces</span>
+<span class="keyword">public interface</span> <span class="class-name">IWorkable</span>
+{
+    <span class="keyword">void</span> <span class="method">Work</span>();
+}
+
+<span class="keyword">public interface</span> <span class="class-name">IFeedable</span>
+{
+    <span class="keyword">void</span> <span class="method">Eat</span>();
+}
+
+<span class="keyword">public class</span> <span class="class-name">Human</span> : <span class="class-name">IWorkable</span>, <span class="class-name">IFeedable</span>
+{
+    <span class="keyword">public void</span> <span class="method">Work</span>() { <span class="comment">/* work */</span> }
+    <span class="keyword">public void</span> <span class="method">Eat</span>() { <span class="comment">/* eat */</span> }
+}
+
+<span class="keyword">public class</span> <span class="class-name">Robot</span> : <span class="class-name">IWorkable</span>
+{
+    <span class="keyword">public void</span> <span class="method">Work</span>() { <span class="comment">/* work */</span> }
+    <span class="comment">// No need to implement Eat()</span>
+}
+
+<span class="comment">// ========== D - DEPENDENCY INVERSION PRINCIPLE ==========</span>
+<span class="comment">// BAD: High-level module depends on low-level module</span>
+<span class="keyword">public class</span> <span class="class-name">OrderService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">SqlServerRepository</span> _repo = <span class="keyword">new</span> <span class="class-name">SqlServerRepository</span>();
+    <span class="comment">// Tightly coupled to SqlServer - can't test or swap easily</span>
+    
+    <span class="keyword">public void</span> <span class="method">PlaceOrder</span>(<span class="class-name">Order</span> order)
+    {
+        _repo.<span class="method">Save</span>(order);
+    }
+}
+
+<span class="comment">// GOOD: Depend on abstraction</span>
+<span class="keyword">public interface</span> <span class="class-name">IOrderRepository</span>
+{
+    Task <span class="method">SaveAsync</span>(<span class="class-name">Order</span> order);
+}
+
+<span class="keyword">public class</span> <span class="class-name">OrderService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IOrderRepository</span> _repo;
+    
+    <span class="keyword">public</span> <span class="method">OrderService</span>(<span class="class-name">IOrderRepository</span> repo) <span class="comment">// Injected via DI</span>
+    {
+        _repo = repo;
+    }
+    
+    <span class="keyword">public async</span> Task <span class="method">PlaceOrderAsync</span>(<span class="class-name">Order</span> order)
+    {
+        <span class="keyword">await</span> _repo.<span class="method">SaveAsync</span>(order);
+        <span class="comment">// Can inject SqlServerRepo, MongoRepo, or MockRepo for testing</span>
+    }
+}
+
+<span class="comment">// Register in Startup.cs</span>
+services.<span class="method">AddScoped</span>&lt;<span class="class-name">IOrderRepository</span>, <span class="class-name">SqlServerRepository</span>&gt;();</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                SOLID principles are fundamental to writing clean, maintainable .NET code. <strong>SRP</strong> keeps classes focused, 
+                                <strong>OCP</strong> enables extension via interfaces, <strong>LSP</strong> ensures proper inheritance, <strong>ISP</strong> avoids fat interfaces, 
+                                and <strong>DIP</strong> with dependency injection makes code testable and flexible. These principles work together to create robust architectures.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">C-Sharp Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Question 88 -->
+            <div class="question-item" data-keywords="singleton pattern single instance thread safe lazy initialization dependency injection addsingleton">
+                <details>
+                    <summary>Q88: Singleton - Ensure single instance usage</summary>
+                    <div class="answer-content">
+                        
+                        <div class="section">
+                            <h3>📚 Theory</h3>
+                            <p>
+                                The Singleton pattern ensures a class has only one instance throughout the application lifetime and provides a global access point to it. 
+                                Common use cases: configuration managers, logging, caching, database connection pools. Critical concerns: <strong>thread safety</strong> 
+                                (multiple threads creating instances simultaneously), <strong>lazy initialization</strong> (create only when needed), and 
+                                <strong>testability</strong> (singletons can make unit testing difficult).
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>⚙️ How it Works in .NET Core</h3>
+                            <p>
+                                <strong>Traditional Implementation Methods:</strong>
+                            </p>
+                            <ul>
+                                <li><strong>Eager Initialization</strong>: Create instance at class load time</li>
+                                <li><strong>Lazy&lt;T&gt;</strong>: Thread-safe lazy initialization (recommended)</li>
+                                <li><strong>Double-Check Locking</strong>: Optimize with lock only when needed (avoid, use Lazy instead)</li>
+                                <li><strong>Static Constructor</strong>: CLR guarantees thread safety</li>
+                            </ul>
+                            <p>
+                                <strong>Modern .NET Core Approach:</strong> Use built-in Dependency Injection with <code>services.AddSingleton&lt;T&gt;()</code>. 
+                                This is preferred over manual singleton implementation because it's testable, follows DIP, and the DI container manages lifecycle.
+                            </p>
+                        </div>
+
+                        <div class="section">
+                            <h3>💼 Practical Example</h3>
+                            <p>
+                                I've implemented singletons in various ways across different projects. Here are the patterns I've used:
+                            </p>
+                            <pre><code><span class="comment">// ========== METHOD 1: LAZY&lt;T&gt; (RECOMMENDED MANUAL APPROACH) ==========</span>
+<span class="keyword">public sealed class</span> <span class="class-name">ConfigurationManager</span>
+{
+    <span class="keyword">private static readonly</span> <span class="class-name">Lazy</span>&lt;<span class="class-name">ConfigurationManager</span>&gt; _instance = 
+        <span class="keyword">new</span> <span class="class-name">Lazy</span>&lt;<span class="class-name">ConfigurationManager</span>&gt;(() => <span class="keyword">new</span> <span class="class-name">ConfigurationManager</span>());
+    
+    <span class="keyword">public static</span> <span class="class-name">ConfigurationManager</span> Instance => _instance.Value;
+    
+    <span class="keyword">private</span> <span class="method">ConfigurationManager</span>()
+    {
+        <span class="comment">// Load configuration from file/environment</span>
+        <span class="method">LoadSettings</span>();
+    }
+    
+    <span class="keyword">public string</span> ConnectionString { <span class="keyword">get</span>; <span class="keyword">private set</span>; }
+    
+    <span class="keyword">private void</span> <span class="method">LoadSettings</span>()
+    {
+        ConnectionString = <span class="string">"Server=...;Database=..."</span>;
+    }
+}
+
+<span class="comment">// Usage</span>
+<span class="keyword">var</span> config = <span class="class-name">ConfigurationManager</span>.Instance;
+<span class="keyword">var</span> connStr = config.ConnectionString;
+
+<span class="comment">// ========== METHOD 2: STATIC CONSTRUCTOR (THREAD-SAFE) ==========</span>
+<span class="keyword">public sealed class</span> <span class="class-name">Logger</span>
+{
+    <span class="keyword">private static readonly</span> <span class="class-name">Logger</span> _instance = <span class="keyword">new</span> <span class="class-name">Logger</span>();
+    
+    <span class="comment">// Static constructor ensures thread safety</span>
+    <span class="keyword">static</span> <span class="method">Logger</span>() { }
+    
+    <span class="keyword">private</span> <span class="method">Logger</span>()
+    {
+        <span class="comment">// Initialize logging</span>
+    }
+    
+    <span class="keyword">public static</span> <span class="class-name">Logger</span> Instance => _instance;
+    
+    <span class="keyword">public void</span> <span class="method">Log</span>(<span class="keyword">string</span> message)
+    {
+        <span class="class-name">Console</span>.<span class="method">WriteLine</span>(<span class="string">$"[{DateTime.Now}] {message}"</span>);
+    }
+}
+
+<span class="comment">// ========== METHOD 3: DOUBLE-CHECK LOCKING (AVOID - USE LAZY INSTEAD) ==========</span>
+<span class="keyword">public sealed class</span> <span class="class-name">CacheManager</span>
+{
+    <span class="keyword">private static</span> <span class="class-name">CacheManager</span> _instance;
+    <span class="keyword">private static readonly object</span> _lock = <span class="keyword">new object</span>();
+    
+    <span class="keyword">public static</span> <span class="class-name">CacheManager</span> Instance
+    {
+        <span class="keyword">get</span>
+        {
+            <span class="keyword">if</span> (_instance == <span class="keyword">null</span>) <span class="comment">// First check (no lock)</span>
+            {
+                <span class="keyword">lock</span> (_lock)
+                {
+                    <span class="keyword">if</span> (_instance == <span class="keyword">null</span>) <span class="comment">// Second check (with lock)</span>
+                    {
+                        _instance = <span class="keyword">new</span> <span class="class-name">CacheManager</span>();
+                    }
+                }
+            }
+            <span class="keyword">return</span> _instance;
+        }
+    }
+    
+    <span class="keyword">private</span> <span class="method">CacheManager</span>() { }
+}
+
+<span class="comment">// ========== METHOD 4: DEPENDENCY INJECTION (MODERN .NET CORE WAY) ==========</span>
+
+<span class="comment">// 1. Define service interface and implementation</span>
+<span class="keyword">public interface</span> <span class="class-name">IApplicationSettings</span>
+{
+    <span class="keyword">string</span> ApiKey { <span class="keyword">get</span>; }
+    <span class="keyword">int</span> MaxRetries { <span class="keyword">get</span>; }
+}
+
+<span class="keyword">public class</span> <span class="class-name">ApplicationSettings</span> : <span class="class-name">IApplicationSettings</span>
+{
+    <span class="keyword">public string</span> ApiKey { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    <span class="keyword">public int</span> MaxRetries { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+    
+    <span class="keyword">public</span> <span class="method">ApplicationSettings</span>()
+    {
+        <span class="comment">// Load from configuration</span>
+        ApiKey = <span class="string">"your-api-key"</span>;
+        MaxRetries = <span class="number">3</span>;
+    }
+}
+
+<span class="comment">// 2. Register as Singleton in Startup.cs</span>
+<span class="keyword">public class</span> <span class="class-name">Startup</span>
+{
+    <span class="keyword">public void</span> <span class="method">ConfigureServices</span>(<span class="class-name">IServiceCollection</span> services)
+    {
+        <span class="comment">// Singleton - Single instance for entire app lifetime</span>
+        services.<span class="method">AddSingleton</span>&lt;<span class="class-name">IApplicationSettings</span>, <span class="class-name">ApplicationSettings</span>&gt;();
+        
+        <span class="comment">// Alternative: Register instance directly</span>
+        services.<span class="method">AddSingleton</span>&lt;<span class="class-name">IApplicationSettings</span>&gt;(<span class="keyword">new</span> <span class="class-name">ApplicationSettings</span>());
+        
+        <span class="comment">// Alternative: Factory method</span>
+        services.<span class="method">AddSingleton</span>&lt;<span class="class-name">IApplicationSettings</span>&gt;(sp =>
+        {
+            <span class="keyword">var</span> config = sp.<span class="method">GetRequiredService</span>&lt;<span class="class-name">IConfiguration</span>&gt;();
+            <span class="keyword">return new</span> <span class="class-name">ApplicationSettings</span>
+            {
+                ApiKey = config[<span class="string">"ApiKey"</span>],
+                MaxRetries = <span class="keyword">int</span>.<span class="method">Parse</span>(config[<span class="string">"MaxRetries"</span>])
+            };
+        });
+    }
+}
+
+<span class="comment">// 3. Inject into services/controllers</span>
+<span class="keyword">public class</span> <span class="class-name">OrderService</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">IApplicationSettings</span> _settings;
+    
+    <span class="keyword">public</span> <span class="method">OrderService</span>(<span class="class-name">IApplicationSettings</span> settings)
+    {
+        _settings = settings; <span class="comment">// Same instance injected everywhere</span>
+    }
+    
+    <span class="keyword">public void</span> <span class="method">ProcessOrder</span>()
+    {
+        <span class="keyword">var</span> apiKey = _settings.ApiKey;
+        <span class="comment">// Use singleton instance</span>
+    }
+}
+
+<span class="comment">// ========== REAL-WORLD EXAMPLE: DATABASE CONNECTION POOL ==========</span>
+<span class="keyword">public sealed class</span> <span class="class-name">DatabaseConnectionPool</span>
+{
+    <span class="keyword">private static readonly</span> <span class="class-name">Lazy</span>&lt;<span class="class-name">DatabaseConnectionPool</span>&gt; _instance =
+        <span class="keyword">new</span> <span class="class-name">Lazy</span>&lt;<span class="class-name">DatabaseConnectionPool</span>&gt;(() => <span class="keyword">new</span> <span class="class-name">DatabaseConnectionPool</span>());
+    
+    <span class="keyword">private readonly</span> <span class="class-name">ConcurrentBag</span>&lt;<span class="class-name">SqlConnection</span>&gt; _connections;
+    <span class="keyword">private const int</span> MaxConnections = <span class="number">100</span>;
+    
+    <span class="keyword">public static</span> <span class="class-name">DatabaseConnectionPool</span> Instance => _instance.Value;
+    
+    <span class="keyword">private</span> <span class="method">DatabaseConnectionPool</span>()
+    {
+        _connections = <span class="keyword">new</span> <span class="class-name">ConcurrentBag</span>&lt;<span class="class-name">SqlConnection</span>&gt;();
+    }
+    
+    <span class="keyword">public</span> <span class="class-name">SqlConnection</span> <span class="method">GetConnection</span>()
+    {
+        <span class="keyword">if</span> (_connections.<span class="method">TryTake</span>(<span class="keyword">out var</span> connection))
+            <span class="keyword">return</span> connection;
+        
+        <span class="keyword">if</span> (_connections.Count < MaxConnections)
+            <span class="keyword">return new</span> <span class="class-name">SqlConnection</span>(<span class="string">"connection-string"</span>);
+        
+        <span class="keyword">throw new</span> <span class="class-name">InvalidOperationException</span>(<span class="string">"Connection pool exhausted"</span>);
+    }
+    
+    <span class="keyword">public void</span> <span class="method">ReturnConnection</span>(<span class="class-name">SqlConnection</span> connection)
+    {
+        _connections.<span class="method">Add</span>(connection);
+    }
+}
+
+<span class="comment">// ========== TESTING CONSIDERATION ==========</span>
+<span class="comment">// Problem: Hard to test code that uses static singletons</span>
+<span class="keyword">public class</span> <span class="class-name">OrderProcessor</span>
+{
+    <span class="keyword">public void</span> <span class="method">Process</span>()
+    {
+        <span class="class-name">Logger</span>.Instance.<span class="method">Log</span>(<span class="string">"Processing..."</span>); <span class="comment">// Can't mock Logger!</span>
+    }
+}
+
+<span class="comment">// Solution: Use DI with singleton lifetime</span>
+<span class="keyword">public class</span> <span class="class-name">OrderProcessor</span>
+{
+    <span class="keyword">private readonly</span> <span class="class-name">ILogger</span> _logger;
+    
+    <span class="keyword">public</span> <span class="method">OrderProcessor</span>(<span class="class-name">ILogger</span> logger)
+    {
+        _logger = logger; <span class="comment">// Can inject mock logger in tests!</span>
+    }
+    
+    <span class="keyword">public void</span> <span class="method">Process</span>()
+    {
+        _logger.<span class="method">Log</span>(<span class="string">"Processing..."</span>);
+    }
+}</code></pre>
+                        </div>
+
+                        <div class="key-takeaway">
+                            <h3>🎯 Key Takeaway</h3>
+                            <p>
+                                For manual singleton implementation, use <code>Lazy&lt;T&gt;</code> for thread-safe lazy initialization. However, in modern .NET Core applications, 
+                                prefer <strong>Dependency Injection with <code>AddSingleton()</code></strong> because it's testable, follows SOLID principles, and the DI container 
+                                manages the lifecycle. Manual singletons are harder to test and violate dependency inversion. Use singletons for stateless services like configuration, 
+                                logging, or caching—avoid for stateful objects shared across requests.
+                            </p>
+                        </div>
+
+                        <div class="categories">
+                            <span class="category-tag">Design Patterns</span>
+                            <span class="category-tag">.NET Core Concepts</span>
+                            <span class="category-tag">C-Sharp Concepts</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchBar = document.getElementById('searchBar');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const questionItems = document.querySelectorAll('.question-item');
+        const resultCount = document.getElementById('resultCount');
+
+        searchBar.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            questionItems.forEach(item => {
+                const keywords = item.getAttribute('data-keywords');
+                const summaryText = item.querySelector('summary').textContent.toLowerCase();
+                const contentText = item.querySelector('.answer-content').textContent.toLowerCase();
+                
+                const matches = keywords.includes(searchTerm) || 
+                               summaryText.includes(searchTerm) || 
+                               contentText.includes(searchTerm);
+
+                if (matches || searchTerm === '') {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            if (searchTerm === '') {
+                resultCount.textContent = '';
+            } else {
+                resultCount.textContent = `Found ${visibleCount} of ${questionItems.length} questions`;
+            }
+        });
+
+        // Expand all / Collapse all (Ctrl+E / Ctrl+C shortcuts)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                document.querySelectorAll('details').forEach(d => d.open = true);
+            }
+            if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                document.querySelectorAll('details').forEach(d => d.open = false);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!-- Question 41: Scope of Services -->
+<details class="question-item">
+    <summary>Q41: Scope of services in Dependency Injection</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                Service scope determines the lifetime of objects created by the Dependency Injection (DI) container. .NET supports three lifetimes: <strong>Transient</strong> (created each time they're requested), <strong>Scoped</strong> (created once per HTTP request/scope), and <strong>Singleton</strong> (created once for the application lifetime). Choosing the wrong scope can cause memory leaks, thread-safety issues, or unexpected behavior. For example, injecting a scoped DbContext into a singleton service will cause "Cannot access a disposed object" exceptions because the DbContext gets disposed before the singleton releases it.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                Register services in <code>Program.cs</code> using:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><code>builder.Services.AddTransient&lt;IService, Service&gt;()</code> - New instance every time</li>
+                    <li><code>builder.Services.AddScoped&lt;IService, Service&gt;()</code> - New instance per HTTP request</li>
+                    <li><code>builder.Services.AddSingleton&lt;IService, Service&gt;()</code> - Single instance for app lifetime</li>
+                    <li><strong>DbContext</strong> is always scoped by default (<code>AddDbContext</code>)</li>
+                    <li><strong>HttpClient</strong> via <code>AddHttpClient</code> is managed as singleton but with scoped handlers</li>
+                    <li>Use <code>IServiceProvider.CreateScope()</code> for manual scope creation in background services</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In a logistics tracking system, we had a critical bug where a <strong>singleton</strong> <code>NotificationService</code> was injecting a <strong>scoped</strong> <code>AppDbContext</code>. The DbContext got disposed after the first request, causing "ObjectDisposedException" on subsequent notifications. We fixed it by making the NotificationService scoped and creating manual scopes in background workers.
+
+<pre><code><span class="comment">// Program.cs - Service Registration</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// Transient - new instance every injection</span>
+builder.Services.AddTransient&lt;<span class="type">IEmailSender</span>, <span class="type">EmailSender</span>&gt;();
+
+<span class="comment">// Scoped - one instance per HTTP request (or manually created scope)</span>
+builder.Services.AddScoped&lt;<span class="type">IOrderService</span>, <span class="type">OrderService</span>&gt;();
+builder.Services.AddDbContext&lt;<span class="type">AppDbContext</span>&gt;(options => 
+    options.UseNpgsql(builder.Configuration.GetConnectionString(<span class="string">"DefaultConnection"</span>)));
+
+<span class="comment">// Singleton - one instance for entire app lifetime</span>
+builder.Services.AddSingleton&lt;<span class="type">ICacheService</span>, <span class="type">RedisCacheService</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="type">IConfiguration</span>&gt;(builder.Configuration);
+
+<span class="comment">// Background service needs manual scope creation</span>
+builder.Services.AddHostedService&lt;<span class="type">OrderProcessingWorker</span>&gt;();
+
+<span class="keyword">var</span> app = builder.Build();
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// BAD EXAMPLE - Singleton injecting Scoped (causes crash)</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">NotificationService</span> <span class="comment">// Registered as Singleton</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">AppDbContext</span> _context; <span class="comment">// PROBLEM: Scoped service!</span>
+
+    <span class="keyword">public</span> NotificationService(<span class="type">AppDbContext</span> context)
+    {
+        _context = context; <span class="comment">// This will be disposed after first request</span>
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task SendNotificationAsync(<span class="type">string</span> userId)
+    {
+        <span class="keyword">var</span> user = <span class="keyword">await</span> _context.Users.FindAsync(userId); <span class="comment">// BOOM: ObjectDisposedException</span>
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// CORRECT APPROACH - Background Worker with Manual Scopes</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">OrderProcessingWorker</span> : <span class="type">BackgroundService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IServiceProvider</span> _serviceProvider;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">ILogger</span>&lt;<span class="type">OrderProcessingWorker</span>&gt; _logger;
+
+    <span class="keyword">public</span> OrderProcessingWorker(
+        <span class="type">IServiceProvider</span> serviceProvider, 
+        <span class="type">ILogger</span>&lt;<span class="type">OrderProcessingWorker</span>&gt; logger)
+    {
+        _serviceProvider = serviceProvider;
+        _logger = logger;
+    }
+
+    <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task ExecuteAsync(<span class="type">CancellationToken</span> stoppingToken)
+    {
+        <span class="keyword">while</span> (!stoppingToken.IsCancellationRequested)
+        {
+            <span class="comment">// Create a new scope for each iteration</span>
+            <span class="keyword">using</span> (<span class="keyword">var</span> scope = _serviceProvider.CreateScope())
+            {
+                <span class="keyword">var</span> orderService = scope.ServiceProvider.GetRequiredService&lt;<span class="type">IOrderService</span>&gt;();
+                <span class="keyword">var</span> dbContext = scope.ServiceProvider.GetRequiredService&lt;<span class="type">AppDbContext</span>&gt;();
+
+                <span class="keyword">try</span>
+                {
+                    <span class="keyword">await</span> orderService.ProcessPendingOrdersAsync();
+                    _logger.LogInformation(<span class="string">"Processed pending orders"</span>);
+                }
+                <span class="keyword">catch</span> (Exception ex)
+                {
+                    _logger.LogError(ex, <span class="string">"Error processing orders"</span>);
+                }
+            } <span class="comment">// Scope disposed here - DbContext cleaned up</span>
+
+            <span class="keyword">await</span> Task.Delay(TimeSpan.FromMinutes(<span class="number">5</span>), stoppingToken);
+        }
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// REAL-WORLD SCOPE USAGE</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">OrderService</span> : <span class="type">IOrderService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">AppDbContext</span> _context; <span class="comment">// Scoped - safe to inject</span>
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IEmailSender</span> _emailSender; <span class="comment">// Transient - new each time</span>
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">ICacheService</span> _cache; <span class="comment">// Singleton - shared across all requests</span>
+
+    <span class="keyword">public</span> OrderService(
+        <span class="type">AppDbContext</span> context,
+        <span class="type">IEmailSender</span> emailSender,
+        <span class="type">ICacheService</span> cache)
+    {
+        _context = context;
+        _emailSender = emailSender;
+        _cache = cache;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">Order</span>&gt; CreateOrderAsync(<span class="type">CreateOrderRequest</span> request)
+    {
+        <span class="comment">// Check cache (singleton - thread-safe)</span>
+        <span class="keyword">var</span> cachedProduct = <span class="keyword">await</span> _cache.GetAsync&lt;<span class="type">Product</span>&gt;($<span class="string">"product:{request.ProductId}"</span>);
+
+        <span class="comment">// Use scoped DbContext</span>
+        <span class="keyword">var</span> order = <span class="keyword">new</span> Order { ProductId = request.ProductId, Quantity = request.Quantity };
+        _context.Orders.Add(order);
+        <span class="keyword">await</span> _context.SaveChangesAsync();
+
+        <span class="comment">// Transient email sender - new instance</span>
+        <span class="keyword">await</span> _emailSender.SendAsync(<span class="string">"Order confirmed"</span>, request.UserEmail);
+
+        <span class="keyword">return</span> order;
+    }
+}
+</code></pre>
+
+                Key lesson: We added validation in our CI pipeline to detect singleton-scoped violations using Roslyn analyzers. This caught 3 similar bugs before they hit production.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                Use <strong>Transient</strong> for lightweight stateless services, <strong>Scoped</strong> for DbContext and per-request services, and <strong>Singleton</strong> for expensive thread-safe services like caching or configuration. Never inject scoped services into singletons—use <code>IServiceProvider.CreateScope()</code> instead.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag">C-Sharp Concepts</span>
+        </div>
+    </div>
+</details>
+
+<!-- Question 42: Health Checks -->
+<details class="question-item">
+    <summary>Q42: Health checks of API</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                Health checks are endpoints that report the operational status of an application and its dependencies (database, cache, external APIs). They're used by orchestrators (Kubernetes, Docker Swarm), load balancers, and monitoring systems to determine if an instance should receive traffic. ASP.NET Core supports two types: <strong>liveness</strong> (is the app running?) and <strong>readiness</strong> (is the app ready to handle requests?). Health checks can be <strong>basic</strong> (just responds 200 OK) or <strong>detailed</strong> (checks DB connections, disk space, memory). Kubernetes uses liveness probes to restart failing pods and readiness probes to route traffic.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                Use the built-in <code>Microsoft.Extensions.Diagnostics.HealthChecks</code>:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><code>builder.Services.AddHealthChecks()</code> - registers health check services</li>
+                    <li><code>app.MapHealthChecks("/health")</code> - exposes health check endpoint</li>
+                    <li><strong>AspNetCore.HealthChecks.* packages</strong> - pre-built checks for SQL Server, PostgreSQL, Redis, RabbitMQ, Azure services</li>
+                    <li>Custom checks implement <code>IHealthCheck</code> interface</li>
+                    <li><code>HealthCheckOptions</code> - customize response format (JSON, plain text)</li>
+                    <li>Use tags to separate liveness (<code>/health/live</code>) and readiness (<code>/health/ready</code>)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In a high-traffic e-commerce API deployed on AKS, we implemented comprehensive health checks after a production incident where unhealthy pods continued receiving traffic because they responded 200 OK while the database connection was dead. We added database, Redis, and external payment gateway checks with separate liveness/readiness endpoints.
+
+<pre><code><span class="comment">// Program.cs - Health Check Configuration</span>
+<span class="keyword">using</span> Microsoft.Extensions.Diagnostics.HealthChecks;
+
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// Add health checks with dependencies</span>
+builder.Services.AddHealthChecks()
+    <span class="comment">// Liveness checks - basic app health</span>
+    .AddCheck(<span class="string">"self"</span>, () => HealthCheckResult.Healthy(<span class="string">"API is running"</span>), tags: <span class="keyword">new</span>[] { <span class="string">"live"</span> })
+    
+    <span class="comment">// Readiness checks - dependency health</span>
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString(<span class="string">"DefaultConnection"</span>),
+        name: <span class="string">"postgres"</span>,
+        tags: <span class="keyword">new</span>[] { <span class="string">"ready"</span>, <span class="string">"db"</span> },
+        timeout: TimeSpan.FromSeconds(<span class="number">5</span>))
+    
+    .AddRedis(
+        builder.Configuration.GetConnectionString(<span class="string">"Redis"</span>),
+        name: <span class="string">"redis-cache"</span>,
+        tags: <span class="keyword">new</span>[] { <span class="string">"ready"</span>, <span class="string">"cache"</span> })
+    
+    .AddRabbitMQ(
+        rabbitConnectionString: builder.Configuration[<span class="string">"RabbitMQ:ConnectionString"</span>],
+        name: <span class="string">"rabbitmq"</span>,
+        tags: <span class="keyword">new</span>[] { <span class="string">"ready"</span>, <span class="string">"messaging"</span> })
+    
+    <span class="comment">// Custom health check for external API</span>
+    .AddCheck&lt;<span class="type">PaymentGatewayHealthCheck</span>&gt;(
+        <span class="string">"payment-gateway"</span>, 
+        tags: <span class="keyword">new</span>[] { <span class="string">"ready"</span>, <span class="string">"external"</span> });
+
+<span class="keyword">var</span> app = builder.Build();
+
+<span class="comment">// Liveness endpoint - just checks if app is running</span>
+app.MapHealthChecks(<span class="string">"/health/live"</span>, <span class="keyword">new</span> HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains(<span class="string">"live"</span>),
+    AllowCachingResponses = <span class="keyword">false</span>
+});
+
+<span class="comment">// Readiness endpoint - checks dependencies</span>
+app.MapHealthChecks(<span class="string">"/health/ready"</span>, <span class="keyword">new</span> HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains(<span class="string">"ready"</span>),
+    AllowCachingResponses = <span class="keyword">false</span>,
+    ResponseWriter = WriteDetailedHealthResponse <span class="comment">// Custom JSON response</span>
+});
+
+<span class="comment">// Full health endpoint with detailed status</span>
+app.MapHealthChecks(<span class="string">"/health"</span>, <span class="keyword">new</span> HealthCheckOptions
+{
+    ResponseWriter = WriteDetailedHealthResponse
+});
+
+app.Run();
+
+<span class="comment">// Custom response writer for detailed JSON</span>
+<span class="keyword">static</span> Task WriteDetailedHealthResponse(<span class="type">HttpContext</span> context, <span class="type">HealthReport</span> report)
+{
+    context.Response.ContentType = <span class="string">"application/json"</span>;
+    
+    <span class="keyword">var</span> result = JsonSerializer.Serialize(<span class="keyword">new</span>
+    {
+        status = report.Status.ToString(),
+        duration = report.TotalDuration.TotalMilliseconds,
+        checks = report.Entries.Select(e => <span class="keyword">new</span>
+        {
+            name = e.Key,
+            status = e.Value.Status.ToString(),
+            description = e.Value.Description,
+            duration = e.Value.Duration.TotalMilliseconds,
+            exception = e.Value.Exception?.Message,
+            data = e.Value.Data
+        })
+    }, <span class="keyword">new</span> JsonSerializerOptions { WriteIndented = <span class="keyword">true</span> });
+
+    <span class="keyword">return</span> context.Response.WriteAsync(result);
+}
+</code></pre>
+
+<pre><code><span class="comment">// Custom Health Check Implementation</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">PaymentGatewayHealthCheck</span> : <span class="type">IHealthCheck</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IHttpClientFactory</span> _httpClientFactory;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IConfiguration</span> _configuration;
+
+    <span class="keyword">public</span> PaymentGatewayHealthCheck(<span class="type">IHttpClientFactory</span> httpClientFactory, <span class="type">IConfiguration</span> configuration)
+    {
+        _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">HealthCheckResult</span>&gt; CheckHealthAsync(
+        <span class="type">HealthCheckContext</span> context, 
+        <span class="type">CancellationToken</span> cancellationToken = <span class="keyword">default</span>)
+    {
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">var</span> client = _httpClientFactory.CreateClient();
+            <span class="keyword">var</span> gatewayUrl = _configuration[<span class="string">"PaymentGateway:HealthUrl"</span>];
+            
+            <span class="keyword">var</span> response = <span class="keyword">await</span> client.GetAsync(gatewayUrl, cancellationToken);
+
+            <span class="keyword">if</span> (response.IsSuccessStatusCode)
+            {
+                <span class="keyword">return</span> HealthCheckResult.Healthy(
+                    <span class="string">"Payment gateway is responsive"</span>,
+                    <span class="keyword">new</span> Dictionary&lt;<span class="type">string</span>, <span class="type">object</span>&gt;
+                    {
+                        { <span class="string">"status_code"</span>, (<span class="type">int</span>)response.StatusCode },
+                        { <span class="string">"response_time_ms"</span>, <span class="number">100</span> }
+                    });
+            }
+
+            <span class="keyword">return</span> HealthCheckResult.Degraded(
+                $<span class="string">"Payment gateway returned {response.StatusCode}"</span>);
+        }
+        <span class="keyword">catch</span> (Exception ex)
+        {
+            <span class="keyword">return</span> HealthCheckResult.Unhealthy(
+                <span class="string">"Payment gateway is unreachable"</span>, 
+                ex);
+        }
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Kubernetes Deployment YAML</span>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecommerce-api
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: api
+        image: myregistry/ecommerce-api:latest
+        ports:
+        - containerPort: 8080
+        <span class="comment"># Liveness probe - restart if fails</span>
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        <span class="comment"># Readiness probe - remove from load balancer if fails</span>
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+</code></pre>
+
+                Real-world impact: After implementing this, we caught a database connection pool exhaustion issue in staging. The readiness check failed, K8s removed the pod from service, and it recovered automatically without user impact. Before health checks, the pod would've continued serving 500 errors.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                Implement separate <strong>liveness</strong> and <strong>readiness</strong> health checks. Liveness should be simple (just app status), while readiness validates dependencies. Use pre-built health checks from NuGet for common services and custom checks for external APIs. Always configure timeouts to prevent health check endpoints from hanging.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag api">API</span>
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag microservices">Microservices</span>
+        </div>
+    </div>
+</details>
+
+<!-- Question 43: Caching Mechanism -->
+<details class="question-item">
+    <summary>Q43: Caching mechanism in API</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                Caching stores frequently accessed data in fast storage (memory or distributed cache) to reduce database load and improve response times. There are three main types: <strong>In-Memory caching</strong> (stored locally in app memory, lost on restart), <strong>Distributed caching</strong> (shared across multiple instances using Redis/SQL Server), and <strong>HTTP Response caching</strong> (browser/CDN caches responses). Cache invalidation is critical—choose between time-based expiration (TTL), manual invalidation, or cache-aside pattern. For read-heavy APIs, caching can reduce latency from 200ms to under 10ms. The hard parts are cache coherence (keeping cache in sync with DB) and cache stampede (many requests hitting a cold cache simultaneously).
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                .NET provides multiple caching options:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><strong>IMemoryCache</strong> - in-memory caching (single server)</li>
+                    <li><strong>IDistributedCache</strong> - abstraction for Redis, SQL Server, NCache</li>
+                    <li><code>AddStackExchangeRedisCache()</code> - Redis distributed cache</li>
+                    <li><code>[ResponseCache]</code> attribute - HTTP response caching</li>
+                    <li><code>AddOutputCache()</code> (.NET 7+) - modern output caching middleware</li>
+                    <li><strong>CacheTagHelper</strong> - for Razor page caching</li>
+                    <li><strong>HybridCache</strong> (.NET 9+) - combines in-memory + distributed with automatic serialization</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In a product catalog API serving 10K requests/sec, we implemented a multi-layer caching strategy: in-memory cache for hot products (top 100), Redis distributed cache for the rest, and database as fallback. This reduced database queries by 95% and average response time from 180ms to 12ms.
+
+<pre><code><span class="comment">// Program.cs - Caching Configuration</span>
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// 1. In-Memory Cache (for single instance or hot data)</span>
+builder.Services.AddMemoryCache();
+
+<span class="comment">// 2. Distributed Redis Cache (for multi-instance deployments)</span>
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration[<span class="string">"Redis:ConnectionString"</span>];
+    options.InstanceName = <span class="string">"ProductCatalog:"</span>;
+});
+
+<span class="comment">// 3. Output Caching (HTTP response caching) - .NET 7+</span>
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(policy => policy.Expire(TimeSpan.FromMinutes(<span class="number">5</span>)));
+    
+    <span class="comment">// Cache by query parameters</span>
+    options.AddPolicy(<span class="string">"ProductsByCategory"</span>, policy => 
+        policy.Expire(TimeSpan.FromMinutes(<span class="number">10</span>))
+              .SetVaryByQuery(<span class="string">"category"</span>, <span class="string">"page"</span>));
+});
+
+<span class="keyword">var</span> app = builder.Build();
+app.UseOutputCache();
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// Hybrid Caching Service - In-Memory + Distributed</span>
+<span class="keyword">public</span> <span class="keyword">interface</span> <span class="type">ICacheService</span>
+{
+    Task&lt;T&gt; GetOrSetAsync&lt;T&gt;(<span class="type">string</span> key, Func&lt;Task&lt;T&gt;&gt; factory, TimeSpan? expiration = <span class="keyword">null</span>);
+    Task RemoveAsync(<span class="type">string</span> key);
+}
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">HybridCacheService</span> : <span class="type">ICacheService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IMemoryCache</span> _memoryCache;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IDistributedCache</span> _distributedCache;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">ILogger</span>&lt;<span class="type">HybridCacheService</span>&gt; _logger;
+
+    <span class="keyword">public</span> HybridCacheService(
+        <span class="type">IMemoryCache</span> memoryCache, 
+        <span class="type">IDistributedCache</span> distributedCache,
+        <span class="type">ILogger</span>&lt;<span class="type">HybridCacheService</span>&gt; logger)
+    {
+        _memoryCache = memoryCache;
+        _distributedCache = distributedCache;
+        _logger = logger;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;T&gt; GetOrSetAsync&lt;T&gt;(
+        <span class="type">string</span> key, 
+        Func&lt;Task&lt;T&gt;&gt; factory, 
+        TimeSpan? expiration = <span class="keyword">null</span>)
+    {
+        <span class="comment">// 1. Try in-memory cache first (fastest)</span>
+        <span class="keyword">if</span> (_memoryCache.TryGetValue(key, <span class="keyword">out</span> T cachedValue))
+        {
+            _logger.LogDebug(<span class="string">"Cache HIT (Memory): {Key}"</span>, key);
+            <span class="keyword">return</span> cachedValue;
+        }
+
+        <span class="comment">// 2. Try distributed cache (Redis)</span>
+        <span class="keyword">var</span> distributedData = <span class="keyword">await</span> _distributedCache.GetStringAsync(key);
+        <span class="keyword">if</span> (distributedData != <span class="keyword">null</span>)
+        {
+            _logger.LogDebug(<span class="string">"Cache HIT (Redis): {Key}"</span>, key);
+            <span class="keyword">var</span> value = JsonSerializer.Deserialize&lt;T&gt;(distributedData);
+            
+            <span class="comment">// Promote to in-memory cache</span>
+            _memoryCache.Set(key, value, expiration ?? TimeSpan.FromMinutes(<span class="number">5</span>));
+            <span class="keyword">return</span> value;
+        }
+
+        <span class="comment">// 3. Cache MISS - fetch from source (database)</span>
+        _logger.LogDebug(<span class="string">"Cache MISS: {Key}"</span>, key);
+        <span class="keyword">var</span> result = <span class="keyword">await</span> factory();
+
+        <span class="comment">// Store in both caches</span>
+        <span class="keyword">var</span> serialized = JsonSerializer.Serialize(result);
+        <span class="keyword">var</span> options = <span class="keyword">new</span> DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(<span class="number">30</span>)
+        };
+
+        <span class="keyword">await</span> _distributedCache.SetStringAsync(key, serialized, options);
+        _memoryCache.Set(key, result, expiration ?? TimeSpan.FromMinutes(<span class="number">5</span>));
+
+        <span class="keyword">return</span> result;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task RemoveAsync(<span class="type">string</span> key)
+    {
+        _memoryCache.Remove(key);
+        <span class="keyword">await</span> _distributedCache.RemoveAsync(key);
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Product Service with Caching</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">ProductService</span> : <span class="type">IProductService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">AppDbContext</span> _context;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">ICacheService</span> _cache;
+
+    <span class="keyword">public</span> ProductService(<span class="type">AppDbContext</span> context, <span class="type">ICacheService</span> cache)
+    {
+        _context = context;
+        _cache = cache;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">Product</span>&gt; GetProductByIdAsync(<span class="type">int</span> productId)
+    {
+        <span class="keyword">var</span> cacheKey = $<span class="string">"product:{productId}"</span>;
+        
+        <span class="keyword">return</span> <span class="keyword">await</span> _cache.GetOrSetAsync(
+            cacheKey,
+            <span class="keyword">async</span> () => <span class="keyword">await</span> _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == productId),
+            expiration: TimeSpan.FromMinutes(<span class="number">30</span>)
+        );
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task UpdateProductAsync(<span class="type">Product</span> product)
+    {
+        _context.Products.Update(product);
+        <span class="keyword">await</span> _context.SaveChangesAsync();
+
+        <span class="comment">// Invalidate cache after update</span>
+        <span class="keyword">await</span> _cache.RemoveAsync($<span class="string">"product:{product.Id}"</span>);
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// API Endpoint with Output Caching</span>
+app.MapGet(<span class="string">"/api/products"</span>, <span class="keyword">async</span> (
+    <span class="type">string</span>? category, 
+    <span class="type">int</span> page,
+    <span class="type">IProductService</span> productService) =>
+{
+    <span class="keyword">var</span> products = <span class="keyword">await</span> productService.GetProductsByCategoryAsync(category, page);
+    <span class="keyword">return</span> Results.Ok(products);
+})
+.CacheOutput(<span class="string">"ProductsByCategory"</span>); <span class="comment">// Cache entire HTTP response</span>
+
+<span class="comment">// Clear cache on updates</span>
+app.MapPut(<span class="string">"/api/products/{id}"</span>, <span class="keyword">async</span> (
+    <span class="type">int</span> id,
+    <span class="type">UpdateProductRequest</span> request,
+    <span class="type">IProductService</span> productService,
+    <span class="type">IOutputCacheStore</span> cacheStore) =>
+{
+    <span class="keyword">await</span> productService.UpdateProductAsync(id, request);
+    
+    <span class="comment">// Evict output cache</span>
+    <span class="keyword">await</span> cacheStore.EvictByTagAsync(<span class="string">"products"</span>, <span class="keyword">default</span>);
+    
+    <span class="keyword">return</span> Results.NoContent();
+});
+</code></pre>
+
+                We learned this the hard way: initially, we used only in-memory cache across 10 pod replicas. Cache hit rate was terrible (10%) because each pod had different cached data. Switching to Redis brought hit rate to 92%. We also implemented cache warming on startup for top 100 products to avoid cold start issues during deployments.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                Use <strong>distributed caching (Redis)</strong> for multi-instance APIs, <strong>in-memory cache</strong> for hot data, and <strong>output caching</strong> for GET endpoints. Always implement cache invalidation strategy (time-based or event-based). Cache hit rates above 80% indicate effective caching. Monitor cache memory usage to avoid evictions.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag api">API</span>
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag microservices">Microservices</span>
+        </div>
+    </div>
+</details>
+
+<!-- Question 44: Event-Driven Architecture -->
+<details class="question-item">
+    <summary>Q44: Event-driven architecture - Kafka, RabbitMQ</summary>
+    <div class="question-content">
+        <div class="section">
+            <div class="section-title">1. Theory</div>
+            <div class="section-content">
+                Event-driven architecture uses asynchronous messaging to decouple services. Instead of direct HTTP calls, services publish events to a message broker (Kafka, RabbitMQ, Azure Service Bus), and other services subscribe to events they care about. <strong>RabbitMQ</strong> is a message broker optimized for complex routing (exchanges, queues, bindings) with guaranteed delivery and message acknowledgments. <strong>Kafka</strong> is a distributed event streaming platform built for high throughput, event sourcing, and replay capability—messages are stored in ordered logs (topics) and can be replayed. Use RabbitMQ for traditional messaging patterns (pub/sub, request/reply) and Kafka for event streaming, log aggregation, and real-time analytics.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2. How it Works in .NET Core</div>
+            <div class="section-content">
+                Popular .NET libraries for messaging:
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><strong>MassTransit</strong> - abstraction over RabbitMQ, Azure Service Bus, Amazon SQS (recommended)</li>
+                    <li><strong>NServiceBus</strong> - enterprise messaging framework (commercial)</li>
+                    <li><strong>Confluent.Kafka</strong> - official Kafka client for .NET</li>
+                    <li><strong>RabbitMQ.Client</strong> - native RabbitMQ client</li>
+                    <li><strong>Rebus</strong> - lightweight service bus for .NET</li>
+                </ul>
+                Key patterns: <strong>Pub/Sub</strong>, <strong>Competing Consumers</strong>, <strong>Saga/Choreography</strong> for distributed transactions.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3. Practical Example</div>
+            <div class="section-content">
+                In a fintech payment processing system, we used <strong>RabbitMQ for transactional messages</strong> (payment processing, retries, dead letter queues) and <strong>Kafka for event streaming</strong> (audit logs, analytics, fraud detection). When a payment succeeded, we published an event that triggered 5 downstream services: invoice generation, email notification, accounting, analytics, and fraud detection—all running independently without blocking the payment API response.
+
+<pre><code><span class="comment">// Program.cs - RabbitMQ with MassTransit</span>
+<span class="keyword">using</span> MassTransit;
+
+<span class="keyword">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="comment">// Configure MassTransit with RabbitMQ</span>
+builder.Services.AddMassTransit(x =>
+{
+    <span class="comment">// Register consumers</span>
+    x.AddConsumer&lt;<span class="type">PaymentSuccessConsumer</span>&gt;();
+    x.AddConsumer&lt;<span class="type">SendInvoiceConsumer</span>&gt;();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(<span class="string">"rabbitmq://localhost"</span>, h =>
+        {
+            h.Username(<span class="string">"guest"</span>);
+            h.Password(<span class="string">"guest"</span>);
+        });
+
+        <span class="comment">// Configure retry policy</span>
+        cfg.UseMessageRetry(retry => retry.Exponential(
+            retryLimit: <span class="number">5</span>,
+            minInterval: TimeSpan.FromSeconds(<span class="number">2</span>),
+            maxInterval: TimeSpan.FromMinutes(<span class="number">5</span>),
+            intervalDelta: TimeSpan.FromSeconds(<span class="number">5</span>)
+        ));
+
+        <span class="comment">// Dead letter queue for failed messages</span>
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
+<span class="keyword">var</span> app = builder.Build();
+app.Run();
+</code></pre>
+
+<pre><code><span class="comment">// Event Definition</span>
+<span class="keyword">public</span> <span class="keyword">record</span> <span class="type">PaymentSuccessEvent</span>
+{
+    <span class="keyword">public</span> <span class="type">Guid</span> PaymentId { <span class="keyword">get</span>; <span class="keyword">init</span>; }
+    <span class="keyword">public</span> <span class="type">string</span> UserId { <span class="keyword">get</span>; <span class="keyword">init</span>; }
+    <span class="keyword">public</span> <span class="type">decimal</span> Amount { <span class="keyword">get</span>; <span class="keyword">init</span>; }
+    <span class="keyword">public</span> <span class="type">DateTime</span> ProcessedAt { <span class="keyword">get</span>; <span class="keyword">init</span>; }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Publishing Events - Payment Service</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">PaymentService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IPublishEndpoint</span> _publisher;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">AppDbContext</span> _context;
+
+    <span class="keyword">public</span> PaymentService(<span class="type">IPublishEndpoint</span> publisher, <span class="type">AppDbContext</span> context)
+    {
+        _publisher = publisher;
+        _context = context;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task&lt;<span class="type">PaymentResult</span>&gt; ProcessPaymentAsync(<span class="type">PaymentRequest</span> request)
+    {
+        <span class="comment">// Process payment logic</span>
+        <span class="keyword">var</span> payment = <span class="keyword">new</span> Payment 
+        { 
+            UserId = request.UserId, 
+            Amount = request.Amount, 
+            Status = <span class="string">"Success"</span> 
+        };
+
+        _context.Payments.Add(payment);
+        <span class="keyword">await</span> _context.SaveChangesAsync();
+
+        <span class="comment">// Publish event asynchronously (fire-and-forget)</span>
+        <span class="keyword">await</span> _publisher.Publish(<span class="keyword">new</span> PaymentSuccessEvent
+        {
+            PaymentId = payment.Id,
+            UserId = payment.UserId,
+            Amount = payment.Amount,
+            ProcessedAt = DateTime.UtcNow
+        });
+
+        <span class="keyword">return</span> <span class="keyword">new</span> PaymentResult { Success = <span class="keyword">true</span>, PaymentId = payment.Id };
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Consumer - Invoice Service</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">SendInvoiceConsumer</span> : <span class="type">IConsumer</span>&lt;<span class="type">PaymentSuccessEvent</span>&gt;
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IInvoiceService</span> _invoiceService;
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">ILogger</span>&lt;<span class="type">SendInvoiceConsumer</span>&gt; _logger;
+
+    <span class="keyword">public</span> SendInvoiceConsumer(<span class="type">IInvoiceService</span> invoiceService, <span class="type">ILogger</span>&lt;<span class="type">SendInvoiceConsumer</span>&gt; logger)
+    {
+        _invoiceService = invoiceService;
+        _logger = logger;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task Consume(<span class="type">ConsumeContext</span>&lt;<span class="type">PaymentSuccessEvent</span>&gt; context)
+    {
+        _logger.LogInformation(<span class="string">"Generating invoice for payment {PaymentId}"</span>, context.Message.PaymentId);
+
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">await</span> _invoiceService.GenerateInvoiceAsync(
+                context.Message.PaymentId, 
+                context.Message.UserId, 
+                context.Message.Amount);
+
+            _logger.LogInformation(<span class="string">"Invoice generated successfully"</span>);
+        }
+        <span class="keyword">catch</span> (Exception ex)
+        {
+            _logger.LogError(ex, <span class="string">"Failed to generate invoice"</span>);
+            <span class="keyword">throw</span>; <span class="comment">// Message will be retried or moved to dead letter queue</span>
+        }
+    }
+}
+</code></pre>
+
+<pre><code><span class="comment">// Kafka Integration for Event Streaming</span>
+<span class="keyword">using</span> Confluent.Kafka;
+
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">KafkaProducerService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IProducer</span>&lt;<span class="type">string</span>, <span class="type">string</span>&gt; _producer;
+
+    <span class="keyword">public</span> KafkaProducerService(<span class="type">IConfiguration</span> configuration)
+    {
+        <span class="keyword">var</span> config = <span class="keyword">new</span> ProducerConfig
+        {
+            BootstrapServers = configuration[<span class="string">"Kafka:BootstrapServers"</span>],
+            Acks = Acks.All, <span class="comment">// Wait for all replicas</span>
+            EnableIdempotence = <span class="keyword">true</span> <span class="comment">// Prevent duplicate messages</span>
+        };
+
+        _producer = <span class="keyword">new</span> ProducerBuilder&lt;<span class="type">string</span>, <span class="type">string</span>&gt;(config).Build();
+    }
+
+    <span class="keyword">public</span> <span class="keyword">async</span> Task PublishEventAsync(<span class="type">string</span> topic, <span class="type">string</span> key, <span class="type">object</span> eventData)
+    {
+        <span class="keyword">var</span> json = JsonSerializer.Serialize(eventData);
+        <span class="keyword">var</span> message = <span class="keyword">new</span> Message&lt;<span class="type">string</span>, <span class="type">string</span>&gt;
+        {
+            Key = key,
+            Value = json,
+            Timestamp = <span class="keyword">new</span> Timestamp(DateTime.UtcNow)
+        };
+
+        <span class="keyword">var</span> result = <span class="keyword">await</span> _producer.ProduceAsync(topic, message);
+        Console.WriteLine($<span class="string">"Published to Kafka: {result.Topic}, Partition: {result.Partition}, Offset: {result.Offset}"</span>);
+    }
+}
+
+<span class="comment">// Kafka Consumer for Fraud Detection</span>
+<span class="keyword">public</span> <span class="keyword">class</span> <span class="type">FraudDetectionConsumer</span> : <span class="type">BackgroundService</span>
+{
+    <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="type">IConsumer</span>&lt;<span class="type">string</span>, <span class="type">string</span>&gt; _consumer;
+
+    <span class="keyword">public</span> FraudDetectionConsumer(<span class="type">IConfiguration</span> configuration)
+    {
+        <span class="keyword">var</span> config = <span class="keyword">new</span> ConsumerConfig
+        {
+            BootstrapServers = configuration[<span class="string">"Kafka:BootstrapServers"</span>],
+            GroupId = <span class="string">"fraud-detection-group"</span>,
+            AutoOffsetReset = AutoOffsetReset.Earliest,
+            EnableAutoCommit = <span class="keyword">false</span> <span class="comment">// Manual commit for reliability</span>
+        };
+
+        _consumer = <span class="keyword">new</span> ConsumerBuilder&lt;<span class="type">string</span>, <span class="type">string</span>&gt;(config).Build();
+        _consumer.Subscribe(<span class="string">"payment-events"</span>);
+    }
+
+    <span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task ExecuteAsync(<span class="type">CancellationToken</span> stoppingToken)
+    {
+        <span class="keyword">while</span> (!stoppingToken.IsCancellationRequested)
+        {
+            <span class="keyword">try</span>
+            {
+                <span class="keyword">var</span> consumeResult = _consumer.Consume(stoppingToken);
+                <span class="keyword">var</span> paymentEvent = JsonSerializer.Deserialize&lt;<span class="type">PaymentSuccessEvent</span>&gt;(consumeResult.Message.Value);
+
+                <span class="comment">// Process fraud detection</span>
+                <span class="keyword">await</span> AnalyzeFraudAsync(paymentEvent);
+
+                <span class="comment">// Commit offset after successful processing</span>
+                _consumer.Commit(consumeResult);
+            }
+            <span class="keyword">catch</span> (Exception ex)
+            {
+                Console.WriteLine($<span class="string">"Error: {ex.Message}"</span>);
+            }
+        }
+    }
+
+    <span class="keyword">private</span> Task AnalyzeFraudAsync(<span class="type">PaymentSuccessEvent</span> paymentEvent)
+    {
+        <span class="comment">// Fraud detection logic</span>
+        <span class="keyword">return</span> Task.CompletedTask;
+    }
+}
+</code></pre>
+
+                Real-world challenge: We initially used synchronous HTTP calls between payment and downstream services. During Black Friday, the notification service went down and took the entire payment flow with it (cascading failure). After migrating to RabbitMQ, payment processing became resilient—even if downstream services failed, messages queued up and processed when they recovered. We also used Kafka for audit logging, storing every payment event for compliance (replayed 6 months of data during an audit).
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">4. Key Takeaway</div>
+            <div class="section-content">
+                Use <strong>RabbitMQ</strong> for transactional messaging (guarantees, retries, dead letter queues) and <strong>Kafka</strong> for event streaming and analytics. Event-driven architecture enables loose coupling and resilience but adds complexity—implement idempotency, message versioning, and monitoring. MassTransit is the best abstraction for RabbitMQ in .NET.
+            </div>
+        </div>
+
+        <div class="category-tags">
+            <span class="tag microservices">Microservices</span>
+            <span class="tag dotnet">.NET Core Concepts</span>
+            <span class="tag">Design Patterns</span>
+        </div>
+    </div>
+</details>
